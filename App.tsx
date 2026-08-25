@@ -9,7 +9,9 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { HomeScreen } from './src/screens/HomeScreen';
+import { OnboardingFlow } from './src/screens/OnboardingFlow';
 import { CheckInProvider } from './src/state/CheckInContext';
+import { ProfileProvider, useProfile } from './src/state/ProfileContext';
 import { colors } from './src/theme';
 
 export default function App() {
@@ -23,10 +25,18 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <CheckInProvider>
-        <StatusBar style="dark" />
-        <HomeScreen />
-      </CheckInProvider>
+      <ProfileProvider>
+        <CheckInProvider>
+          <StatusBar style="dark" />
+          <Root />
+        </CheckInProvider>
+      </ProfileProvider>
     </SafeAreaProvider>
   );
+}
+
+/** Picks onboarding vs. the real app — needs to live inside ProfileProvider to read isOnboarded. */
+function Root() {
+  const { isOnboarded } = useProfile();
+  return isOnboarded ? <HomeScreen /> : <OnboardingFlow />;
 }

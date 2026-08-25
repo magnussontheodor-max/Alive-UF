@@ -12,13 +12,13 @@ import React, { createContext, useContext, useMemo, useState } from 'react';
  * reads/writes Supabase. Screens that consume `useCheckIn()` shouldn't
  * need to change at all — that's the point of keeping this behind a
  * single hook.
+ *
+ * Who the user is and who their trusted contact is lives in
+ * ProfileContext, not here — this context is only about *today's*
+ * check-in.
  */
 
 type CheckInState = {
-  /** Demo user. Will come from the authenticated profile later. */
-  userName: string;
-  /** Demo trusted contact. Will come from a real contacts feature later. */
-  contactName: string;
   /** When the user last checked in today, or null if they haven't yet. */
   lastCheckInAt: Date | null;
   /** Record a check-in right now (demo only — nobody is notified). */
@@ -34,8 +34,6 @@ export function CheckInProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<CheckInState>(
     () => ({
-      userName: 'Theo',
-      contactName: 'Dad',
       lastCheckInAt,
       checkIn: () => setLastCheckInAt(new Date()),
       reset: () => setLastCheckInAt(null),

@@ -1,3 +1,5 @@
+import type { CheckInWindow } from '../types/profile';
+
 /** Time-of-day-aware greeting: "Good morning" / "Good afternoon" / "Good evening". */
 export function greetingForHour(hour: number): string {
   if (hour < 5) return 'Good evening';
@@ -22,10 +24,11 @@ export function formatTime(date: Date): string {
 }
 
 /**
- * Describes when the next check-in window opens. This is a simple demo
- * placeholder — the real version will depend on the user's chosen
- * check-in window and time zone.
+ * Describes when the next check-in window opens, based on the window
+ * chosen during onboarding. Always says "tomorrow" — once a real
+ * schedule exists, this should say "today" if the window hasn't
+ * happened yet and the user hasn't checked in.
  */
-export function nextCheckInLabel(): string {
-  return 'Tomorrow morning';
+export function nextCheckInLabel(window: CheckInWindow): string {
+  return `Tomorrow ${window}`;
 }

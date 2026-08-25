@@ -6,7 +6,9 @@ import { AliveButton } from '../components/AliveButton';
 import { CheckInSummary } from '../components/CheckInSummary';
 import { DemoFooter } from '../components/DemoFooter';
 import { Wordmark } from '../components/Wordmark';
+import { useEntranceStyle } from '../hooks/useEntranceStyle';
 import { useCheckIn } from '../state/CheckInContext';
+import { useProfile } from '../state/ProfileContext';
 import { colors, spacing, typography } from '../theme';
 import { formatDateLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
 
@@ -21,7 +23,8 @@ const CHECKMARK_HOLD_MS = 1300;
 type Phase = 'idle' | 'confirming' | 'confirmed';
 
 export function HomeScreen() {
-  const { userName, contactName, lastCheckInAt, checkIn, reset } = useCheckIn();
+  const { userName, contactName, checkInWindow, restartOnboarding } = useProfile();
+  const { lastCheckInAt, checkIn, reset } = useCheckIn();
 
   const [phase, setPhase] = useState<Phase>(lastCheckInAt ? 'confirmed' : 'idle');
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,10 +41,16 @@ export function HomeScreen() {
     holdTimer.current = setTimeout(() => setPhase('confirmed'), CHECKMARK_HOLD_MS);
   };
 
-  const handleReset = () => {
+  const handleResetCheckIn = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
     reset();
     setPhase('idle');
+  };
+
+  const handleRestartOnboarding = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    reset();
+    restartOnboarding();
   };
 
   const now = new Date();
@@ -52,28 +61,7 @@ export function HomeScreen() {
   // A quiet fade + rise for whichever content is on screen, replayed
   // whenever the confirmed state is entered or left — slow enough that
   // the change reads as considered rather than a jump cut.
-  const entrance = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    entrance.setValue(0);
-    Animated.timing(entrance, {
-      toValue: 1,
-      duration: 450,
-      delay: 40,
-      useNativeDriver: true,
-    }).start();
-  }, [showsConfirmedContent, entrance]);
-
-  const entranceStyle = {
-    opacity: entrance,
-    transform: [
-      {
-        translateY: entrance.interpolate({
-          inputRange: [0, 1],
-          outputRange: [10, 0],
-        }),
-      },
-    ],
-  };
+  const entranceStyle = useEntranceStyle(showsConfirmedContent, { duration: 450 });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -107,7 +95,7 @@ export function HomeScreen() {
               <CheckInSummary
                 rows={[
                   { label: 'Checked in today', value: formatTime(lastCheckInAt as Date) },
-                  { label: 'Next check-in', value: nextCheckInLabel() },
+                  { label: 'Next check-in', value: nextCheckInLabel(checkInWindow) },
                 ]}
               />
             </Animated.View>
@@ -121,7 +109,10 @@ export function HomeScreen() {
         </View>
 
         <View style={styles.bottom}>
-          <DemoFooter onReset={showsConfirmedContent ? handleReset : undefined} />
+          <DemoFooter
+            onResetCheckIn={showsConfirmedContent ? handleResetCheckIn : undefined}
+            onRestartOnboarding={handleRestartOnboarding}
+          />
         </View>
       </View>
     </SafeAreaView>
