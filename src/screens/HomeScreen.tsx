@@ -5,15 +5,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AliveButton } from '../components/AliveButton';
 import { CheckInSummary } from '../components/CheckInSummary';
 import { DemoFooter } from '../components/DemoFooter';
+import { Wordmark } from '../components/Wordmark';
 import { useCheckIn } from '../state/CheckInContext';
 import { colors, spacing, typography } from '../theme';
-import { formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
+import { formatDateLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
 
 export function HomeScreen() {
   const { userName, contactName, lastCheckInAt, checkIn, reset } = useCheckIn();
   const hasCheckedInToday = lastCheckInAt !== null;
 
-  const greeting = `${greetingForHour(new Date().getHours())}, ${userName}.`;
+  const now = new Date();
+  const greeting = `${greetingForHour(now.getHours())}, ${userName}.`;
+  const dateLabel = formatDateLabel(now);
 
   // A quiet fade + rise for whichever content is on screen, replayed
   // every time the checked-in state flips — this is what makes the
@@ -45,7 +48,9 @@ export function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.top}>
-          <Animated.View style={entranceStyle}>
+          <Wordmark />
+          <Animated.View style={[styles.textBlock, entranceStyle]}>
+            <Text style={styles.eyebrow}>{dateLabel.toUpperCase()}</Text>
             {hasCheckedInToday ? (
               <>
                 <Text style={styles.hero}>You're all set.</Text>
@@ -96,10 +101,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.xl,
-    justifyContent: 'space-between',
   },
   top: {
-    paddingTop: spacing.xxl,
+    paddingTop: spacing.lg,
+  },
+  textBlock: {
+    marginTop: spacing.xxl,
+  },
+  eyebrow: {
+    ...typography.eyebrow,
+    color: colors.inkFaint,
+    marginBottom: spacing.sm,
   },
   hero: {
     ...typography.hero,
@@ -111,6 +123,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   middle: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

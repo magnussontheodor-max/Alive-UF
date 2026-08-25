@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   reset: {
     ...typography.caption,
     color: colors.inkMuted,
+    letterSpacing: 0.6,
     textDecorationLine: 'underline',
   },
 });

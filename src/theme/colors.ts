@@ -1,25 +1,26 @@
 /**
- * ALIVE color palette.
+ * ALIVE color palette — v2.
  *
- * Deliberately small and calm: one warm neutral background, one ink for
- * text, one deep, quiet green as the single accent (trust, nature,
- * "okay" — not medical red, not gamified brights), and a couple of
- * muted greys for secondary text and hairlines.
- *
- * If we ever add dark mode, this is the one file that needs a second
- * variant — everything else in the app reads colors from here.
+ * Moved away from a plain off-white/bright-green "safety app" look
+ * (the SnugSafety / Are You Dead Yet pattern: white background, a flat
+ * green go-button) toward something closer to Scandinavian product and
+ * editorial design: warm linen instead of stark white, a deep,
+ * desaturated pine rather than a saturated "success" green, and warm
+ * greys instead of cool ones. Nothing here is meant to say "you are
+ * safe" the way traffic-light green does — it's meant to feel like a
+ * considered, physical object.
  */
 export const colors = {
-  background: '#FAF9F6',
+  background: '#F3EEE4',
   surface: '#FFFFFF',
 
-  ink: '#171814',
-  inkMuted: '#6B6D63',
-  inkFaint: '#A6A79C',
+  ink: '#20201A',
+  inkMuted: '#6E6A5B',
+  inkFaint: '#A6A08B',
 
-  accent: '#243B2C',
-  accentPressed: '#1A2B21',
-  onAccent: '#FAF9F6',
+  accent: '#333F2C',
+  accentPressed: '#242D20',
+  onAccent: '#F3EEE4',
 
-  hairline: '#E7E5DD',
+  hairline: '#E1D9C8',
 } as const;

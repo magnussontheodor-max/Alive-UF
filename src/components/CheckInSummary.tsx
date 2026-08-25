@@ -10,8 +10,9 @@ type Row = {
 
 /**
  * Two quiet lines of fact beneath the main confirmation — when today's
- * check-in happened, and when the next one is expected. No cards, no
- * icons, just aligned text, the way a well-set receipt or ticket reads.
+ * check-in happened, and when the next one is expected. Tracked-caps
+ * labels with serif values, styled closer to a boarding pass or a
+ * printed receipt than an app "card".
  */
 export function CheckInSummary({ rows }: { rows: Row[] }) {
   return (
@@ -21,7 +22,7 @@ export function CheckInSummary({ rows }: { rows: Row[] }) {
           key={row.label}
           style={[styles.row, index > 0 && styles.rowDivider]}
         >
-          <Text style={styles.label}>{row.label}</Text>
+          <Text style={styles.label}>{row.label.toUpperCase()}</Text>
           <Text style={styles.value}>{row.value}</Text>
         </View>
       ))}
@@ -44,12 +45,11 @@ const styles = StyleSheet.create({
     borderTopColor: colors.hairline,
   },
   label: {
-    ...typography.bodyMuted,
+    ...typography.label,
     color: colors.inkMuted,
   },
   value: {
-    ...typography.body,
+    ...typography.value,
     color: colors.ink,
-    fontWeight: '500',
   },
 });

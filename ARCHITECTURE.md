@@ -26,8 +26,9 @@ index.ts                 Expo entry point (registers App)
 
 src/
   theme/                 The single source of truth for how ALIVE looks
-    colors.ts            Palette (background, ink, one accent, hairlines)
-    typography.ts        Type scale (hero, body, button, label, caption)
+    colors.ts            Palette (warm background, ink, one deep-pine accent)
+    typography.ts        Type scale — serif (Fraunces) for warmth, system
+                           sans for everything functional
     spacing.ts            Spacing scale + corner radii
     index.ts              Re-exports the above
 
@@ -46,9 +47,10 @@ src/
     AliveButton.tsx        The primary action: press animation + haptics.
     CheckInSummary.tsx      Two-line fact display (checked in at / next).
     DemoFooter.tsx          Demo disclosure + reset-for-testing control.
+    Wordmark.tsx            The small "ALIVE" brand mark.
 
   utils/
-    time.ts                Greeting text and time formatting helpers.
+    time.ts                Greeting, date, and time formatting helpers.
 ```
 
 ## Why this shape
@@ -80,7 +82,7 @@ product requirement is explicit: the app must never claim a trusted
 contact has actually been notified while running on local/demo logic.
 Two things enforce that here:
 
-1. The confirmed-state copy describes the *mechanism* ("Sara will only
+1. The confirmed-state copy describes the *mechanism* ("Theo will only
    hear from ALIVE if you ever miss a check-in") rather than asserting
    a notification just happened — which is also, not coincidentally,
    what the real product will do, since contacts are only ever
@@ -96,8 +98,18 @@ unnecessary and get removed in one place.
 
 No navigation library, no persisted storage, no networking, no auth,
 no icon library, no animation library beyond React Native's built-in
-`Animated`. This is one screen with one interaction; adding
+`Animated`, no web support (`react-native-web`/`react-dom`) — this is
+a phone-only product, aimed at the App Store and Play Store, not a
+website. This is one screen with one interaction; adding
 infrastructure for screens and problems that don't exist yet would
 make the codebase harder to understand for exactly zero benefit right
 now. Each will be introduced deliberately when the feature that needs
 it is actually being built.
+
+The one deliberate exception is the serif typeface (`expo-font` +
+`@expo-google-fonts/fraunces`) — added after the first visual pass read
+as a generic "safety app" (flat white background, flat green button —
+the same pattern SnugSafety and "Are You Dead Yet" both use). Real
+typographic craft is one of the few things that reliably separates a
+premium product from a utility one, and it's cheap: the font ships as
+a bundled file, no network calls, no ongoing cost.

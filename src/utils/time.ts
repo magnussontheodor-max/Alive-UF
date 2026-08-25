@@ -6,6 +6,14 @@ export function greetingForHour(hour: number): string {
   return 'Good evening';
 }
 
+/** Formats today's date as "Tuesday · 25 August", for the small eyebrow label. */
+export function formatDateLabel(date: Date): string {
+  const weekday = date.toLocaleDateString('en-GB', { weekday: 'long' });
+  const day = date.getDate();
+  const month = date.toLocaleDateString('en-GB', { month: 'long' });
+  return `${weekday} · ${day} ${month}`;
+}
+
 /** Formats a time as 24-hour "HH:MM", the convention used in Sweden. */
 export function formatTime(date: Date): string {
   const hours = date.getHours().toString().padStart(2, '0');

@@ -35,7 +35,7 @@ export function CheckInProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<CheckInState>(
     () => ({
       userName: 'Anna',
-      contactName: 'Sara',
+      contactName: 'Theo',
       lastCheckInAt,
       checkIn: () => setLastCheckInAt(new Date()),
       reset: () => setLastCheckInAt(null),
