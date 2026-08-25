@@ -82,7 +82,7 @@ product requirement is explicit: the app must never claim a trusted
 contact has actually been notified while running on local/demo logic.
 Two things enforce that here:
 
-1. The confirmed-state copy describes the *mechanism* ("Theo will only
+1. The confirmed-state copy describes the *mechanism* ("Dad will only
    hear from ALIVE if you ever miss a check-in") rather than asserting
    a notification just happened — which is also, not coincidentally,
    what the real product will do, since contacts are only ever
