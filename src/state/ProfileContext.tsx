@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 
-import type { CheckInWindow } from '../types/profile';
+import type { CheckInWindow, TrustedContact } from '../types/profile';
 
 /**
  * DEMO / LOCAL STATE ONLY — see CheckInContext.tsx for the full
  * explanation. This holds what onboarding collects: the user's name,
- * their trusted contact's name, and a check-in window. Nothing here is
+ * their trusted contact(s), and a check-in window. Nothing here is
  * sent anywhere; it lives only in memory for this run of the app.
  *
  * Splitting this from CheckInContext mirrors how the real backend will
@@ -16,10 +16,11 @@ import type { CheckInWindow } from '../types/profile';
 type ProfileState = {
   isOnboarded: boolean;
   userName: string;
-  contactName: string;
+  /** Up to MAX_TRUSTED_CONTACTS entries, each with a name and phone number. */
+  contacts: TrustedContact[];
   checkInWindow: CheckInWindow;
   setUserName: (name: string) => void;
-  setContactName: (name: string) => void;
+  setContacts: (contacts: TrustedContact[]) => void;
   setCheckInWindow: (window: CheckInWindow) => void;
   completeOnboarding: () => void;
   /** Testing only — clears everything and returns to onboarding. */
@@ -31,27 +32,27 @@ const ProfileContext = createContext<ProfileState | undefined>(undefined);
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [userName, setUserName] = useState('');
-  const [contactName, setContactName] = useState('');
+  const [contacts, setContacts] = useState<TrustedContact[]>([]);
   const [checkInWindow, setCheckInWindow] = useState<CheckInWindow>('morning');
 
   const value = useMemo<ProfileState>(
     () => ({
       isOnboarded,
       userName,
-      contactName,
+      contacts,
       checkInWindow,
       setUserName,
-      setContactName,
+      setContacts,
       setCheckInWindow,
       completeOnboarding: () => setIsOnboarded(true),
       restartOnboarding: () => {
         setIsOnboarded(false);
         setUserName('');
-        setContactName('');
+        setContacts([]);
         setCheckInWindow('morning');
       },
     }),
-    [isOnboarded, userName, contactName, checkInWindow]
+    [isOnboarded, userName, contacts, checkInWindow]
   );
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;

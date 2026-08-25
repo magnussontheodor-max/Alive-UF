@@ -1,5 +1,13 @@
 export type CheckInWindow = 'morning' | 'afternoon' | 'evening';
 
+export type TrustedContact = {
+  name: string;
+  phone: string;
+};
+
+/** ALIVE supports up to two trusted contacts for now — enough for "a partner and a parent" without turning onboarding into a contact list. */
+export const MAX_TRUSTED_CONTACTS = 2;
+
 export type CheckInWindowOption = {
   id: CheckInWindow;
   label: string;

@@ -7,16 +7,19 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { useEntranceStyle } from '../hooks/useEntranceStyle';
 import { useProfile } from '../state/ProfileContext';
 import { colors, spacing } from '../theme';
-import type { CheckInWindow } from '../types/profile';
+import type { CheckInWindow, TrustedContact } from '../types/profile';
 import { CheckInWindowStep } from './onboarding/CheckInWindowStep';
+import { ContactsStep } from './onboarding/ContactsStep';
 import { TextStep } from './onboarding/TextStep';
 import { WelcomeStep } from './onboarding/WelcomeStep';
 
-const STEPS = ['welcome', 'name', 'contact', 'window'] as const;
+const STEPS = ['welcome', 'name', 'contacts', 'window'] as const;
 type Step = (typeof STEPS)[number];
 
+const EMPTY_CONTACT: TrustedContact = { name: '', phone: '' };
+
 /**
- * A short, linear wizard — welcome, your name, your trusted contact,
+ * A short, linear wizard — welcome, your name, your trusted contact(s),
  * your check-in window — then straight into the real app. Each step
  * writes into local component state (`draft`), and only the final step
  * commits it to ProfileContext via completeOnboarding(). No navigation
@@ -27,22 +30,25 @@ export function OnboardingFlow() {
   const profile = useProfile();
   const [stepIndex, setStepIndex] = useState(0);
   const [nameDraft, setNameDraft] = useState(profile.userName);
-  const [contactDraft, setContactDraft] = useState(profile.contactName);
+  const [contactsDraft, setContactsDraft] = useState<TrustedContact[]>(
+    profile.contacts.length > 0 ? profile.contacts : [EMPTY_CONTACT]
+  );
   const [windowDraft, setWindowDraft] = useState<CheckInWindow>(profile.checkInWindow);
 
   const step: Step = STEPS[stepIndex];
   const entranceStyle = useEntranceStyle(step, { duration: 360 });
 
-  const canContinue =
-    step !== 'name' || nameDraft.trim().length > 0;
-  const canFinish = contactDraft.trim().length > 0;
+  const canContinueName = nameDraft.trim().length > 0;
+  const canContinueContacts = contactsDraft.every(
+    (contact) => contact.name.trim().length > 0 && contact.phone.trim().length > 0
+  );
 
   const goNext = () => setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
   const goBack = () => setStepIndex((i) => Math.max(i - 1, 0));
 
   const handleFinish = () => {
     profile.setUserName(nameDraft.trim());
-    profile.setContactName(contactDraft.trim());
+    profile.setContacts(contactsDraft.map((c) => ({ name: c.name.trim(), phone: c.phone.trim() })));
     profile.setCheckInWindow(windowDraft);
     profile.completeOnboarding();
   };
@@ -51,8 +57,7 @@ export function OnboardingFlow() {
     step === 'welcome' ? 'Get started' : step === 'window' ? 'Start using ALIVE' : 'Continue';
 
   const primaryDisabled =
-    (step === 'name' && nameDraft.trim().length === 0) ||
-    (step === 'contact' && contactDraft.trim().length === 0);
+    (step === 'name' && !canContinueName) || (step === 'contacts' && !canContinueContacts);
 
   const handlePrimaryPress = step === 'window' ? handleFinish : goNext;
 
@@ -69,7 +74,12 @@ export function OnboardingFlow() {
             )}
           </View>
 
-          <Animated.View style={[styles.content, entranceStyle]}>
+          <Animated.ScrollView
+            style={[styles.content, entranceStyle]}
+            contentContainerStyle={styles.contentContainer}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
             {step === 'welcome' && <WelcomeStep />}
             {step === 'name' && (
               <TextStep
@@ -78,23 +88,16 @@ export function OnboardingFlow() {
                 value={nameDraft}
                 onChangeText={setNameDraft}
                 placeholder="Your name"
-                onSubmitEditing={canContinue ? goNext : undefined}
+                onSubmitEditing={canContinueName ? goNext : undefined}
               />
             )}
-            {step === 'contact' && (
-              <TextStep
-                title="Who should know you're okay?"
-                subtitle="We'll only ever reach out to them if you miss a check-in."
-                value={contactDraft}
-                onChangeText={setContactDraft}
-                placeholder="Their name"
-                onSubmitEditing={canFinish ? handleFinish : undefined}
-              />
+            {step === 'contacts' && (
+              <ContactsStep contacts={contactsDraft} onChange={setContactsDraft} />
             )}
             {step === 'window' && (
               <CheckInWindowStep value={windowDraft} onChange={setWindowDraft} />
             )}
-          </Animated.View>
+          </Animated.ScrollView>
 
           <View style={styles.bottom}>
             <PrimaryButton label={primaryLabel} onPress={handlePrimaryPress} disabled={primaryDisabled} />
@@ -124,6 +127,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
   },
   bottom: {

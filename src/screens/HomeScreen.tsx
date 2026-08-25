@@ -11,6 +11,7 @@ import { useCheckIn } from '../state/CheckInContext';
 import { useProfile } from '../state/ProfileContext';
 import { colors, spacing, typography } from '../theme';
 import { formatDateLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
+import { joinNames } from '../utils/text';
 
 /**
  * How long the button lingers on its checkmark before the screen hands
@@ -23,7 +24,8 @@ const CHECKMARK_HOLD_MS = 1300;
 type Phase = 'idle' | 'confirming' | 'confirmed';
 
 export function HomeScreen() {
-  const { userName, contactName, checkInWindow, restartOnboarding } = useProfile();
+  const { userName, contacts, checkInWindow, restartOnboarding } = useProfile();
+  const contactNames = joinNames(contacts.map((c) => c.name));
   const { lastCheckInAt, checkIn, reset } = useCheckIn();
 
   const [phase, setPhase] = useState<Phase>(lastCheckInAt ? 'confirmed' : 'idle');
@@ -74,7 +76,7 @@ export function HomeScreen() {
               <>
                 <Text style={styles.hero}>You're all set.</Text>
                 <Text style={styles.subtext}>
-                  {contactName} will only hear from ALIVE if you ever miss a
+                  {contactNames} will only hear from ALIVE if you ever miss a
                   check-in.
                 </Text>
               </>
@@ -82,7 +84,7 @@ export function HomeScreen() {
               <>
                 <Text style={styles.hero}>{greeting}</Text>
                 <Text style={styles.subtext}>
-                  Let {contactName} know you're okay.
+                  Let {contactNames} know you're okay.
                 </Text>
               </>
             )}

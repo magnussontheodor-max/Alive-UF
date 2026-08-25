@@ -34,14 +34,15 @@ src/
     index.ts              Re-exports the above
 
   types/
-    profile.ts             CheckInWindow type + the three window presets.
+    profile.ts             CheckInWindow type + presets, and TrustedContact
+                           ({ name, phone }) + MAX_TRUSTED_CONTACTS (2).
 
   state/
     CheckInContext.tsx     Demo state for *today's* check-in — local-only,
                            documented as such. Gets replaced by Supabase
                            reads/writes later; useCheckIn() stays the same.
     ProfileContext.tsx      Demo state for *who the user is*: their name,
-                           their trusted contact's name, their check-in
+                           up to two trusted contacts, their check-in
                            window, and whether onboarding is done. Same
                            local-only pattern as CheckInContext, kept in
                            a separate context because it's conceptually a
@@ -54,13 +55,15 @@ src/
   screens/
     HomeScreen.tsx          The "Are they okay?" screen: greeting, the
                            I'M ALIVE button, and the confirmed state.
-    OnboardingFlow.tsx      Orchestrates the 4-step welcome/name/contact/
+    OnboardingFlow.tsx      Orchestrates the 4-step welcome/name/contacts/
                            window wizard; owns which step is showing and
                            writes the result into ProfileContext.
     onboarding/
       WelcomeStep.tsx       Step 1 content: wordmark + tagline.
-      TextStep.tsx          Step 2 & 3 content: one question, one text field
-                           (reused for the user's name and the contact's).
+      TextStep.tsx          Step 2 content: one question, one text field
+                           (the user's own name).
+      ContactsStep.tsx      Step 3 content: name + phone for one or two
+                           trusted contacts, with add/remove.
       CheckInWindowStep.tsx Step 4 content: pick Morning/Afternoon/Evening.
 
   components/
@@ -135,6 +138,15 @@ registration, and its typing for a problem four lines of state already
 solve. The right moment to add one is when the app grows a real
 information architecture — tabs, a settings stack, deep links from a
 push notification — not before.
+
+**Trusted contacts are typed in by hand, not picked from the phone's
+address book.** A real contact picker (`expo-contacts`) means a native
+permission prompt and App Store privacy review for a phone number that
+nothing in the app actually uses yet — there's no Twilio integration
+to send it to. Manual entry gets the real data model in place now
+(`TrustedContact { name, phone }`, up to `MAX_TRUSTED_CONTACTS`) so a
+native picker can be swapped in later as a change to `ContactsStep.tsx`
+alone, not a data model change.
 
 **The circle is reserved.** `AliveButton`'s circular shape only ever
 means one thing: the one daily action the whole product exists for.
