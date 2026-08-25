@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,27 +10,58 @@ import { useCheckIn } from '../state/CheckInContext';
 import { colors, spacing, typography } from '../theme';
 import { formatDateLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
 
+/**
+ * How long the button lingers on its checkmark before the screen hands
+ * off to the confirmed state. This is deliberately unhurried — the
+ * whole point of this beat is to let "that worked" register before
+ * anything else changes.
+ */
+const CHECKMARK_HOLD_MS = 1300;
+
+type Phase = 'idle' | 'confirming' | 'confirmed';
+
 export function HomeScreen() {
   const { userName, contactName, lastCheckInAt, checkIn, reset } = useCheckIn();
-  const hasCheckedInToday = lastCheckInAt !== null;
+
+  const [phase, setPhase] = useState<Phase>(lastCheckInAt ? 'confirmed' : 'idle');
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (holdTimer.current) clearTimeout(holdTimer.current);
+    };
+  }, []);
+
+  const handleCheckIn = () => {
+    checkIn(); // Recorded immediately, so the timestamp reflects the actual tap.
+    setPhase('confirming');
+    holdTimer.current = setTimeout(() => setPhase('confirmed'), CHECKMARK_HOLD_MS);
+  };
+
+  const handleReset = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    reset();
+    setPhase('idle');
+  };
 
   const now = new Date();
   const greeting = `${greetingForHour(now.getHours())}, ${userName}.`;
   const dateLabel = formatDateLabel(now);
+  const showsConfirmedContent = phase === 'confirmed';
 
   // A quiet fade + rise for whichever content is on screen, replayed
-  // every time the checked-in state flips — this is what makes the
-  // switch between "ask" and "confirmed" feel considered rather than
-  // like a jump cut.
+  // whenever the confirmed state is entered or left — slow enough that
+  // the change reads as considered rather than a jump cut.
   const entrance = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     entrance.setValue(0);
     Animated.timing(entrance, {
       toValue: 1,
-      duration: 320,
+      duration: 450,
+      delay: 40,
       useNativeDriver: true,
     }).start();
-  }, [hasCheckedInToday, entrance]);
+  }, [showsConfirmedContent, entrance]);
 
   const entranceStyle = {
     opacity: entrance,
@@ -51,7 +82,7 @@ export function HomeScreen() {
           <Wordmark />
           <Animated.View style={[styles.textBlock, entranceStyle]}>
             <Text style={styles.eyebrow}>{dateLabel.toUpperCase()}</Text>
-            {hasCheckedInToday ? (
+            {showsConfirmedContent ? (
               <>
                 <Text style={styles.hero}>You're all set.</Text>
                 <Text style={styles.subtext}>
@@ -71,7 +102,7 @@ export function HomeScreen() {
         </View>
 
         <View style={styles.middle}>
-          {hasCheckedInToday ? (
+          {showsConfirmedContent ? (
             <Animated.View style={[styles.summaryWrap, entranceStyle]}>
               <CheckInSummary
                 rows={[
@@ -81,12 +112,16 @@ export function HomeScreen() {
               />
             </Animated.View>
           ) : (
-            <AliveButton label="I'M ALIVE" onPress={checkIn} />
+            <AliveButton
+              label="I'M ALIVE"
+              onPress={handleCheckIn}
+              confirmed={phase === 'confirming'}
+            />
           )}
         </View>
 
         <View style={styles.bottom}>
-          <DemoFooter onReset={hasCheckedInToday ? reset : undefined} />
+          <DemoFooter onReset={showsConfirmedContent ? handleReset : undefined} />
         </View>
       </View>
     </SafeAreaView>

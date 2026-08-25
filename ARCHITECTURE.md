@@ -44,7 +44,9 @@ src/
                            I'M ALIVE button, and the confirmed state.
 
   components/
-    AliveButton.tsx        The primary action: press animation + haptics.
+    AliveButton.tsx        The primary action: press animation, haptics,
+                           and the label -> checkmark confirmation reveal.
+    CheckMark.tsx           A hand-drawn, self-drawing checkmark (SVG).
     CheckInSummary.tsx      Two-line fact display (checked in at / next).
     DemoFooter.tsx          Demo disclosure + reset-for-testing control.
     Wordmark.tsx            The small "ALIVE" brand mark.
@@ -113,3 +115,11 @@ the same pattern SnugSafety and "Are You Dead Yet" both use). Real
 typographic craft is one of the few things that reliably separates a
 premium product from a utility one, and it's cheap: the font ships as
 a bundled file, no network calls, no ongoing cost.
+
+`react-native-svg` was added for the same reason as the font: the
+check-in confirmation needed a precise, hand-drawn checkmark that
+draws itself on, and neither a Unicode glyph (renders inconsistently
+across platforms) nor a full icon library (we'd use one icon out of
+hundreds) fit. `react-native-svg` is the standard, Expo-supported way
+to draw exact vector shapes, and `CheckMark.tsx` is the only thing
+using it.
