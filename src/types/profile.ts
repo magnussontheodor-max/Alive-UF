@@ -12,6 +12,9 @@ export type CheckInWindowOption = {
   id: CheckInWindow;
   label: string;
   hours: string;
+  /** 24h clock. Used to compute the closing-soon/missed/escalated states, not just for display. */
+  startHour: number;
+  endHour: number;
 };
 
 /**
@@ -22,7 +25,27 @@ export type CheckInWindowOption = {
  * `checkInWindow`.
  */
 export const CHECK_IN_WINDOW_OPTIONS: CheckInWindowOption[] = [
-  { id: 'morning', label: 'Morning', hours: '7:00–11:00' },
-  { id: 'afternoon', label: 'Afternoon', hours: '12:00–16:00' },
-  { id: 'evening', label: 'Evening', hours: '17:00–21:00' },
+  { id: 'morning', label: 'Morning', hours: '7:00–11:00', startHour: 7, endHour: 11 },
+  { id: 'afternoon', label: 'Afternoon', hours: '12:00–16:00', startHour: 12, endHour: 16 },
+  { id: 'evening', label: 'Evening', hours: '17:00–21:00', startHour: 17, endHour: 21 },
 ];
+
+export function windowOption(window: CheckInWindow): CheckInWindowOption {
+  const option = CHECK_IN_WINDOW_OPTIONS.find((o) => o.id === window);
+  if (!option) throw new Error(`Unknown check-in window: ${window}`);
+  return option;
+}
+
+/**
+ * The escalation timeline, in minutes relative to the window closing:
+ * a reminder 30 minutes before it closes, another 30 minutes after it
+ * closes, and — if still nothing — trusted contacts are informed 30
+ * minutes after that (a full hour of grace after the window closes).
+ * One fixed cadence for now rather than a per-user setting; see
+ * ARCHITECTURE.md.
+ */
+export const ESCALATION = {
+  reminderBeforeCloseMin: 30,
+  reminderAfterCloseMin: 30,
+  escalateAfterCloseMin: 60,
+} as const;

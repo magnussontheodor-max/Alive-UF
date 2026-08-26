@@ -5,13 +5,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AliveButton } from '../components/AliveButton';
 import { CheckInSummary } from '../components/CheckInSummary';
 import { DemoFooter } from '../components/DemoFooter';
+import { StatusPreview } from '../components/StatusPreview';
 import { Wordmark } from '../components/Wordmark';
 import { useEntranceStyle } from '../hooks/useEntranceStyle';
 import { useCheckIn } from '../state/CheckInContext';
 import { useProfile } from '../state/ProfileContext';
 import { colors, spacing, typography } from '../theme';
-import { formatDateLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
+import { windowOption } from '../types/profile';
+import { CheckInStatus, getCheckInStatus, previewTimeFor } from '../utils/checkInStatus';
 import { joinNames } from '../utils/text';
+import { formatDateLabel, formatHourLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
 
 /**
  * How long the button lingers on its checkmark before the screen hands
@@ -27,8 +30,12 @@ export function HomeScreen() {
   const { userName, contacts, checkInWindow, restartOnboarding } = useProfile();
   const contactNames = joinNames(contacts.map((c) => c.name));
   const { lastCheckInAt, checkIn, reset } = useCheckIn();
+  const window = windowOption(checkInWindow);
 
   const [phase, setPhase] = useState<Phase>(lastCheckInAt ? 'confirmed' : 'idle');
+  // null = the real clock. Anything else previews what the screen looks
+  // like at that point in the escalation timeline — see StatusPreview.
+  const [previewStatus, setPreviewStatus] = useState<CheckInStatus | null>(null);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -47,6 +54,7 @@ export function HomeScreen() {
     if (holdTimer.current) clearTimeout(holdTimer.current);
     reset();
     setPhase('idle');
+    setPreviewStatus(null);
   };
 
   const handleRestartOnboarding = () => {
@@ -55,15 +63,18 @@ export function HomeScreen() {
     restartOnboarding();
   };
 
-  const now = new Date();
+  const realNow = new Date();
+  const now = previewStatus ? previewTimeFor(previewStatus, window, realNow) : realNow;
+  const status = getCheckInStatus(now, window);
+
   const greeting = `${greetingForHour(now.getHours())}, ${userName}.`;
   const dateLabel = formatDateLabel(now);
   const showsConfirmedContent = phase === 'confirmed';
 
   // A quiet fade + rise for whichever content is on screen, replayed
-  // whenever the confirmed state is entered or left — slow enough that
-  // the change reads as considered rather than a jump cut.
-  const entranceStyle = useEntranceStyle(showsConfirmedContent, { duration: 450 });
+  // whenever the confirmed state or the status changes — slow enough
+  // that the change reads as considered rather than a jump cut.
+  const entranceStyle = useEntranceStyle(showsConfirmedContent ? 'confirmed' : status, { duration: 450 });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -78,6 +89,28 @@ export function HomeScreen() {
                 <Text style={styles.subtext}>
                   {contactNames} will only hear from ALIVE if you ever miss a
                   check-in.
+                </Text>
+              </>
+            ) : status === 'escalated' ? (
+              <>
+                <Text style={styles.hero}>{contactNames} have been notified.</Text>
+                <Text style={styles.subtext}>
+                  Check in now and we'll let them know you're okay.
+                </Text>
+              </>
+            ) : status === 'missed' ? (
+              <>
+                <Text style={styles.hero}>We haven't heard from you.</Text>
+                <Text style={styles.subtext}>
+                  We'll let {contactNames} know if we don't hear from you soon.
+                </Text>
+              </>
+            ) : status === 'closingSoon' ? (
+              <>
+                <Text style={styles.hero}>{greeting}</Text>
+                <Text style={styles.subtext}>
+                  Your window closes at {formatHourLabel(window.endHour)} — let{' '}
+                  {contactNames} know you're okay.
                 </Text>
               </>
             ) : (
@@ -111,6 +144,9 @@ export function HomeScreen() {
         </View>
 
         <View style={styles.bottom}>
+          {phase === 'idle' ? (
+            <StatusPreview activeStatus={previewStatus} onSelect={setPreviewStatus} />
+          ) : null}
           <DemoFooter
             onResetCheckIn={showsConfirmedContent ? handleResetCheckIn : undefined}
             onRestartOnboarding={handleRestartOnboarding}
@@ -160,5 +196,6 @@ const styles = StyleSheet.create({
   },
   bottom: {
     paddingBottom: spacing.lg,
+    gap: spacing.md,
   },
 });

@@ -54,7 +54,9 @@ src/
 
   screens/
     HomeScreen.tsx          The "Are they okay?" screen: greeting, the
-                           I'M ALIVE button, and the confirmed state.
+                           I'M ALIVE button, the confirmed state, and the
+                           four escalation states (open/closing soon/
+                           missed/escalated).
     OnboardingFlow.tsx      Orchestrates the 4-step welcome/name/contacts/
                            window wizard; owns which step is showing and
                            writes the result into ProfileContext.
@@ -79,10 +81,13 @@ src/
     TextField.tsx            A single underlined input line.
     OnboardingHeader.tsx      Back button + step-progress dots.
     OnboardingProgress.tsx    The dots themselves.
+    StatusPreview.tsx         Testing-only: jump to any escalation state
+                           without waiting for the real clock.
 
   utils/
-    time.ts                 Greeting, date, time, and next-check-in-label
-                           formatting helpers.
+    time.ts                 Greeting, date, time, and formatting helpers.
+    checkInStatus.ts         getCheckInStatus(): purely a function of the
+                           clock and the chosen window — see below.
 ```
 
 ## Why this shape
@@ -125,6 +130,37 @@ Two things enforce that here:
 
 When Supabase + Twilio integration lands, both of those become
 unnecessary and get removed in one place.
+
+The `escalated` state is the one place this got a real decision rather
+than an obvious default: its copy ("Dad and Mom have been notified.")
+states the consequence directly, the same way the very first version
+of the confirmed-state copy did ("Sara knows you're okay."), instead
+of hedging it with an on-screen "preview" label. The reasoning: the
+standing `DemoFooter` disclosure is already how *every* screen in the
+app stays honest, and giving this one state a bespoke, heavier
+treatment would be inconsistent with that — and would draw more
+attention to "this isn't real" in a way that undercuts the calm,
+composed tone the app is going for at exactly the moment it matters
+most. One mechanism, applied everywhere, is easier to reason about
+than a special case.
+
+**The escalation timeline is a pure function of the clock, not a
+timer.** `getCheckInStatus(now, window)` in `checkInStatus.ts` takes
+the current time and the user's chosen window and returns one of
+`open` / `closingSoon` / `missed` / `escalated` — there's no
+`setTimeout` counting down in the background, no scheduled job. This
+is deliberate: a demo app that's been closed and reopened, or just sat
+idle for an hour, gives the same answer as one that's been open the
+whole time, because the answer only ever depends on what time it
+actually is right now. The cadence itself — a reminder 30 minutes
+before the window closes, another 30 minutes after, contacts informed
+30 minutes after that — lives in one place (`ESCALATION` in
+`types/profile.ts`) and is currently fixed for everyone; making it a
+per-user setting later is a UI addition, not a rework of this
+function. `StatusPreview` (testing-only) doesn't fake the state
+directly — it only feeds `getCheckInStatus` a different "now" via
+`previewTimeFor`, so what you see in preview is the same real logic
+that will run at 3pm on a Tuesday, not a parallel hand-built mock.
 
 **No navigation library, on purpose — for now.** Onboarding is the
 first time the app has more than one screen, and it was tempting to

@@ -23,6 +23,11 @@ export function formatTime(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
+/** Formats a plain hour (0–23) as "HH:00", for a window's start/end time. */
+export function formatHourLabel(hour: number): string {
+  return `${hour.toString().padStart(2, '0')}:00`;
+}
+
 /**
  * Describes when the next check-in window opens, based on the window
  * chosen during onboarding. Always says "tomorrow" — once a real
