@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   large: {
     ...typography.wordmark,
     color: colors.ink,
-    fontSize: 34,
-    letterSpacing: 6,
+    fontSize: 52,
+    letterSpacing: 9,
   },
 });

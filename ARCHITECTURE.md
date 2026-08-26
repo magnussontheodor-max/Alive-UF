@@ -97,7 +97,27 @@ app uses comes from `src/theme`. A screen never hardcodes `#243B2C` or
 `fontSize: 17` directly — it imports from theme. This is what lets the
 whole app feel like one considered product instead of a pile of
 one-off screens, and it means a future dark mode or rebrand touches
-three files, not forty.
+three files, not forty. It's also what made the v2 type pass (below)
+a one-file change instead of a find-and-replace across a dozen screens.
+
+**Typography carries more of the brand identity than color does.**
+After the first visual pass, the feedback was that it still felt
+generic. The fix wasn't a new color or a new shape — it was pushing
+the type: the hero went from 32px to 44px and switched to the semibold
+cut, set at a dense 1.05 line-height instead of an airy paragraph, so
+headlines stack like a magazine cover rather than reading like body
+copy that happens to be centered. The tracked-caps labels (the
+eyebrow date, row labels) went the opposite direction — smaller and
+more tracked-out — specifically to read as a quiet contrast against
+the now-much-louder headline, not to compete with it. Both moves came
+from one place: `typography.hero` and `typography.label` in
+`src/theme/typography.ts`. One layout had to change to survive it:
+`CheckInSummary`'s label/value pairs used to sit side by side on one
+line ("NEXT CHECK-IN" ... "Tomorrow morning"), which broke — no room
+left between them — once the value font got bigger. It's now a
+stacked "stat block" (label above, value below), which is both more
+robust as values get longer and fits the bolder direction better: the
+value gets to be as big as everything else.
 
 **State is behind a hook, not scattered in components.** `HomeScreen`
 doesn't know or care whether `useCheckIn()` is backed by `useState`

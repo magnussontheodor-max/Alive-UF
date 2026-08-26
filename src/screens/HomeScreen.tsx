@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
   },
   textBlock: {
-    marginTop: spacing.xxl,
+    marginTop: spacing.xxxl,
   },
   eyebrow: {
     ...typography.eyebrow,

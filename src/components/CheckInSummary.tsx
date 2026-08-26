@@ -9,19 +9,17 @@ type Row = {
 };
 
 /**
- * Two quiet lines of fact beneath the main confirmation — when today's
- * check-in happened, and when the next one is expected. Tracked-caps
- * labels with serif values, styled closer to a boarding pass or a
- * printed receipt than an app "card".
+ * A tracked-caps label stacked above a big serif value — a "stat
+ * block" rather than a label/value pair sharing one line. This is
+ * more robust than side-by-side as the value gets longer ("Tomorrow
+ * evening" vs. "07:48") and it fits the bolder type direction: the
+ * value gets to be as big as the rest of the app's headlines.
  */
 export function CheckInSummary({ rows }: { rows: Row[] }) {
   return (
     <View style={styles.container}>
       {rows.map((row, index) => (
-        <View
-          key={row.label}
-          style={[styles.row, index > 0 && styles.rowDivider]}
-        >
+        <View key={row.label} style={[styles.row, index > 0 && styles.rowDivider]}>
           <Text style={styles.label}>{row.label.toUpperCase()}</Text>
           <Text style={styles.value}>{row.value}</Text>
         </View>
@@ -35,9 +33,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
     paddingVertical: spacing.md,
   },
   rowDivider: {
@@ -47,6 +42,7 @@ const styles = StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.inkMuted,
+    marginBottom: spacing.xs,
   },
   value: {
     ...typography.value,
