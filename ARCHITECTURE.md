@@ -6,8 +6,17 @@ rather than a rewrite.
 
 ## Stack
 
-- **Expo + React Native + TypeScript** — the mobile app, one codebase
-  for iOS and Android.
+- **Expo (SDK 54) + React Native + TypeScript** — the mobile app, one
+  codebase for iOS and Android. Started on SDK 57, deliberately moved
+  back to 54: the Expo Go app on the App Store/Play Store only supports
+  up to SDK 54 (55–57 are approved for local/simulator use and EAS
+  builds, but not yet published to the public Expo Go client). Since
+  the whole point right now is being able to hand this to anyone —
+  co-founders included — and have it open in the Expo Go they already
+  have installed, targeting the store-supported version matters more
+  than being on the newest SDK. Worth moving back to 57 once Expo Go's
+  store listing catches up (`npx expo install expo@latest && npx expo
+  install --fix`, the same mechanism used to move to 54).
 - **Supabase** (not yet integrated) — database, auth, and realtime,
   planned for check-ins, trusted contacts, and escalation state.
 - **Expo Notifications** (not yet integrated) — push reminders.
