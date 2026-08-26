@@ -8,14 +8,26 @@ import { CHECK_IN_WINDOW_OPTIONS, CheckInWindow, CheckInWindowOption } from '../
 type Props = {
   value: CheckInWindow;
   onChange: (window: CheckInWindow) => void;
+  /** Omit for the onboarding copy (default); pass null to hide the heading — used when Settings supplies its own section label. */
+  title?: string | null;
+  subtitle?: string | null;
 };
 
-export function CheckInWindowStep({ value, onChange }: Props) {
+const DEFAULT_TITLE = 'When should we check in?';
+const DEFAULT_SUBTITLE = 'Pick the time of day that fits you best.';
+
+/** Reused as-is in Settings; only knows about `value`/`onChange`, not where the choice ends up. */
+export function CheckInWindowStep({
+  value,
+  onChange,
+  title = DEFAULT_TITLE,
+  subtitle = DEFAULT_SUBTITLE,
+}: Props) {
   return (
     <View>
-      <Text style={styles.title}>When should we check in?</Text>
-      <Text style={styles.subtitle}>Pick the time of day that fits you best.</Text>
-      <View style={styles.options}>
+      {title ? <Text style={styles.title}>{title}</Text> : null}
+      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <View style={[styles.options, !title && styles.optionsNoTitle]}>
         {CHECK_IN_WINDOW_OPTIONS.map((option) => (
           <WindowOptionRow
             key={option.id}
@@ -82,6 +94,9 @@ const styles = StyleSheet.create({
   options: {
     marginTop: spacing.xl,
     gap: spacing.sm,
+  },
+  optionsNoTitle: {
+    marginTop: 0,
   },
   option: {
     flexDirection: 'row',

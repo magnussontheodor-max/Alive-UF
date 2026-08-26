@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AliveButton } from '../components/AliveButton';
@@ -26,8 +26,12 @@ const CHECKMARK_HOLD_MS = 1300;
 
 type Phase = 'idle' | 'confirming' | 'confirmed';
 
-export function HomeScreen() {
-  const { userName, contacts, checkInWindow, restartOnboarding } = useProfile();
+type Props = {
+  onOpenSettings: () => void;
+};
+
+export function HomeScreen({ onOpenSettings }: Props) {
+  const { userName, contacts, checkInWindow } = useProfile();
   const contactNames = joinNames(contacts.map((c) => c.name));
   const { lastCheckInAt, checkIn, reset } = useCheckIn();
   const window = windowOption(checkInWindow);
@@ -57,12 +61,6 @@ export function HomeScreen() {
     setPreviewStatus(null);
   };
 
-  const handleRestartOnboarding = () => {
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-    reset();
-    restartOnboarding();
-  };
-
   const realNow = new Date();
   const now = previewStatus ? previewTimeFor(previewStatus, window, realNow) : realNow;
   const status = getCheckInStatus(now, window);
@@ -80,7 +78,12 @@ export function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.top}>
-          <Wordmark />
+          <View style={styles.topRow}>
+            <Wordmark />
+            <Pressable onPress={onOpenSettings} hitSlop={12}>
+              <Text style={styles.settingsLink}>SETTINGS</Text>
+            </Pressable>
+          </View>
           <Animated.View style={[styles.textBlock, entranceStyle]}>
             <Text style={styles.eyebrow}>{dateLabel.toUpperCase()}</Text>
             {showsConfirmedContent ? (
@@ -147,10 +150,7 @@ export function HomeScreen() {
           {phase === 'idle' ? (
             <StatusPreview activeStatus={previewStatus} onSelect={setPreviewStatus} />
           ) : null}
-          <DemoFooter
-            onResetCheckIn={showsConfirmedContent ? handleResetCheckIn : undefined}
-            onRestartOnboarding={handleRestartOnboarding}
-          />
+          <DemoFooter onResetCheckIn={showsConfirmedContent ? handleResetCheckIn : undefined} />
         </View>
       </View>
     </SafeAreaView>
@@ -168,6 +168,15 @@ const styles = StyleSheet.create({
   },
   top: {
     paddingTop: spacing.lg,
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  settingsLink: {
+    ...typography.label,
+    color: colors.inkMuted,
   },
   textBlock: {
     marginTop: spacing.xxxl,

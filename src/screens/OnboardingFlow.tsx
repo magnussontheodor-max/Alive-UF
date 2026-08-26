@@ -10,21 +10,23 @@ import { colors, spacing } from '../theme';
 import type { CheckInWindow, TrustedContact } from '../types/profile';
 import { CheckInWindowStep } from './onboarding/CheckInWindowStep';
 import { ContactsStep } from './onboarding/ContactsStep';
+import { HowItWorksStep } from './onboarding/HowItWorksStep';
 import { TextStep } from './onboarding/TextStep';
 import { WelcomeStep } from './onboarding/WelcomeStep';
 
-const STEPS = ['welcome', 'name', 'contacts', 'window'] as const;
+const STEPS = ['welcome', 'howItWorks', 'name', 'contacts', 'window'] as const;
 type Step = (typeof STEPS)[number];
 
 const EMPTY_CONTACT: TrustedContact = { name: '', phone: '' };
 
 /**
- * A short, linear wizard — welcome, your name, your trusted contact(s),
- * your check-in window — then straight into the real app. Each step
- * writes into local component state (`draft`), and only the final step
- * commits it to ProfileContext via completeOnboarding(). No navigation
- * library: four screens with one "next/back" relationship don't need
- * one yet (see ARCHITECTURE.md).
+ * A short, linear wizard — welcome, how it works, your name, your
+ * trusted contact(s), your check-in window — then straight into the
+ * real app. Each step writes into local component state (`draft`), and
+ * only the final step commits it to ProfileContext via
+ * completeOnboarding(). No navigation library: a handful of screens
+ * with one "next/back" relationship don't need one yet (see
+ * ARCHITECTURE.md).
  */
 export function OnboardingFlow() {
   const profile = useProfile();
@@ -81,6 +83,7 @@ export function OnboardingFlow() {
             showsVerticalScrollIndicator={false}
           >
             {step === 'welcome' && <WelcomeStep />}
+            {step === 'howItWorks' && <HowItWorksStep />}
             {step === 'name' && (
               <TextStep
                 title="What should we call you?"

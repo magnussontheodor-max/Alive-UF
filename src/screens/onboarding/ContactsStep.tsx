@@ -8,7 +8,14 @@ import { MAX_TRUSTED_CONTACTS, TrustedContact } from '../../types/profile';
 type Props = {
   contacts: TrustedContact[];
   onChange: (contacts: TrustedContact[]) => void;
+  /** Omit for the onboarding copy (default); pass null to hide the heading entirely — used when Settings supplies its own section label. */
+  title?: string | null;
+  subtitle?: string | null;
 };
+
+const DEFAULT_TITLE = "Who should know you're okay?";
+const DEFAULT_SUBTITLE =
+  "Add one or two people you trust. We'll only ever reach out to them if you miss a check-in.";
 
 /**
  * Collects one or two trusted contacts by hand (name + phone number)
@@ -17,8 +24,17 @@ type Props = {
  * uses yet — no Twilio, no backend. This gets the real data model
  * (name + phone, up to two people) in place today; swapping in a
  * native picker later only touches this one screen.
+ *
+ * Reused as-is in Settings (editing live) as well as onboarding
+ * (editing a local draft) — it only knows about `contacts`/`onChange`,
+ * not where the data ends up.
  */
-export function ContactsStep({ contacts, onChange }: Props) {
+export function ContactsStep({
+  contacts,
+  onChange,
+  title = DEFAULT_TITLE,
+  subtitle = DEFAULT_SUBTITLE,
+}: Props) {
   const updateContact = (index: number, patch: Partial<TrustedContact>) => {
     onChange(contacts.map((contact, i) => (i === index ? { ...contact, ...patch } : contact)));
   };
@@ -33,13 +49,10 @@ export function ContactsStep({ contacts, onChange }: Props) {
 
   return (
     <View>
-      <Text style={styles.title}>Who should know you're okay?</Text>
-      <Text style={styles.subtitle}>
-        Add one or two people you trust. We'll only ever reach out to them if
-        you miss a check-in.
-      </Text>
+      {title ? <Text style={styles.title}>{title}</Text> : null}
+      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
 
-      <View style={styles.contacts}>
+      <View style={[styles.contacts, !title && styles.contactsNoTitle]}>
         {contacts.map((contact, index) => (
           <View key={index} style={styles.contactBlock}>
             <TextField
@@ -90,6 +103,9 @@ const styles = StyleSheet.create({
   contacts: {
     marginTop: spacing.xl,
     gap: spacing.lg,
+  },
+  contactsNoTitle: {
+    marginTop: 0,
   },
   contactBlock: {
     gap: spacing.md,

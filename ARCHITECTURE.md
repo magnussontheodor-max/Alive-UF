@@ -22,7 +22,7 @@ can be judged on their own before any backend complexity is added.
 
 ```
 App.tsx                  Root: providers, font loading, and picks
-                         OnboardingFlow vs. HomeScreen
+                         OnboardingFlow vs. Home/Settings/HowItWorks
 index.ts                 Expo entry point (registers App)
 
 src/
@@ -36,6 +36,11 @@ src/
   types/
     profile.ts             CheckInWindow type + presets, and TrustedContact
                            ({ name, phone }) + MAX_TRUSTED_CONTACTS (2).
+
+  data/
+    howItWorks.ts           The three-sentence explanation of the product,
+                           as data — shared by the onboarding step and the
+                           standalone screen so the copy exists once.
 
   state/
     CheckInContext.tsx     Demo state for *today's* check-in — local-only,
@@ -57,22 +62,33 @@ src/
                            I'M ALIVE button, the confirmed state, and the
                            four escalation states (open/closing soon/
                            missed/escalated).
-    OnboardingFlow.tsx      Orchestrates the 4-step welcome/name/contacts/
-                           window wizard; owns which step is showing and
-                           writes the result into ProfileContext.
+    SettingsScreen.tsx      Everything onboarding collected, editable live
+                           (no draft/save step) — reuses ContactsStep and
+                           CheckInWindowStep directly; see below.
+    HowItWorksScreen.tsx     The same explainer shown once in onboarding,
+                           kept reachable afterward from Settings.
+    OnboardingFlow.tsx      Orchestrates the welcome/how-it-works/name/
+                           contacts/window wizard; owns which step is
+                           showing and writes the result into
+                           ProfileContext.
     onboarding/
       WelcomeStep.tsx       Step 1 content: wordmark + tagline.
-      TextStep.tsx          Step 2 content: one question, one text field
+      HowItWorksStep.tsx    Step 2 content: the 3-point explainer.
+      TextStep.tsx          Step 3 content: one question, one text field
                            (the user's own name).
-      ContactsStep.tsx      Step 3 content: name + phone for one or two
-                           trusted contacts, with add/remove.
-      CheckInWindowStep.tsx Step 4 content: pick Morning/Afternoon/Evening.
+      ContactsStep.tsx      Step 4 content: name + phone for one or two
+                           trusted contacts, with add/remove. Also reused
+                           by SettingsScreen — see "Why this shape" below.
+      CheckInWindowStep.tsx Step 5 content: pick Morning/Afternoon/Evening.
+                           Also reused by SettingsScreen.
 
   components/
     AliveButton.tsx         The primary action: press animation, haptics,
                            and the label -> checkmark confirmation reveal.
     CheckMark.tsx            A hand-drawn, self-drawing checkmark (SVG).
     CheckInSummary.tsx       Two-line fact display (checked in at / next).
+    HowItWorksRows.tsx        The numbered 3-row explainer list, shared by
+                           HowItWorksStep and HowItWorksScreen.
     DemoFooter.tsx           Demo disclosure + reset-for-testing controls.
     Wordmark.tsx             The "ALIVE" brand mark (small in-app, large
                            on the welcome step).
@@ -182,18 +198,21 @@ directly — it only feeds `getCheckInStatus` a different "now" via
 `previewTimeFor`, so what you see in preview is the same real logic
 that will run at 3pm on a Tuesday, not a parallel hand-built mock.
 
-**No navigation library, on purpose — for now.** Onboarding is the
-first time the app has more than one screen, and it was tempting to
-reach for React Navigation or Expo Router to handle that. Both are
-good tools, but what onboarding actually needs is "show one of four
-things, in order, with a way to go back" — `OnboardingFlow` does that
-with a single `useState` index, the same pattern already used for the
-check-in confirmation's idle/confirming/confirmed states. Pulling in a
-navigation library now would mean learning its API, its screen
-registration, and its typing for a problem four lines of state already
-solve. The right moment to add one is when the app grows a real
-information architecture — tabs, a settings stack, deep links from a
-push notification — not before.
+**No navigation library, on purpose — still.** Onboarding was the
+first time the app had more than one screen, and it was tempting to
+reach for React Navigation or Expo Router to handle that. What it
+actually needed was "show one of several things, in order, with a way
+to go back" — `OnboardingFlow` does that with a single `useState`
+index, the same pattern already used for the check-in confirmation's
+idle/confirming/confirmed states. Settings and "How ALIVE works" added
+a second, small triangle (Home ↔ Settings ↔ How it works), handled the
+same way one level up, in `Root` (`App.tsx`) — again just a `useState`
+holding which of three screens is showing. Neither of these is "a real
+information architecture" yet: no tabs, no deep links, nothing that
+needs a back *stack* rather than a single "where did I come from"
+value. The right moment to add a navigation library is when one of
+those shows up — most likely a push notification needing to open the
+app directly onto a specific screen, which local `useState` can't do.
 
 **Trusted contacts are typed in by hand, not picked from the phone's
 address book.** A real contact picker (`expo-contacts`) means a native
@@ -211,6 +230,21 @@ started", "Start using ALIVE" — uses `PrimaryButton`, a pill. Using
 the same circle for onboarding CTAs would have been easy (it's already
 built) but would dilute the one visual cue that's supposed to say
 "this button is different from every other button."
+
+**Settings reuses onboarding's step components directly, unmodified in
+behavior.** `ContactsStep` and `CheckInWindowStep` don't know or care
+whether the `value`/`onChange` they're given is a local draft
+(onboarding, committed only when the wizard finishes) or the live
+profile (Settings, applied immediately, no save button — the way a
+settings screen is expected to work). The only thing either screen
+customizes is the heading: onboarding asks a question ("Who should
+know you're okay?"), Settings shows a plain section label ("TRUSTED
+CONTACTS") because it's reviewing known information, not asking a
+first-time question. That's the `title`/`subtitle` props on both
+components — `undefined` for the onboarding default, `null` to hide it
+entirely. Getting a whole editable Settings screen mostly "for free"
+from components built for onboarding is the payoff of keeping those
+components ignorant of *why* they're being shown, only *what* they do.
 
 ## What's intentionally not here yet
 
