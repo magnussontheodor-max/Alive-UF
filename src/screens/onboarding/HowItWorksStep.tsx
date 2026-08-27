@@ -1,14 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { HowItWorksRows } from '../../components/HowItWorksRows';
 import { colors, spacing, typography } from '../../theme';
-import { HowItWorksCarousel } from './HowItWorksCarousel';
 
+/** The same three-point explainer shown here and, later, from Settings — see HowItWorksRows. */
 export function HowItWorksStep() {
   return (
     <View>
       <Text style={styles.title}>How it works</Text>
-      <HowItWorksCarousel />
+      <HowItWorksRows />
     </View>
   );
 }

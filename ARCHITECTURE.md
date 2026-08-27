@@ -75,18 +75,16 @@ src/
                            (no draft/save step) — reuses every onboarding
                            step component directly; see below.
     HowItWorksScreen.tsx     The same explainer shown once in onboarding,
-                           kept reachable afterward from Settings (as the
-                           dense list, HowItWorksRows — not the carousel).
+                           kept reachable afterward from Settings — both
+                           screens render the same HowItWorksRows list.
     OnboardingFlow.tsx      Orchestrates the welcome/how-it-works/persona/
                            name/contacts/time/grace wizard; owns which
                            step is showing and writes the result into
                            ProfileContext.
     onboarding/
       WelcomeStep.tsx       Step 1 content: wordmark + tagline.
-      HowItWorksStep.tsx    Step 2 content: HowItWorksCarousel.
-      HowItWorksCarousel.tsx The 3-point explainer as a swiped, one-idea-
-                           per-slide carousel — onboarding-only; see
-                           "Onboarding v2" below.
+      HowItWorksStep.tsx    Step 2 content: HowItWorksRows, the same
+                           numbered 3-point list Settings shows.
       PersonaStep.tsx       Step 3 content: who ALIVE is for (self, or
                            someone the user cares about). Also reused by
                            SettingsScreen.
@@ -106,10 +104,8 @@ src/
                            and the label -> checkmark confirmation reveal.
     CheckMark.tsx            A hand-drawn, self-drawing checkmark (SVG).
     CheckInSummary.tsx       Two-line fact display (checked in at / next).
-    HowItWorksRows.tsx        The numbered 3-row explainer list, used by
-                           HowItWorksScreen (the Settings recall page).
-    HowItWorksIcons.tsx       Three line-drawn glyphs for the onboarding
-                           carousel, in CheckMark's stroke language.
+    HowItWorksRows.tsx        The numbered 3-row explainer list, shared by
+                           HowItWorksStep and HowItWorksScreen.
     OptionCard.tsx            Bordered radio-row-with-checkmark, shared by
                            PersonaStep and GracePeriodStep.
     WheelPicker.tsx           The hand-rolled scrolling time wheel behind
@@ -272,62 +268,67 @@ entirely. Getting a whole editable Settings screen mostly "for free"
 from components built for onboarding is the payoff of keeping those
 components ignorant of *why* they're being shown, only *what* they do.
 
-## Onboarding v2 — Snuggy's principles, not its look
+## Onboarding v2: Snuggy's principles, not its look
 
-After trying a competitor app (Snuggy), the request was specific:
-build ALIVE's onboarding "like this but better — less AI generic but
-similar principles." That's a useful distinction to keep separate in
-the codebase too, so here's what was borrowed, what was deliberately
-not, and where each decision lives.
+After trying a competitor app (Snuggy), the request was specific.
+Build ALIVE's onboarding like that, but better: less generic, similar
+principles. That's a useful distinction to keep separate in the
+codebase too, so here's what was borrowed, what was deliberately not,
+and where each decision lives.
 
 **Borrowed: a precise check-in time instead of a block of the day.**
 `CheckInWindow` used to be one of three fixed presets
-(morning/afternoon/evening — `CHECK_IN_WINDOW_OPTIONS`). It's now
-`{ hour, minute }`, chosen on `WheelPicker` — two scrollable columns of
+(morning/afternoon/evening, `CHECK_IN_WINDOW_OPTIONS`). It's now
+`{ hour, minute }`, chosen on `WheelPicker`, two scrollable columns of
 numerals in 15-minute steps. `getCheckInStatus` simplified along with
 it: instead of a window with a separate open/close bound, there's one
 deadline, with `open`/`closingSoon`/`missed`/`escalated` all computed
 as offsets from it. `WheelPicker` is hand-rolled, not a library or the
-system time picker — that was the actual point of adopting this
-principle rather than just the interaction shape: Fraunces numerals,
-not the OS's own type; a scroll-linked opacity/scale fade around a
-two-hairline band, not a boxed pill. It's ~100 lines of `Animated`
-using `snapToInterval` + `decelerationRate="fast"` for the snap and
-`onMomentumScrollEnd` to commit the value — no new dependency.
+system time picker. Fraunces numerals, not the OS's own type; a
+scroll-linked opacity/scale fade around a two-hairline band, not a
+boxed pill. Every number is also directly tappable (`scrollTo` plus
+commit the value on press), not just draggable, because a vertical
+scroll wheel nested inside this screen's own vertical scroll container
+is a known-flaky gesture on a real device: the outer ScrollView tends
+to win the touch. The onboarding screen also turns off its own scroll
+during this one step (`scrollEnabled={step !== 'time'}` in
+`OnboardingFlow.tsx`) since that step's content never needs it, which
+removes the conflict outright there; the tap-to-select path is what
+keeps the picker usable in Settings too, where the surrounding screen
+can't have its scroll turned off.
 
 **Borrowed: a configurable grace period.** `ESCALATION.escalateAfterCloseMin`
 used to be a fixed 60 minutes for everyone. It's now
 `graceMinutes`, chosen from `GRACE_OPTIONS` (30 min / 1 hr / 3 hr)
-during onboarding and editable later in Settings — a genuine judgment
+during onboarding and editable later in Settings. A genuine judgment
 call (a fast-paced day and a slow one warrant different amounts of
 grace) rather than a platform default. The 30-minute lead-in reminder
 before the deadline stayed fixed; that one isn't really a preference,
-it's closer to "how this feature behaves."
+it's closer to how this feature behaves.
 
 **Borrowed, deliberately lightweight: "who is this for."** `SubjectMode`
 ('self' | 'other') is one new field, asked once, that only changes
-copy — the name step's question, the contacts step's framing — for the
+copy (the name step's question, the contacts step's framing) for the
 rest of onboarding. It does not change the check-in mechanism: it's
 still one phone, one person pressing the button. Building the fuller
 caregiver-configures-for-someone-else product (a different phone
 checks in, a different notification model) would be a real scope
-expansion, not an onboarding tweak — worth doing deliberately later if
+expansion, not an onboarding tweak. Worth doing deliberately later if
 this direction earns it, not folded in here as a side effect.
 
 **Not borrowed: the visual language.** No mascot, no soft-3D
-illustration set, no personified "I" voice. The three-beat explainer
-(`HowItWorksCarousel`, one idea per swiped slide instead of a single
-list — the list itself survives as `HowItWorksRows`, kept for the
-"How ALIVE works" recall page in Settings, where scanning fast is the
-point) uses three line-drawn glyphs (`HowItWorksIcons.tsx`) in the
-exact stroke style `CheckMark` already established: geometric shapes,
-one stroke width, no fill except a single accent dot. Extending an
-existing visual signature, rather than importing a new one, is what
-"less generic" actually cashes out to here.
+illustration set, no personified "I" voice. A first pass tried turning
+the three-point explainer into a swiped carousel with a hand-drawn
+icon per slide, but the icons read as decoration rather than
+communication (an abstract circle for "check in," a bell for
+"reminder") and got rolled back. `HowItWorksStep` (onboarding) and
+`HowItWorksScreen` (the Settings recall page) now both render the same
+`HowItWorksRows`, a plain numbered list, one component instead of two
+diverging versions of the same three sentences.
 
 **Not borrowed: a real phone-call escalation.** Snuggy's model calls a
 contact first, then texts, then emails. ALIVE has no telephony
-integration and isn't getting one to chase this — see the demo/local
+integration and isn't getting one to chase this; see the demo/local
 state notes in `CheckInContext.tsx` and `ProfileContext.tsx`. Copy
 never promises a call; it says a trusted contact is "told."
 

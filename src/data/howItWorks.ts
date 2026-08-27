@@ -13,16 +13,16 @@ export const HOW_IT_WORKS: HowItWorksItem[] = [
   {
     number: '01',
     headline: 'Check in once a day',
-    description: 'One tap tells everyone you’re okay.',
+    description: "One tap tells everyone you're okay.",
   },
   {
     number: '02',
-    headline: 'Miss it, and we follow up',
-    description: 'A couple of gentle reminders before anyone else is involved.',
+    headline: 'Missed check-in',
+    description: 'We follow up with a gentle reminder first.',
   },
   {
     number: '03',
-    headline: 'Still nothing?',
-    description: 'Your trusted contacts find out — only then, never on a normal day.',
+    headline: 'Trusted contact contacted',
+    description: "Only if we still haven't heard from you.",
   },
 ];
