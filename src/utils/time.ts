@@ -23,17 +23,17 @@ export function formatTime(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
-/** Formats a plain hour (0–23) as "HH:00", for a window's start/end time. */
-export function formatHourLabel(hour: number): string {
-  return `${hour.toString().padStart(2, '0')}:00`;
+/** Formats a check-in deadline as 24-hour "HH:MM". */
+export function formatWindowTime(window: CheckInWindow): string {
+  return `${window.hour.toString().padStart(2, '0')}:${window.minute.toString().padStart(2, '0')}`;
 }
 
 /**
- * Describes when the next check-in window opens, based on the window
+ * Describes when the next check-in deadline is, based on the time
  * chosen during onboarding. Always says "tomorrow" — once a real
- * schedule exists, this should say "today" if the window hasn't
- * happened yet and the user hasn't checked in.
+ * schedule exists, this should say "today" if the deadline hasn't
+ * passed yet and the user hasn't checked in.
  */
 export function nextCheckInLabel(window: CheckInWindow): string {
-  return `Tomorrow ${window}`;
+  return `Tomorrow at ${formatWindowTime(window)}`;
 }

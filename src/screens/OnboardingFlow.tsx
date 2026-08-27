@@ -7,35 +7,39 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { useEntranceStyle } from '../hooks/useEntranceStyle';
 import { useProfile } from '../state/ProfileContext';
 import { colors, spacing } from '../theme';
-import type { CheckInWindow, TrustedContact } from '../types/profile';
-import { CheckInWindowStep } from './onboarding/CheckInWindowStep';
+import type { CheckInWindow, SubjectMode, TrustedContact } from '../types/profile';
+import { CheckInTimeStep } from './onboarding/CheckInTimeStep';
 import { ContactsStep } from './onboarding/ContactsStep';
+import { GracePeriodStep } from './onboarding/GracePeriodStep';
 import { HowItWorksStep } from './onboarding/HowItWorksStep';
+import { PersonaStep } from './onboarding/PersonaStep';
 import { TextStep } from './onboarding/TextStep';
 import { WelcomeStep } from './onboarding/WelcomeStep';
 
-const STEPS = ['welcome', 'howItWorks', 'name', 'contacts', 'window'] as const;
+const STEPS = ['welcome', 'howItWorks', 'persona', 'name', 'contacts', 'time', 'grace'] as const;
 type Step = (typeof STEPS)[number];
 
 const EMPTY_CONTACT: TrustedContact = { name: '', phone: '' };
 
 /**
- * A short, linear wizard — welcome, how it works, your name, your
- * trusted contact(s), your check-in window — then straight into the
- * real app. Each step writes into local component state (`draft`), and
- * only the final step commits it to ProfileContext via
- * completeOnboarding(). No navigation library: a handful of screens
- * with one "next/back" relationship don't need one yet (see
- * ARCHITECTURE.md).
+ * A short, linear wizard — welcome, how it works, who this is for,
+ * your name, your trusted contact(s), your check-in time, your grace
+ * period — then straight into the real app. Each step writes into
+ * local component state (`draft`), and only the final step commits it
+ * to ProfileContext via completeOnboarding(). No navigation library: a
+ * handful of screens with one "next/back" relationship don't need one
+ * yet (see ARCHITECTURE.md).
  */
 export function OnboardingFlow() {
   const profile = useProfile();
   const [stepIndex, setStepIndex] = useState(0);
+  const [subjectModeDraft, setSubjectModeDraft] = useState<SubjectMode>(profile.subjectMode);
   const [nameDraft, setNameDraft] = useState(profile.userName);
   const [contactsDraft, setContactsDraft] = useState<TrustedContact[]>(
     profile.contacts.length > 0 ? profile.contacts : [EMPTY_CONTACT]
   );
-  const [windowDraft, setWindowDraft] = useState<CheckInWindow>(profile.checkInWindow);
+  const [timeDraft, setTimeDraft] = useState<CheckInWindow>(profile.checkInWindow);
+  const [graceDraft, setGraceDraft] = useState<number>(profile.graceMinutes);
 
   const step: Step = STEPS[stepIndex];
   const entranceStyle = useEntranceStyle(step, { duration: 360 });
@@ -49,19 +53,38 @@ export function OnboardingFlow() {
   const goBack = () => setStepIndex((i) => Math.max(i - 1, 0));
 
   const handleFinish = () => {
+    profile.setSubjectMode(subjectModeDraft);
     profile.setUserName(nameDraft.trim());
     profile.setContacts(contactsDraft.map((c) => ({ name: c.name.trim(), phone: c.phone.trim() })));
-    profile.setCheckInWindow(windowDraft);
+    profile.setCheckInWindow(timeDraft);
+    profile.setGraceMinutes(graceDraft);
     profile.completeOnboarding();
   };
 
   const primaryLabel =
-    step === 'welcome' ? 'Get started' : step === 'window' ? 'Start using ALIVE' : 'Continue';
+    step === 'welcome' ? 'Get started' : step === 'grace' ? 'Start using ALIVE' : 'Continue';
 
   const primaryDisabled =
     (step === 'name' && !canContinueName) || (step === 'contacts' && !canContinueContacts);
 
-  const handlePrimaryPress = step === 'window' ? handleFinish : goNext;
+  const handlePrimaryPress = step === 'grace' ? handleFinish : goNext;
+
+  // The one piece of copy that actually branches on `persona` — see
+  // PersonaStep's doc comment for why the rest of onboarding doesn't.
+  const isOther = subjectModeDraft === 'other';
+  const nameTitle = isOther ? "What's their name?" : 'What should we call you?';
+  const nameSubtitle = isOther
+    ? 'This is how ALIVE will greet them each day.'
+    : 'This is how ALIVE will greet you each day.';
+  const contactsTitle = isOther ? 'Who should we tell?' : "Who should know you're okay?";
+  const contactsSubtitle = isOther
+    ? "Add yourself and anyone else who should hear from us if a check-in is missed."
+    : "Add one or two people you trust. We'll only ever reach out to them if you miss a check-in.";
+  const timeTitle = isOther ? 'When should they check in?' : 'When should we check in?';
+  const timeSubtitle = isOther
+    ? "Pick the time that fits their day. We'll remind them a little before it."
+    : "Scroll to the time that fits your day. We'll remind you a little before it.";
+  const graceTitle = isOther ? 'If they miss it, how long should we wait?' : 'If you miss it, how long should we wait?';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -84,21 +107,30 @@ export function OnboardingFlow() {
           >
             {step === 'welcome' && <WelcomeStep />}
             {step === 'howItWorks' && <HowItWorksStep />}
+            {step === 'persona' && <PersonaStep value={subjectModeDraft} onChange={setSubjectModeDraft} />}
             {step === 'name' && (
               <TextStep
-                title="What should we call you?"
-                subtitle="This is how ALIVE will greet you each day."
+                title={nameTitle}
+                subtitle={nameSubtitle}
                 value={nameDraft}
                 onChangeText={setNameDraft}
-                placeholder="Your name"
+                placeholder={isOther ? 'Their name' : 'Your name'}
                 onSubmitEditing={canContinueName ? goNext : undefined}
               />
             )}
             {step === 'contacts' && (
-              <ContactsStep contacts={contactsDraft} onChange={setContactsDraft} />
+              <ContactsStep
+                contacts={contactsDraft}
+                onChange={setContactsDraft}
+                title={contactsTitle}
+                subtitle={contactsSubtitle}
+              />
             )}
-            {step === 'window' && (
-              <CheckInWindowStep value={windowDraft} onChange={setWindowDraft} />
+            {step === 'time' && (
+              <CheckInTimeStep value={timeDraft} onChange={setTimeDraft} title={timeTitle} subtitle={timeSubtitle} />
+            )}
+            {step === 'grace' && (
+              <GracePeriodStep value={graceDraft} onChange={setGraceDraft} title={graceTitle} />
             )}
           </Animated.ScrollView>
 

@@ -2,8 +2,10 @@ import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CheckInWindowStep } from './onboarding/CheckInWindowStep';
+import { CheckInTimeStep } from './onboarding/CheckInTimeStep';
 import { ContactsStep } from './onboarding/ContactsStep';
+import { GracePeriodStep } from './onboarding/GracePeriodStep';
+import { PersonaStep } from './onboarding/PersonaStep';
 import { DemoFooter } from '../components/DemoFooter';
 import { TextField } from '../components/TextField';
 import { useCheckIn } from '../state/CheckInContext';
@@ -18,10 +20,10 @@ type Props = {
 /**
  * Everything onboarding collected, editable afterward, live — no
  * draft/save step, changes apply as you type/tap, the same way a
- * normal settings screen works. Reuses ContactsStep and
- * CheckInWindowStep directly rather than re-implementing the same
- * fields: they only care about `value`/`onChange`, not whether that's
- * a local draft (onboarding) or the real profile (here).
+ * normal settings screen works. Reuses every onboarding step component
+ * directly rather than re-implementing the same fields: they only care
+ * about `value`/`onChange`, not whether that's a local draft
+ * (onboarding) or the real profile (here).
  */
 export function SettingsScreen({ onBack, onOpenHowItWorks }: Props) {
   const profile = useProfile();
@@ -41,6 +43,11 @@ export function SettingsScreen({ onBack, onOpenHowItWorks }: Props) {
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Your details.</Text>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>WHO ALIVE IS FOR</Text>
+            <PersonaStep value={profile.subjectMode} onChange={profile.setSubjectMode} title={null} subtitle={null} />
+          </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>NAME</Text>
@@ -64,10 +71,20 @@ export function SettingsScreen({ onBack, onOpenHowItWorks }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>CHECK-IN WINDOW</Text>
-            <CheckInWindowStep
+            <Text style={styles.sectionLabel}>CHECK-IN TIME</Text>
+            <CheckInTimeStep
               value={profile.checkInWindow}
               onChange={profile.setCheckInWindow}
+              title={null}
+              subtitle={null}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>GRACE PERIOD</Text>
+            <GracePeriodStep
+              value={profile.graceMinutes}
+              onChange={profile.setGraceMinutes}
               title={null}
               subtitle={null}
             />

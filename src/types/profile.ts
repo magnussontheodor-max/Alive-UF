@@ -1,4 +1,4 @@
-export type CheckInWindow = 'morning' | 'afternoon' | 'evening';
+export type SubjectMode = 'self' | 'other';
 
 export type TrustedContact = {
   name: string;
@@ -8,44 +8,53 @@ export type TrustedContact = {
 /** ALIVE supports up to two trusted contacts for now — enough for "a partner and a parent" without turning onboarding into a contact list. */
 export const MAX_TRUSTED_CONTACTS = 2;
 
-export type CheckInWindowOption = {
-  id: CheckInWindow;
+/**
+ * A precise daily check-in deadline, e.g. `{ hour: 10, minute: 0 }` =
+ * "check in by 10:00" — chosen on a scroll wheel in 15-minute steps.
+ * Replaces the earlier three fixed presets (morning/afternoon/evening):
+ * a specific time fits how someone actually structures their day better
+ * than picking a four-hour block, and it's still a single quick
+ * interaction, not a form.
+ */
+export type CheckInWindow = {
+  /** 24h clock. */
+  hour: number;
+  /** 0/15/30/45. */
+  minute: number;
+};
+
+export const DEFAULT_CHECK_IN_WINDOW: CheckInWindow = { hour: 10, minute: 0 };
+
+export type GraceOption = {
+  id: string;
   label: string;
-  hours: string;
-  /** 24h clock. Used to compute the closing-soon/missed/escalated states, not just for display. */
-  startHour: number;
-  endHour: number;
+  minutes: number;
+  description: string;
 };
 
 /**
- * Three fixed windows rather than a free time picker — keeps onboarding
- * a single tap instead of a dial/scroll interaction, in line with
- * "extremely simple, minimal cognitive load". A precise custom time can
- * replace this later without changing anything that reads
- * `checkInWindow`.
+ * How long ALIVE waits after a missed check-in before telling trusted
+ * contacts — chosen during onboarding rather than fixed for everyone.
+ * A fast-paced day and a slow one warrant different amounts of grace,
+ * and it's the one part of the escalation timeline that's really a
+ * judgment call, not a platform default.
  */
-export const CHECK_IN_WINDOW_OPTIONS: CheckInWindowOption[] = [
-  { id: 'morning', label: 'Morning', hours: '7:00–11:00', startHour: 7, endHour: 11 },
-  { id: 'afternoon', label: 'Afternoon', hours: '12:00–16:00', startHour: 12, endHour: 16 },
-  { id: 'evening', label: 'Evening', hours: '17:00–21:00', startHour: 17, endHour: 21 },
+export const GRACE_OPTIONS: GraceOption[] = [
+  { id: '30m', label: '30 minutes', minutes: 30, description: 'Tell them quickly if something seems off.' },
+  { id: '1h', label: '1 hour', minutes: 60, description: 'A reasonable default for most days.' },
+  { id: '3h', label: '3 hours', minutes: 180, description: 'More room before anyone else is involved.' },
 ];
 
-export function windowOption(window: CheckInWindow): CheckInWindowOption {
-  const option = CHECK_IN_WINDOW_OPTIONS.find((o) => o.id === window);
-  if (!option) throw new Error(`Unknown check-in window: ${window}`);
-  return option;
-}
+export const DEFAULT_GRACE_MINUTES = 60;
 
 /**
- * The escalation timeline, in minutes relative to the window closing:
- * a reminder 30 minutes before it closes, another 30 minutes after it
- * closes, and — if still nothing — trusted contacts are informed 30
- * minutes after that (a full hour of grace after the window closes).
- * One fixed cadence for now rather than a per-user setting; see
- * ARCHITECTURE.md.
+ * The escalation timeline, in minutes relative to the check-in
+ * deadline: a reminder 30 minutes before it, and — if still nothing —
+ * trusted contacts are informed however long the grace period the user
+ * chose (`GRACE_OPTIONS`) says, after it. Only the lead-in reminder
+ * stays fixed; the wait before contacts hear anything is a per-user
+ * setting now.
  */
 export const ESCALATION = {
   reminderBeforeCloseMin: 30,
-  reminderAfterCloseMin: 30,
-  escalateAfterCloseMin: 60,
 } as const;

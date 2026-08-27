@@ -11,10 +11,9 @@ import { useEntranceStyle } from '../hooks/useEntranceStyle';
 import { useCheckIn } from '../state/CheckInContext';
 import { useProfile } from '../state/ProfileContext';
 import { colors, spacing, typography } from '../theme';
-import { windowOption } from '../types/profile';
 import { CheckInStatus, getCheckInStatus, previewTimeFor } from '../utils/checkInStatus';
 import { joinNames } from '../utils/text';
-import { formatDateLabel, formatHourLabel, formatTime, greetingForHour, nextCheckInLabel } from '../utils/time';
+import { formatDateLabel, formatTime, formatWindowTime, greetingForHour, nextCheckInLabel } from '../utils/time';
 
 /**
  * How long the button lingers on its checkmark before the screen hands
@@ -31,10 +30,10 @@ type Props = {
 };
 
 export function HomeScreen({ onOpenSettings }: Props) {
-  const { userName, contacts, checkInWindow } = useProfile();
+  const { userName, contacts, checkInWindow, graceMinutes } = useProfile();
   const contactNames = joinNames(contacts.map((c) => c.name));
   const { lastCheckInAt, checkIn, reset } = useCheckIn();
-  const window = windowOption(checkInWindow);
+  const window = checkInWindow;
 
   const [phase, setPhase] = useState<Phase>(lastCheckInAt ? 'confirmed' : 'idle');
   // null = the real clock. Anything else previews what the screen looks
@@ -62,8 +61,8 @@ export function HomeScreen({ onOpenSettings }: Props) {
   };
 
   const realNow = new Date();
-  const now = previewStatus ? previewTimeFor(previewStatus, window, realNow) : realNow;
-  const status = getCheckInStatus(now, window);
+  const now = previewStatus ? previewTimeFor(previewStatus, window, graceMinutes, realNow) : realNow;
+  const status = getCheckInStatus(now, window, graceMinutes);
 
   const greeting = `${greetingForHour(now.getHours())}, ${userName}.`;
   const dateLabel = formatDateLabel(now);
@@ -112,7 +111,7 @@ export function HomeScreen({ onOpenSettings }: Props) {
               <>
                 <Text style={styles.hero}>{greeting}</Text>
                 <Text style={styles.subtext}>
-                  Your window closes at {formatHourLabel(window.endHour)} — let{' '}
+                  Your check-in closes at {formatWindowTime(window)} — let{' '}
                   {contactNames} know you're okay.
                 </Text>
               </>
