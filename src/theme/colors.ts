@@ -11,7 +11,7 @@
  * considered, physical object.
  */
 export const colors = {
-  background: '#F3EEE4',
+  background: '#EEDEC5',
   surface: '#FFFFFF',
 
   ink: '#20201A',
