@@ -1,5 +1,13 @@
 import React, { useRef } from 'react';
-import { Animated, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { colors, typography } from '../theme';
 
@@ -20,18 +28,36 @@ type Props = {
  * the piece that most needed to not look like every other "safety app"
  * onboarding. Fraunces numerals instead of the OS's own type, and
  * values fade + shrink around a quiet two-hairline band rather than
- * sitting in a boxed pill. Scroll, let go, it snaps to the nearest
- * value — `snapToInterval` + `decelerationRate="fast"` do the actual
- * snapping; the interpolated opacity/scale is purely cosmetic and rides
- * the same scroll position on the native thread.
+ * sitting in a boxed pill.
+ *
+ * Two ways to set a value, not one: drag-and-snap (`snapToInterval` +
+ * `decelerationRate="fast"`, committed in `onMomentumScrollEnd`), and a
+ * direct tap on any visible number (`scrollTo` to re-center it, commit
+ * immediately). The tap path exists because a vertical scroll wheel
+ * nested inside this screen's own vertical scroll container is a
+ * known-flaky gesture on a real device — a parent ScrollView often
+ * wins the touch before this one sees it. Tapping doesn't depend on
+ * that gesture resolving in this component's favor at all, so the
+ * picker stays usable even where the surrounding screen can't have its
+ * own scrolling turned off (Settings, which needs to scroll for its
+ * other sections).
  */
 export function WheelPicker({ items, selectedIndex, onChange, width = 84, accessibilityLabel }: Props) {
   const scrollY = useRef(new Animated.Value(selectedIndex * ITEM_HEIGHT)).current;
+  const scrollRef = useRef<ScrollView>(null);
 
-  const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
+  const commit = (index: number) => {
     const clamped = Math.max(0, Math.min(items.length - 1, index));
     if (clamped !== selectedIndex) onChange(clamped);
+  };
+
+  const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    commit(Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT));
+  };
+
+  const handleItemPress = (index: number) => {
+    scrollRef.current?.scrollTo({ y: index * ITEM_HEIGHT, animated: true });
+    commit(index);
   };
 
   return (
@@ -42,6 +68,7 @@ export function WheelPicker({ items, selectedIndex, onChange, width = 84, access
     >
       <View pointerEvents="none" style={[styles.centerBand, { top: ITEM_HEIGHT * HALF, height: ITEM_HEIGHT }]} />
       <Animated.ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
         decelerationRate="fast"
@@ -72,11 +99,15 @@ export function WheelPicker({ items, selectedIndex, onChange, width = 84, access
             extrapolate: 'clamp',
           });
           return (
-            <View key={`${label}-${index}`} style={[styles.item, { height: ITEM_HEIGHT }]}>
+            <Pressable
+              key={`${label}-${index}`}
+              onPress={() => handleItemPress(index)}
+              style={[styles.item, { height: ITEM_HEIGHT }]}
+            >
               <Animated.Text style={[styles.itemText, { opacity, transform: [{ scale }] }]}>
                 {label}
               </Animated.Text>
-            </View>
+            </Pressable>
           );
         })}
       </Animated.ScrollView>

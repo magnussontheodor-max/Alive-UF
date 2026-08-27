@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ContactsGlyph, FollowUpGlyph, TapGlyph } from '../../components/HowItWorksIcons';
 import { OnboardingProgress } from '../../components/OnboardingProgress';
 import { HOW_IT_WORKS } from '../../data/howItWorks';
-import { colors, spacing, typography } from '../../theme';
+import { colors, radius, spacing, typography } from '../../theme';
 
 const ICONS = [TapGlyph, FollowUpGlyph, ContactsGlyph];
 
@@ -15,10 +15,17 @@ const ICONS = [TapGlyph, FollowUpGlyph, ContactsGlyph];
  * reachable from Settings keeps HowItWorksRows, the dense stacked
  * list, because scanning quickly is the point once someone already
  * knows the app.
+ *
+ * Each slide leans on a real visual anchor — the glyph sits inside a
+ * bordered circle, not floating loose — and repeats the numbered-step
+ * pattern HowItWorksRows already established, so the two versions of
+ * this explainer read as the same idea, not two different components
+ * that happen to share text.
  */
 export function HowItWorksCarousel() {
   const [width, setWidth] = useState(0);
   const [slide, setSlide] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
 
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (!width) return;
@@ -26,10 +33,16 @@ export function HowItWorksCarousel() {
     setSlide(Math.max(0, Math.min(HOW_IT_WORKS.length - 1, index)));
   };
 
+  const goToSlide = (index: number) => {
+    scrollRef.current?.scrollTo({ x: index * width, animated: true });
+    setSlide(index);
+  };
+
   return (
     <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {width > 0 ? (
         <ScrollView
+          ref={scrollRef}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
@@ -39,7 +52,10 @@ export function HowItWorksCarousel() {
             const Icon = ICONS[index] ?? TapGlyph;
             return (
               <View key={item.number} style={[styles.slide, { width }]}>
-                <Icon size={40} color={colors.ink} />
+                <View style={styles.iconBadge}>
+                  <Icon size={32} color={colors.ink} />
+                </View>
+                <Text style={styles.number}>{item.number}</Text>
                 <Text style={styles.headline}>{item.headline}</Text>
                 <Text style={styles.description}>{item.description}</Text>
               </View>
@@ -48,7 +64,7 @@ export function HowItWorksCarousel() {
         </ScrollView>
       ) : null}
       <View style={styles.dots}>
-        <OnboardingProgress total={HOW_IT_WORKS.length} current={slide} />
+        <OnboardingProgress total={HOW_IT_WORKS.length} current={slide} onSelect={goToSlide} />
       </View>
     </View>
   );
@@ -58,12 +74,26 @@ const styles = StyleSheet.create({
   slide: {
     justifyContent: 'center',
   },
+  iconBadge: {
+    width: 72,
+    height: 72,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  number: {
+    ...typography.label,
+    color: colors.inkFaint,
+    marginTop: spacing.lg,
+  },
   headline: {
     ...typography.hero,
     fontSize: 30,
     lineHeight: 34,
     color: colors.ink,
-    marginTop: spacing.lg,
+    marginTop: spacing.xs,
     maxWidth: 300,
   },
   description: {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { ContactsGlyph, TapGlyph } from '../../components/HowItWorksIcons';
 import { OptionCard } from '../../components/OptionCard';
 import { colors, spacing, typography } from '../../theme';
 import type { SubjectMode } from '../../types/profile';
@@ -30,14 +31,16 @@ export function PersonaStep({ value, onChange, title = DEFAULT_TITLE, subtitle =
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       <View style={[styles.options, !title && styles.optionsNoTitle]}>
         <OptionCard
+          icon={TapGlyph}
           label="Myself"
           description="You'll be the one checking in, every day."
           selected={value === 'self'}
           onSelect={() => onChange('self')}
         />
         <OptionCard
+          icon={ContactsGlyph}
           label="Someone I care about"
-          description="A parent, partner, or friend — they'll check in; you'll be listed as a contact."
+          description="A parent, partner, or friend you're setting this up for."
           selected={value === 'other'}
           onSelect={() => onChange('other')}
         />

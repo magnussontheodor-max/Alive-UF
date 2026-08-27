@@ -10,6 +10,8 @@ type Props = {
   selected: boolean;
   onSelect: () => void;
   accessibilityLabel?: string;
+  /** An icon glyph component (e.g. from HowItWorksIcons), shown in a small badge to the left of the text. */
+  icon?: React.ComponentType<{ size?: number; color?: string }>;
 };
 
 /**
@@ -19,7 +21,7 @@ type Props = {
  * WindowOptionRow so PersonaStep and GracePeriodStep get the exact
  * same considered feel instead of each rolling their own card.
  */
-export function OptionCard({ label, description, selected, onSelect, accessibilityLabel }: Props) {
+export function OptionCard({ label, description, selected, onSelect, accessibilityLabel, icon: Icon }: Props) {
   const reveal = useRef(new Animated.Value(selected ? 1 : 0)).current;
 
   useEffect(() => {
@@ -38,6 +40,11 @@ export function OptionCard({ label, description, selected, onSelect, accessibili
       accessibilityLabel={accessibilityLabel ?? label}
       style={[styles.option, selected && styles.optionSelected]}
     >
+      {Icon ? (
+        <View style={[styles.iconBadge, selected && styles.iconBadgeSelected]}>
+          <Icon size={20} color={selected ? colors.accent : colors.inkMuted} />
+        </View>
+      ) : null}
       <View style={styles.textCol}>
         <Text style={styles.optionLabel}>{label}</Text>
         {description ? <Text style={styles.optionDescription}>{description}</Text> : null}
@@ -63,6 +70,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   optionSelected: {
+    borderColor: colors.accent,
+  },
+  iconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  iconBadgeSelected: {
     borderColor: colors.accent,
   },
   textCol: {

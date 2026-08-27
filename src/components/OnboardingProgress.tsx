@@ -1,23 +1,31 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { colors, spacing } from '../theme';
 
 type Props = {
   total: number;
   current: number;
+  /** If provided, each dot becomes tappable and jumps straight to that index — used by the how-it-works carousel, not the top step-progress row. */
+  onSelect?: (index: number) => void;
 };
 
 /** Three quiet dots — enough to signal "this is short", not a step counter to read. */
-export function OnboardingProgress({ total, current }: Props) {
+export function OnboardingProgress({ total, current, onSelect }: Props) {
   return (
     <View style={styles.row}>
-      {Array.from({ length: total }).map((_, index) => (
-        <View
-          key={index}
-          style={[styles.dot, index === current ? styles.dotActive : styles.dotInactive]}
-        />
-      ))}
+      {Array.from({ length: total }).map((_, index) =>
+        onSelect ? (
+          <Pressable key={index} onPress={() => onSelect(index)} hitSlop={8}>
+            <View style={[styles.dot, index === current ? styles.dotActive : styles.dotInactive]} />
+          </Pressable>
+        ) : (
+          <View
+            key={index}
+            style={[styles.dot, index === current ? styles.dotActive : styles.dotInactive]}
+          />
+        )
+      )}
     </View>
   );
 }

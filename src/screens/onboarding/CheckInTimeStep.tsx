@@ -52,6 +52,7 @@ export function CheckInTimeStep({
           accessibilityLabel="Minute"
         />
       </View>
+      <Text style={styles.hint}>Tap a number, or scroll to it.</Text>
     </View>
   );
 }
@@ -80,5 +81,11 @@ const styles = StyleSheet.create({
     ...typography.hero,
     fontSize: 32,
     color: colors.inkFaint,
+  },
+  hint: {
+    ...typography.caption,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    marginTop: spacing.lg,
   },
 });

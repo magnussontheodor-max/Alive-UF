@@ -104,6 +104,14 @@ export function OnboardingFlow() {
             contentContainerStyle={styles.contentContainer}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            // The time step nests its own vertical scroll wheels — a
+            // vertical ScrollView scrolling inside another vertical
+            // ScrollView is a well-known gesture fight (the outer one
+            // tends to win the touch), which made the wheels feel
+            // broken. That step's content is short and never needs
+            // this outer scroll anyway, so it's simplest to just turn
+            // it off there rather than fight the nested gesture.
+            scrollEnabled={step !== 'time'}
           >
             {step === 'welcome' && <WelcomeStep />}
             {step === 'howItWorks' && <HowItWorksStep />}
