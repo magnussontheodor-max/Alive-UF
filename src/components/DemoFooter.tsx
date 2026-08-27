@@ -13,18 +13,23 @@ type Props = {
 /**
  * Two jobs, both required by the product spec:
  *
- * 1. Make it unmistakable that this build is a local demo — no message
- *    ever actually reaches a trusted contact yet. This is real product
- *    copy, not a developer note, so it stays quiet and out of the way
- *    of the primary experience rather than being an alarming banner.
- * 2. Offer ways to reset demo state for testing, visually separated
- *    from the real flow so neither ever reads as a product feature.
+ * 1. Say plainly what actually happens: check-ins are saved for real
+ *    now (Supabase, not local-only state), and a trusted contact is
+ *    genuinely notified by push once they've accepted an invite —
+ *    but only if they have ALIVE installed too. That limitation is
+ *    real, not a demo disclaimer, so it stays here as long as it's
+ *    true. This is real product copy, not a developer note, so it
+ *    stays quiet and out of the way of the primary experience rather
+ *    than being an alarming banner.
+ * 2. Offer ways to reset check-in/onboarding state for testing,
+ *    visually separated from the real flow so neither ever reads as a
+ *    product feature.
  */
 export function DemoFooter({ onResetCheckIn, onRestartOnboarding }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.notice}>
-        Demo build — check-ins stay on this device. No one is notified yet.
+        Trusted contacts are notified by push — they'll need ALIVE installed too.
       </Text>
       <View style={styles.links}>
         {onResetCheckIn ? (

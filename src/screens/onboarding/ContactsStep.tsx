@@ -1,5 +1,6 @@
+import * as Linking from 'expo-linking';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
 import { TextField } from '../../components/TextField';
 import { colors, radius, spacing, typography } from '../../theme';
@@ -28,6 +29,12 @@ const DEFAULT_SUBTITLE =
  * Reused as-is in Settings (editing live) as well as onboarding
  * (editing a local draft) — it only knows about `contacts`/`onChange`,
  * not where the data ends up.
+ *
+ * A contact only gets an `inviteToken` once it's actually been saved
+ * (ProfileContext.setContacts assigns one server-side on insert), so
+ * the invite row below only ever appears in Settings, never mid-
+ * onboarding where these are still unsaved drafts — no special-casing
+ * needed, the data just isn't there yet at that point.
  */
 export function ContactsStep({
   contacts,
@@ -45,6 +52,19 @@ export function ContactsStep({
 
   const removeContact = (index: number) => {
     onChange(contacts.filter((_, i) => i !== index));
+  };
+
+  const sendInvite = async (contact: TrustedContact) => {
+    if (!contact.inviteToken) return;
+    const url = Linking.createURL(`join/${contact.inviteToken}`);
+    try {
+      await Share.share({
+        message: `I'm using ALIVE to let people know I'm okay each day. Open this on your phone so I can add you as someone to notify: ${url}`,
+      });
+    } catch {
+      // The share sheet can be dismissed or fail silently on some
+      // platforms — nothing to recover from, just nothing sent.
+    }
   };
 
   return (
@@ -72,6 +92,15 @@ export function ContactsStep({
               keyboardType="phone-pad"
               returnKeyType="done"
             />
+            {contact.inviteToken ? (
+              contact.status === 'linked' ? (
+                <Text style={styles.linkedNote}>Connected — they'll be notified if you miss a check-in.</Text>
+              ) : (
+                <Pressable onPress={() => sendInvite(contact)} hitSlop={8} style={styles.inviteLink}>
+                  <Text style={styles.inviteLinkText}>Send them an invite link</Text>
+                </Pressable>
+              )
+            ) : null}
             {index > 0 ? (
               <Pressable onPress={() => removeContact(index)} hitSlop={8} style={styles.removeLink}>
                 <Text style={styles.removeText}>Remove this contact</Text>
@@ -112,6 +141,19 @@ const styles = StyleSheet.create({
   },
   removeLink: {
     alignSelf: 'flex-start',
+  },
+  inviteLink: {
+    alignSelf: 'flex-start',
+  },
+  inviteLinkText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  linkedNote: {
+    ...typography.caption,
+    color: colors.inkMuted,
   },
   removeText: {
     ...typography.caption,

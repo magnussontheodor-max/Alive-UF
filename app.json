@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "alive",
     "ios": {
       "supportsTablet": true
     },
@@ -19,7 +20,14 @@
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#333F2C"
+        }
+      ]
     ]
   }
 }

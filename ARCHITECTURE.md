@@ -1,8 +1,10 @@
 # ALIVE — Architecture
 
-This document explains how the codebase is organized and why, so that
-adding the real backend later is a series of small, contained swaps
-rather than a rewrite.
+This document explains how the codebase is organized and why. The app
+was deliberately built local-only first, then had a real backend
+(Supabase) swapped in behind the exact same hooks screens already used
+— see "Real backend" below for what that took and what it needs from
+you to actually run.
 
 ## Stack
 
@@ -17,22 +19,39 @@ rather than a rewrite.
   than being on the newest SDK. Worth moving back to 57 once Expo Go's
   store listing catches up (`npx expo install expo@latest && npx expo
   install --fix`, the same mechanism used to move to 54).
-- **Supabase** (not yet integrated) — database, auth, and realtime,
-  planned for check-ins, trusted contacts, and escalation state.
-- **Expo Notifications** (not yet integrated) — push reminders.
-- **Twilio** (not yet integrated) — SMS to trusted contacts.
+- **Supabase** — Postgres, Auth, Row Level Security, and a scheduled
+  Edge Function, for check-ins, trusted contacts, and escalation state.
+  Wired up in code; needs a real project's URL and anon key in `.env`
+  to actually run — see "Real backend" below for exact setup steps.
+- **Expo Notifications** — how a trusted contact is actually told a
+  check-in was missed: a push to their device, not SMS (see "Real
+  backend" for why).
+- Twilio/SMS — not built. Reaching a phone number that hasn't
+  installed ALIVE is a real, separate piece of work (a paid account,
+  business-texting registration for volume) — see "What's intentionally
+  not here yet."
 
-Nothing above the "not yet integrated" line exists in the code yet.
-The app so far — onboarding and the daily check-in screen — runs
-entirely on local/demo state, so the interaction and visual language
-can be judged on their own before any backend complexity is added.
+The interaction and visual language were deliberately built and judged
+on local-only state first, before any backend complexity — see
+"Onboarding v2" below for how much got settled that way. That phase is
+over: everything user-specific now reads and writes Supabase for real.
 
 ## Folder structure
 
 ```
-App.tsx                  Root: providers, font loading, and picks
-                         OnboardingFlow vs. Home/Settings/HowItWorks
+App.tsx                  Root: font loading, then AuthGate (sign in /
+                         not-configured / the real app), then Root
+                         picks OnboardingFlow vs. Home/Settings/HowItWorks
+
 index.ts                 Expo entry point (registers App)
+
+supabase/
+  migrations/0001_init.sql  The whole schema: profiles, trusted_contacts,
+                           check_ins, push_tokens, escalation_notifications,
+                           their RLS policies, and the signup trigger.
+  functions/
+    check-escalations/     The scheduled Edge Function that actually
+                           notifies trusted contacts — see "Real backend".
 
 src/
   theme/                 The single source of truth for how ALIVE looks
@@ -43,30 +62,46 @@ src/
     index.ts              Re-exports the above
 
   types/
-    profile.ts             CheckInWindow type + presets, and TrustedContact
-                           ({ name, phone }) + MAX_TRUSTED_CONTACTS (2).
+    profile.ts             CheckInWindow, SubjectMode, GRACE_OPTIONS, and
+                           TrustedContact (name/phone, plus inviteToken/
+                           status once it's actually been saved) +
+                           MAX_TRUSTED_CONTACTS (2).
 
   data/
     howItWorks.ts           The three-sentence explanation of the product,
                            as data — shared by the onboarding step and the
                            standalone screen so the copy exists once.
 
+  lib/
+    supabase.ts             The one Supabase client, reading EXPO_PUBLIC_
+                           env vars — see "Real backend" below.
+
   state/
-    CheckInContext.tsx     Demo state for *today's* check-in — local-only,
-                           documented as such. Gets replaced by Supabase
-                           reads/writes later; useCheckIn() stays the same.
-    ProfileContext.tsx      Demo state for *who the user is*: their name,
-                           up to two trusted contacts, their check-in
-                           window, and whether onboarding is done. Same
-                           local-only pattern as CheckInContext, kept in
-                           a separate context because it's conceptually a
-                           different thing (a profile, not a daily event).
+    AuthContext.tsx         The signed-in session — email + a 6-digit
+                           code, not a magic link (see its own doc
+                           comment for why). Gates everything else.
+    CheckInContext.tsx      *Today's* check-in — real Supabase reads and
+                           writes now, keyed to the signed-in user;
+                           useCheckIn()'s shape didn't change.
+    ProfileContext.tsx      *Who the user is*: name, trusted contacts,
+                           check-in time, grace period, onboarding
+                           status — real Supabase reads and writes;
+                           useProfile()'s shape didn't change either.
 
   hooks/
     useEntranceStyle.ts     The fade + rise used whenever content swaps in
                            place (check-in confirmation, onboarding steps).
+    useRegisterPushToken.ts Registers this device for push once signed
+                           in — what the escalation function sends to.
+    usePendingInvite.ts     Watches for a trusted-contact invite link
+                           (alive://join/<token>) and holds the token
+                           until AuthGate can claim it.
 
   screens/
+    SignInScreen.tsx        The only way into the app: email, then the
+                           code sent to it.
+    NotConfiguredScreen.tsx Shown instead of crashing when .env has no
+                           real Supabase project in it yet.
     HomeScreen.tsx          The "Are they okay?" screen: greeting, the
                            I'M ALIVE button, the confirmed state, and the
                            four escalation states (open/closing soon/
@@ -171,22 +206,22 @@ keeps each file readable on its own and easy to reuse when we add
 future screens (e.g. a settings screen will likely reuse
 `CheckInSummary`-style rows).
 
-**Demo state is never allowed to impersonate real behavior.** The
-product requirement is explicit: the app must never claim a trusted
-contact has actually been notified while running on local/demo logic.
-Two things enforce that here:
+**The app is never allowed to claim more than it actually does.** That
+was true when this was local-only demo state, and it's still the rule
+now that the backend is real: `DemoFooter` still permanently discloses
+the one real limitation that remains — a trusted contact is notified
+by push, which means they need ALIVE installed and signed in too, not
+just a phone number on file. That's true today, not a stand-in for
+something realer coming later; it stays until SMS (or some other
+channel that reaches a non-user) actually exists. `DemoFooter` also
+still offers the "testing" reset controls, separated from the primary
+flow, since those remain genuinely useful even against a real backend.
 
-1. The confirmed-state copy describes the *mechanism* ("Dad will only
-   hear from ALIVE if you ever miss a check-in") rather than asserting
-   a notification just happened — which is also, not coincidentally,
-   what the real product will do, since contacts are only ever
-   messaged on a *missed* check-in, not on every successful one.
-2. `DemoFooter` permanently and visibly discloses that this build is
-   local-only and that no one is notified yet, plus a clearly-labeled
-   "testing" reset control, separated from the primary flow.
-
-When Supabase + Twilio integration lands, both of those become
-unnecessary and get removed in one place.
+The confirmed-state copy describes the *mechanism* ("Dad will only
+hear from ALIVE if you ever miss a check-in") rather than asserting a
+notification just happened, which is also, not coincidentally, what
+actually happens now: contacts are only ever pushed on a missed
+check-in, never on a successful one.
 
 The `escalated` state is the one place this got a real decision rather
 than an obvious default: its copy ("Dad and Mom have been notified.")
@@ -229,20 +264,25 @@ idle/confirming/confirmed states. Settings and "How ALIVE works" added
 a second, small triangle (Home ↔ Settings ↔ How it works), handled the
 same way one level up, in `Root` (`App.tsx`) — again just a `useState`
 holding which of three screens is showing. Neither of these is "a real
-information architecture" yet: no tabs, no deep links, nothing that
-needs a back *stack* rather than a single "where did I come from"
-value. The right moment to add a navigation library is when one of
-those shows up — most likely a push notification needing to open the
-app directly onto a specific screen, which local `useState` can't do.
+information architecture" yet: no tabs, nothing that needs a back
+*stack* rather than a single "where did I come from" value. There is
+now exactly one deep link (`alive://join/<token>`, the trusted-contact
+invite — see "Real backend"), handled directly by `usePendingInvite`
+rather than a router, because it's one path with one job: hold a token
+until sign-in finishes. The right moment to add a real navigation
+library is when a second one of these shows up with its own screen to
+jump to — most likely a tapped push notification wanting to open
+straight onto a specific screen, which today's local `useState` can't
+do (a tap currently just opens the app to whatever Root already had).
 
 **Trusted contacts are typed in by hand, not picked from the phone's
 address book.** A real contact picker (`expo-contacts`) means a native
-permission prompt and App Store privacy review for a phone number that
-nothing in the app actually uses yet — there's no Twilio integration
-to send it to. Manual entry gets the real data model in place now
-(`TrustedContact { name, phone }`, up to `MAX_TRUSTED_CONTACTS`) so a
-native picker can be swapped in later as a change to `ContactsStep.tsx`
-alone, not a data model change.
+permission prompt and App Store privacy review for data the product
+doesn't need in bulk — it only ever needs the one or two people
+actually being invited. Manual entry keeps the real data model
+(`TrustedContact { name, phone }`, up to `MAX_TRUSTED_CONTACTS`) in
+place either way, so a native picker can be swapped in later as a
+change to `ContactsStep.tsx` alone, not a data model change.
 
 **The circle is reserved.** `AliveButton`'s circular shape only ever
 means one thing: the one daily action the whole product exists for.
@@ -340,19 +380,104 @@ exact same shape. Same reasoning as `ContactsStep`/`CheckInTimeStep`
 being reused between onboarding and Settings: one considered component
 beats two copies drifting apart.
 
+## Real backend
+
+Everything under `supabase/`, plus `src/lib/supabase.ts`,
+`src/state/AuthContext.tsx`, and the Supabase-backed `ProfileContext`/
+`CheckInContext`, is real — not scaffolding for later. It just needs a
+live project to run against. One-time setup:
+
+1. Create a project at supabase.com (free tier, no card needed to start).
+2. Project Settings → API: copy the Project URL and the `anon` `public`
+   key into a `.env` file at the repo root (copy `.env.example` first)
+   as `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY`, then
+   restart `expo start` — Expo only reads `.env` at startup.
+3. Run `supabase/migrations/0001_init.sql` once, either pasted into the
+   SQL Editor or via `supabase db push` with the CLI.
+4. Authentication → Email Templates → Magic Link: change the body to
+   show `{{ .Token }}` instead of the default `{{ .ConfirmationURL }}`
+   link. This is what turns sign-in into a typed 6-digit code instead
+   of a tapped link — see AuthContext's doc comment for why that's
+   deliberate, not an oversight. Skip this step and the email will
+   contain a link the app never reads.
+5. `supabase functions deploy check-escalations` (needs the CLI,
+   `supabase login` once). It reads `SUPABASE_URL`/
+   `SUPABASE_SERVICE_ROLE_KEY`, which Supabase injects automatically —
+   nothing to configure there.
+6. Schedule it: Dashboard → Integrations → Cron → New job → type
+   "Supabase Edge Function" → `check-escalations` → every 5 minutes (or
+   similar). This is the piece that actually notices a missed
+   check-in — every step above can be done correctly and nothing will
+   ever fire without this one.
+7. Push needs an EAS project id (`npx eas init`, free) before
+   `useRegisterPushToken` has anywhere to register a device — until
+   that's done it fails quietly rather than crashing.
+
+**Data model.** `profiles` (one per person, created automatically on
+signup by a trigger), `trusted_contacts` (who to notify — each row
+carries an `invite_token` that a second account claims via
+`accept_invite()`, a `security definer` Postgres function, to become
+the linked watcher), `check_ins` (one append-only row per person per
+day), `push_tokens`, and `escalation_notifications` (stops the
+scheduled function from notifying the same missed day twice, even
+across overlapping runs). Every table has Row Level Security on: a
+person reads/writes their own rows, and a *linked* trusted contact can
+additionally read — never write — the profile, check-ins, and contact
+record of whoever they're watching over. That boundary is enforced by
+Postgres itself, not by app code remembering to check it, which is
+exactly what "won't collapse" actually depends on at real scale — not
+raw server capacity, which Postgres has plenty of, but data staying
+correctly walled off as more of it accumulates.
+
+**Timezone.** `profiles.timezone` is captured once, silently, from the
+device (`Intl.DateTimeFormat().resolvedOptions().timeZone`) when
+onboarding finishes. The escalation function runs with no device of
+its own, so this is the only record of what "10:00" means for each
+person — without it, every deadline would be read as UTC.
+
+**Scale.** The escalation function currently scans every onboarded
+profile on each run — fine at thousands of users, and simple enough to
+reason about while the product is still this young. If that scan ever
+becomes the bottleneck, the fix is a computed, indexed
+`next_deadline_utc` column recalculated on check-in or settings change
+(an added column and an indexed range query), not a rewrite — noted
+directly in the function's own comments, not just here, so it's found
+by whoever's actually touching that code when it matters.
+
 ## What's intentionally not here yet
 
-No persisted storage — onboarding runs again every time the app is
-fully reloaded, the same in-memory-only tradeoff `CheckInContext`
-already makes, and for the same reason: real persistence is Supabase's
-job, not a local cache's. No networking, no auth, no icon library, no
-animation library beyond React Native's built-in `Animated`, no
-navigation library (see above), no web support (`react-native-web`/
-`react-dom`) — this is a phone-only product, aimed at the App Store
-and Play Store, not a website. Adding infrastructure for problems that
-don't exist yet would make the codebase harder to understand for
-exactly zero benefit right now. Each will be introduced deliberately
-when the feature that needs it is actually being built.
+**A way to reach a trusted contact who hasn't installed ALIVE.** Right
+now "notified" means a push to their own device, which means they
+need the app and a linked account. That's a real, known limitation
+(`DemoFooter` says so on Home), not an oversight — SMS (Twilio, plus
+business-texting registration for real volume) is the honest fix, and
+it's a deliberately separate piece of work with its own cost, not
+something to bolt on quietly.
+
+**Anything for the linked contact to actually look at.** RLS already
+lets them read the profile, check-ins, and status of whoever they
+watch — the policies were written that way on purpose — but there's no
+screen that uses it yet. A push is a start; a "here's how they're
+doing" view is the natural next increment, in its own right, not
+squeezed into this pass.
+
+**Invite tokens don't expire.** Whoever has the link can claim it,
+once — fine for a token shared privately with the specific person it's
+meant for, not yet hardened against a leaked link circulating further
+than intended.
+
+**No production build.** Everything above runs through `expo start` /
+Expo Go. Getting onto an actual App Store or Play Store listing is EAS
+Build + Submit, a separate, deliberate step once there's something
+ready to ship that way.
+
+No icon library, no animation library beyond React Native's built-in
+`Animated`, no navigation library (see above), no web support
+(`react-native-web`/`react-dom` are dev-only, used solely to render the
+browser preview artifacts — never shipped) — this is a phone-only
+product, aimed at the App Store and Play Store, not a website. Adding
+infrastructure for problems that don't exist yet would make the
+codebase harder to understand for exactly zero benefit right now.
 
 The one deliberate exception is the serif typeface (`expo-font` +
 `@expo-google-fonts/fraunces`) — added after the first visual pass read

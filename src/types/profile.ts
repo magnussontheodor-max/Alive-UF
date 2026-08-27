@@ -1,8 +1,14 @@
 export type SubjectMode = 'self' | 'other';
 
 export type TrustedContact = {
+  /** Unset for a contact not yet saved to the backend (a fresh row in an onboarding draft). */
+  id?: string;
   name: string;
   phone: string;
+  /** Set once this contact has been saved — used to build the shareable invite link (see ContactsStep / ARCHITECTURE.md). */
+  inviteToken?: string;
+  /** 'linked' once the contact has opened the invite and signed in as themselves. */
+  status?: 'pending' | 'linked';
 };
 
 /** ALIVE supports up to two trusted contacts for now — enough for "a partner and a parent" without turning onboarding into a contact list. */
