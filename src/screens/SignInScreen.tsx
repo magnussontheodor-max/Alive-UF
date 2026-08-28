@@ -35,8 +35,11 @@ export function SignInScreen() {
     try {
       await sendCode(email.trim());
       setStep('code');
-    } catch {
-      setError("Couldn't send that. Check the address and try again.");
+    } catch (e) {
+      // Surfaces Supabase's actual error text (a bad SMTP config, a rate
+      // limit, an invalid key — each says something different) instead
+      // of one generic message that hides which of those it is.
+      setError(e instanceof Error ? e.message : "Couldn't send that. Check the address and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -49,8 +52,8 @@ export function SignInScreen() {
     try {
       await verifyCode(email.trim(), code.trim());
       // Success flips AuthContext's session; App.tsx reacts to that on its own.
-    } catch {
-      setError("That code didn't work. Check it and try again.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "That code didn't work. Check it and try again.");
     } finally {
       setIsSubmitting(false);
     }
