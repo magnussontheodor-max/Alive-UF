@@ -25,6 +25,15 @@ type AuthState = {
   sendCode: (email: string) => Promise<void>;
   verifyCode: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /**
+   * GDPR Art. 17, right to erasure — permanently deletes this
+   * account's row in auth.users via delete_own_account()
+   * (supabase/migrations/0002_gdpr.sql), which cascades to every
+   * table that references it (profile, trusted contacts, check-ins,
+   * push tokens). Irreversible; signs out locally afterward since the
+   * session it was holding no longer refers to anything.
+   */
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -67,6 +76,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error;
       },
       signOut: async () => {
+        await supabase.auth.signOut();
+      },
+      deleteAccount: async () => {
+        const { error } = await supabase.rpc('delete_own_account');
+        if (error) throw error;
+        // The row this session's access token pointed at is already
+        // gone server-side; sign out locally to clear it here too
+        // rather than leaving a dead session sitting in AsyncStorage.
         await supabase.auth.signOut();
       },
     }),

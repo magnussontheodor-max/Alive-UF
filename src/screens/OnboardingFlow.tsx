@@ -9,14 +9,16 @@ import { useProfile } from '../state/ProfileContext';
 import { colors, spacing } from '../theme';
 import type { CheckInWindow, SubjectMode, TrustedContact } from '../types/profile';
 import { CheckInTimeStep } from './onboarding/CheckInTimeStep';
+import { ConsentStep } from './onboarding/ConsentStep';
 import { ContactsStep } from './onboarding/ContactsStep';
 import { GracePeriodStep } from './onboarding/GracePeriodStep';
 import { HowItWorksStep } from './onboarding/HowItWorksStep';
+import { LegalScreen } from './LegalScreen';
 import { PersonaStep } from './onboarding/PersonaStep';
 import { TextStep } from './onboarding/TextStep';
 import { WelcomeStep } from './onboarding/WelcomeStep';
 
-const STEPS = ['welcome', 'howItWorks', 'persona', 'name', 'contacts', 'time', 'grace'] as const;
+const STEPS = ['welcome', 'consent', 'howItWorks', 'persona', 'name', 'contacts', 'time', 'grace'] as const;
 type Step = (typeof STEPS)[number];
 
 const EMPTY_CONTACT: TrustedContact = { name: '', phone: '' };
@@ -33,6 +35,7 @@ const EMPTY_CONTACT: TrustedContact = { name: '', phone: '' };
 export function OnboardingFlow() {
   const profile = useProfile();
   const [stepIndex, setStepIndex] = useState(0);
+  const [consentDraft, setConsentDraft] = useState<boolean>(profile.privacyAccepted);
   const [subjectModeDraft, setSubjectModeDraft] = useState<SubjectMode>(profile.subjectMode);
   const [nameDraft, setNameDraft] = useState(profile.userName);
   const [contactsDraft, setContactsDraft] = useState<TrustedContact[]>(
@@ -40,6 +43,11 @@ export function OnboardingFlow() {
   );
   const [timeDraft, setTimeDraft] = useState<CheckInWindow>(profile.checkInWindow);
   const [graceDraft, setGraceDraft] = useState<number>(profile.graceMinutes);
+  // Set while the Privacy Policy or Terms is open mid-onboarding —
+  // replaces the whole flow with LegalScreen rather than being a step
+  // of its own, since "go read this" isn't a forward step in the
+  // wizard the way the others are.
+  const [legalDoc, setLegalDoc] = useState<'privacy' | 'terms' | null>(null);
 
   const step: Step = STEPS[stepIndex];
   const entranceStyle = useEntranceStyle(step, { duration: 360 });
@@ -53,6 +61,7 @@ export function OnboardingFlow() {
   const goBack = () => setStepIndex((i) => Math.max(i - 1, 0));
 
   const handleFinish = () => {
+    if (consentDraft && !profile.privacyAccepted) profile.acceptPrivacyPolicy();
     profile.setSubjectMode(subjectModeDraft);
     profile.setUserName(nameDraft.trim());
     profile.setContacts(contactsDraft.map((c) => ({ name: c.name.trim(), phone: c.phone.trim() })));
@@ -65,7 +74,13 @@ export function OnboardingFlow() {
     step === 'welcome' ? 'Get started' : step === 'grace' ? 'Start using ALIVE' : 'Continue';
 
   const primaryDisabled =
-    (step === 'name' && !canContinueName) || (step === 'contacts' && !canContinueContacts);
+    (step === 'consent' && !consentDraft) ||
+    (step === 'name' && !canContinueName) ||
+    (step === 'contacts' && !canContinueContacts);
+
+  if (legalDoc) {
+    return <LegalScreen doc={legalDoc} onBack={() => setLegalDoc(null)} />;
+  }
 
   const handlePrimaryPress = step === 'grace' ? handleFinish : goNext;
 
@@ -114,6 +129,14 @@ export function OnboardingFlow() {
             scrollEnabled={step !== 'time'}
           >
             {step === 'welcome' && <WelcomeStep />}
+            {step === 'consent' && (
+              <ConsentStep
+                accepted={consentDraft}
+                onChange={setConsentDraft}
+                onOpenPrivacy={() => setLegalDoc('privacy')}
+                onOpenTerms={() => setLegalDoc('terms')}
+              />
+            )}
             {step === 'howItWorks' && <HowItWorksStep />}
             {step === 'persona' && <PersonaStep value={subjectModeDraft} onChange={setSubjectModeDraft} />}
             {step === 'name' && (

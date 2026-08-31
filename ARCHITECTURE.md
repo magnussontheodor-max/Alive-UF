@@ -460,6 +460,70 @@ becomes the bottleneck, the fix is a computed, indexed
 directly in the function's own comments, not just here, so it's found
 by whoever's actually touching that code when it matters.
 
+## GDPR
+
+What ALIVE actually collects — email, name, timezone, check-in
+time/grace period, each trusted contact's name and phone, a timestamp
+per check-in, a push token — is covered end to end, both in code and in
+the two documents users are asked to actually read, not just link to:
+
+- **Consent, recorded, not assumed.** `profiles.privacy_accepted_at` /
+  `privacy_policy_version` (`supabase/migrations/0002_gdpr.sql`) are
+  null until `ConsentStep` — the second onboarding step, right after
+  the welcome screen and before anything else is collected — is
+  affirmatively accepted. `PRIVACY_POLICY_VERSION` in
+  `src/legal/content.ts` is what gets stamped; bump it and anyone who
+  already accepted an older version needs to accept again (not wired
+  automatically yet — see below).
+- **Right of access / portability (Art. 15/20).** Settings → "Download
+  my data" queries every row that exists about the signed-in account
+  (profile, trusted contacts, check-ins — all already scoped by RLS to
+  `auth.uid()`, nothing to filter client-side) and hands it back as
+  plain JSON via the native share sheet.
+- **Right to erasure (Art. 17).** Settings → "Delete my account" calls
+  `delete_own_account()`, a `security definer` Postgres function scoped
+  to `auth.uid()` — the anon/publishable key can't touch `auth.users`
+  directly, so this is the one narrow hole punched through that, and
+  only for your own row. Deleting it cascades to `profiles` and from
+  there to everything owned by that person; a `trusted_contacts` row
+  where they were the *linked* contact rather than the owner survives
+  with `linked_user_id` set to null, since that's the owner's address
+  book entry, not the deleted account's data.
+- **Security (Art. 32).** Every table has Row Level Security on already
+  (see "Real backend" above) — someone's data is only readable by them
+  or a linked contact, enforced by Postgres, not app code. Supabase
+  encrypts in transit and at rest by default; nothing extra to set up.
+- **The actual documents.** `src/legal/content.ts` is the single source
+  of truth; `LegalScreen` renders it both from `ConsentStep` and from
+  Settings afterward, and `PRIVACY_POLICY.md` / `TERMS_OF_SERVICE.md`
+  at the repo root are the same text kept in sync for reviewing without
+  running the app.
+
+**What's still a human decision, not a code change:**
+
+1. Every `[BRACKETED]` placeholder in `src/legal/content.ts` (and the
+   two root `.md` files) — legal entity/individual name, address,
+   contact email, jurisdiction, data retention window — needs your real
+   details filled in.
+2. Both documents need an actual lawyer's review before real users rely
+   on them. This is a solid, specific draft matched to what the code
+   really does, not boilerplate — but it isn't legal advice, and GDPR
+   compliance ultimately turns on facts (who your data controller
+   legally is, whether a DPO is required at your scale) that only that
+   review settles.
+3. Confirm your Supabase project's hosting region (Project Settings →
+   General) is appropriate for your users — this can't be changed after
+   creation without migrating to a new project, so it's worth checking
+   deliberately rather than assuming.
+4. Accept Supabase's Data Processing Addendum and check Resend's — both
+   publish one; whether you need to countersign anything depends on
+   your plan tier on each.
+5. A policy-version bump doesn't yet force re-consent from someone who
+   already onboarded under an older version — worth wiring
+   (`privacy_policy_version !== PRIVACY_POLICY_VERSION` gating a
+   re-consent prompt) before the text changes in any way that matters,
+   rather than after.
+
 ## What's intentionally not here yet
 
 **A way to reach a trusted contact who hasn't installed ALIVE.** Right

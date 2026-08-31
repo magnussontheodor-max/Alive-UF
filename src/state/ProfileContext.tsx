@@ -10,6 +10,7 @@ import React, {
 import { View } from 'react-native';
 
 import { supabase } from '../lib/supabase';
+import { PRIVACY_POLICY_VERSION } from '../legal/content';
 import { colors } from '../theme';
 import {
   CheckInWindow,
@@ -31,6 +32,8 @@ import { useAuth } from './AuthContext';
 
 type ProfileState = {
   isOnboarded: boolean;
+  /** True once this account has recorded agreeing to the current Privacy Policy/Terms — see ConsentStep. */
+  privacyAccepted: boolean;
   subjectMode: SubjectMode;
   userName: string;
   contacts: TrustedContact[];
@@ -41,6 +44,8 @@ type ProfileState = {
   setContacts: (contacts: TrustedContact[]) => void;
   setCheckInWindow: (window: CheckInWindow) => void;
   setGraceMinutes: (minutes: number) => void;
+  /** Records consent to the current policy version — called once, from ConsentStep via OnboardingFlow.handleFinish. */
+  acceptPrivacyPolicy: () => void;
   completeOnboarding: () => void;
   /** Testing only — clears everything and returns to onboarding. */
   restartOnboarding: () => void;
@@ -55,6 +60,7 @@ type ProfileRow = {
   check_in_minute: number;
   grace_minutes: number;
   onboarding_completed_at: string | null;
+  privacy_accepted_at: string | null;
 };
 
 type ContactRow = {
@@ -88,6 +94,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
   const [loading, setLoading] = useState(true);
   const [isOnboarded, setIsOnboarded] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [subjectMode, setSubjectModeState] = useState<SubjectMode>('self');
   const [userName, setUserNameState] = useState('');
   const [contacts, setContactsState] = useState<TrustedContact[]>([]);
@@ -132,6 +139,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         setCheckInWindowState({ hour: row.check_in_hour, minute: row.check_in_minute });
         setGraceMinutesState(row.grace_minutes);
         setIsOnboarded(row.onboarding_completed_at !== null);
+        setPrivacyAccepted(row.privacy_accepted_at !== null);
       }
       if (contactsResult) setContactsState(contactsResult);
 
@@ -251,6 +259,21 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     [userId]
   );
 
+  const acceptPrivacyPolicy = useCallback(() => {
+    setPrivacyAccepted(true);
+    if (!userId) return;
+    supabase
+      .from('profiles')
+      .update({
+        privacy_accepted_at: new Date().toISOString(),
+        privacy_policy_version: PRIVACY_POLICY_VERSION,
+      })
+      .eq('id', userId)
+      .then(({ error }) => {
+        if (error) console.warn('Failed to record privacy policy consent', error);
+      });
+  }, [userId]);
+
   const completeOnboarding = useCallback(() => {
     setIsOnboarded(true);
     if (!userId) return;
@@ -297,6 +320,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<ProfileState>(
     () => ({
       isOnboarded,
+      privacyAccepted,
       subjectMode,
       userName,
       contacts,
@@ -307,11 +331,13 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       setContacts,
       setCheckInWindow,
       setGraceMinutes,
+      acceptPrivacyPolicy,
       completeOnboarding,
       restartOnboarding,
     }),
     [
       isOnboarded,
+      privacyAccepted,
       subjectMode,
       userName,
       contacts,
@@ -322,6 +348,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       setContacts,
       setCheckInWindow,
       setGraceMinutes,
+      acceptPrivacyPolicy,
       completeOnboarding,
       restartOnboarding,
     ]
