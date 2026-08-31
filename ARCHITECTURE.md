@@ -394,12 +394,28 @@ live project to run against. One-time setup:
    restart `expo start` — Expo only reads `.env` at startup.
 3. Run `supabase/migrations/0001_init.sql` once, either pasted into the
    SQL Editor or via `supabase db push` with the CLI.
-4. Authentication → Email Templates → Magic Link: change the body to
-   show `{{ .Token }}` instead of the default `{{ .ConfirmationURL }}`
-   link. This is what turns sign-in into a typed 6-digit code instead
-   of a tapped link — see AuthContext's doc comment for why that's
-   deliberate, not an oversight. Skip this step and the email will
-   contain a link the app never reads.
+4. Authentication → Email Templates: edit **both** "Confirm signup" and
+   "Magic Link" — Supabase picks whichever one applies to the specific
+   email (first-ever OTP for a brand-new address uses Confirm signup;
+   every request after that uses Magic Link), so editing only one
+   leaves the other still sending a link. For each: click the
+   **Source** tab (not the WYSIWYG preview — edits made outside Source
+   don't save) and replace the body with something that renders
+   `{{ .Token }}` instead of the default `{{ .ConfirmationURL }}` link,
+   e.g.:
+   ```html
+   <h2>Your ALIVE code</h2>
+   <p>Enter this code in the app to sign in:</p>
+   <h1 style="font-size: 32px; letter-spacing: 4px;">{{ .Token }}</h1>
+   <p>This code expires shortly and can only be used once.</p>
+   ```
+   Click **Save** on each template separately. This is what turns
+   sign-in into a typed 6-digit code instead of a tapped link — see
+   AuthContext's doc comment for why that's deliberate, not an
+   oversight. Skip either template and that email will contain a link
+   the app never reads. (Editing templates requires custom SMTP to be
+   enabled first — Supabase locks Source editing to the built-in
+   mailer.)
 5. `supabase functions deploy check-escalations` (needs the CLI,
    `supabase login` once). It reads `SUPABASE_URL`/
    `SUPABASE_SERVICE_ROLE_KEY`, which Supabase injects automatically —
