@@ -3,10 +3,12 @@
 > **This is the same text rendered in-app** (Settings → Terms of Service, and shown during onboarding) — see `src/legal/content.ts`, the source of truth. Kept here as a plain root-level copy so it's reviewable without running the app. Edit both together.
 >
 > **Not legal advice.** Fill in every `[BRACKETED]` placeholder with your real details and have this reviewed by a lawyer qualified in your users' jurisdiction before real users rely on it.
+>
+> **A UF company isn't a separate legal entity.** Ung Företagsamhet enterprises are training companies, not registered businesses — legal responsibility here likely falls on the individual student(s) or the supervising school/UF chapter, not "ALIVE UF" as named below. Confirm with your UF advisor before this goes live.
 
 Last updated: 2026-08-31
 
-These terms are the agreement between you and [LEGAL ENTITY OR INDIVIDUAL NAME] ("we", "us") for using the ALIVE app. By creating an account, you agree to them.
+These terms are the agreement between you and ALIVE UF, a UF (Ung Företagsamhet) student enterprise, [SCHOOL / UF CHAPTER NAME AND ADDRESS], Sweden ("we", "us"), for using the ALIVE app. By creating an account, you agree to them.
 
 ## What ALIVE does
 
@@ -42,8 +44,8 @@ To the fullest extent the law allows, we aren't liable for indirect or consequen
 
 ## Governing law
 
-These terms are governed by the laws of [JURISDICTION — FILL IN].
+These terms are governed by the laws of Sweden.
 
 ## Contact
 
-Questions about these terms: [CONTACT EMAIL].
+Questions about these terms: magnussontheodor@gmail.com.

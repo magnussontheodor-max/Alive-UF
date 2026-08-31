@@ -3,6 +3,8 @@
 > **This is the same text rendered in-app** (Settings → Privacy Policy, and shown during onboarding) — see `src/legal/content.ts`, the source of truth. Kept here as a plain root-level copy so it's reviewable without running the app. Edit both together.
 >
 > **Not legal advice.** Fill in every `[BRACKETED]` placeholder with your real details and have this reviewed by a lawyer qualified in your users' jurisdiction before real users rely on it.
+>
+> **A UF company isn't a separate legal entity.** Ung Företagsamhet enterprises are training companies, not registered businesses — legal/GDPR responsibility here likely falls on the individual student(s) or the supervising school/UF chapter, not "ALIVE UF" as named below. Confirm with your UF advisor before this goes live.
 
 Last updated: 2026-08-31
 
@@ -10,7 +12,7 @@ This policy explains what personal data the ALIVE app collects, why, and what ri
 
 ## Who is responsible for your data
 
-[LEGAL ENTITY OR INDIVIDUAL NAME], [ADDRESS], [COUNTRY] ("we", "us") is the data controller for the personal data described below. Contact us about your data at [PRIVACY CONTACT EMAIL].
+ALIVE UF, a UF (Ung Företagsamhet) student enterprise, [SCHOOL / UF CHAPTER NAME AND ADDRESS], Sweden ("we", "us") is the data controller for the personal data described below. Contact us about your data at magnussontheodor@gmail.com.
 
 ## What we collect
 
@@ -30,7 +32,7 @@ Everything above is collected because it's necessary to provide the check-in and
 
 We use a small number of service providers ("processors") to run ALIVE. They only ever act on our instructions and only see what's needed to do their job:
 
-- **Supabase** (database, authentication, and the server-side job that checks for missed check-ins) — hosted at [SUPABASE PROJECT REGION].
+- **Supabase** (database, authentication, and the server-side job that checks for missed check-ins) — hosted at [SUPABASE PROJECT REGION — check Project Settings → General in the Supabase dashboard].
 - **Resend** (sends the sign-in code and any notification emails).
 - **Expo's push notification service** (delivers push alerts to devices).
 
@@ -38,7 +40,7 @@ We don't share your data with anyone else, and we don't transfer it outside thes
 
 ## How long we keep it
 
-We keep your data for as long as your account exists. If you delete your account (Settings → Delete my account, or by writing to us), your profile, trusted contacts, check-in history, and device token are permanently deleted within [X DAYS — FILL IN] and cannot be recovered. A trusted contact's own record of you isn't affected by your deletion, since that's their data, not yours — only the link between your two accounts is removed.
+We keep your data for as long as your account exists. If you delete your account (Settings → Delete my account, or by writing to us), your profile, trusted contacts, check-in history, and device token are deleted immediately and cannot be recovered — deleting your account triggers this straight away, not after a delay. A trusted contact's own record of you isn't affected by your deletion, since that's their data, not yours — only the link between your two accounts is removed.
 
 ## Your rights
 
@@ -51,7 +53,7 @@ Under GDPR, you can:
 - **Object to or restrict** how we use it, or withdraw consent where we rely on it.
 - **Complain** to your local data protection authority if you think we've got this wrong.
 
-To exercise any of these beyond what Settings already gives you directly, contact [PRIVACY CONTACT EMAIL].
+To exercise any of these beyond what Settings already gives you directly, contact magnussontheodor@gmail.com.
 
 ## Security
 

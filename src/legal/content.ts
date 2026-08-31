@@ -9,15 +9,21 @@
  * exactly what ALIVE's code actually does — not boilerplate — but it
  * is not legal advice, and neither of us (you or Claude) is your
  * lawyer. Before real users rely on this:
- *   1. Replace every [BRACKETED] placeholder below with your actual
- *      details (legal entity/individual name, address, contact email,
- *      country).
- *   2. Have both documents reviewed by a lawyer qualified in your
- *      users' jurisdiction — GDPR compliance depends on facts a
- *      document can't settle on its own (who your data controller
- *      legally is, whether you need a DPO, whether your Supabase
- *      project's hosting region is adequate for your users).
- *   3. Confirm the operational items ARCHITECTURE.md's GDPR section
+ *   1. A UF company (Ung Företagsamhet) isn't a separate legal entity
+ *      under Swedish law — it's a training enterprise. Legal/GDPR
+ *      responsibility for something real users rely on typically falls
+ *      on the individual student(s) running it, or the supervising
+ *      school/UF chapter, not "ALIVE UF" as if it were a registered
+ *      business. Confirm with your UF advisor who the documents below
+ *      should actually name before this goes live — they currently
+ *      name ALIVE UF as a placeholder, not a settled answer.
+ *   2. Replace the remaining [BRACKETED] placeholders below (school/UF
+ *      chapter address, Supabase project region, account-deletion
+ *      retention window if 30 days isn't what you actually want).
+ *   3. Have both documents reviewed by someone who can actually confirm
+ *      the above — GDPR compliance depends on facts a document can't
+ *      settle on its own.
+ *   4. Confirm the operational items ARCHITECTURE.md's GDPR section
  *      lists as "still needs a human" are actually done.
  */
 
@@ -32,7 +38,7 @@ This policy explains what personal data the ALIVE app collects, why, and what ri
 
 WHO IS RESPONSIBLE FOR YOUR DATA
 
-[LEGAL ENTITY OR INDIVIDUAL NAME], [ADDRESS], [COUNTRY] ("we", "us") is the data controller for the personal data described below. Contact us about your data at [PRIVACY CONTACT EMAIL].
+ALIVE UF, a UF (Ung Företagsamhet) student enterprise, [SCHOOL / UF CHAPTER NAME AND ADDRESS], Sweden ("we", "us") is the data controller for the personal data described below. Contact us about your data at magnussontheodor@gmail.com.
 
 WHAT WE COLLECT
 
@@ -52,7 +58,7 @@ WHO ELSE SEES IT
 
 We use a small number of service providers ("processors") to run ALIVE. They only ever act on our instructions and only see what's needed to do their job:
 
-- Supabase (database, authentication, and the server-side job that checks for missed check-ins) — hosted at [SUPABASE PROJECT REGION].
+- Supabase (database, authentication, and the server-side job that checks for missed check-ins) — hosted at [SUPABASE PROJECT REGION — check Project Settings → General in the Supabase dashboard].
 - Resend (sends the sign-in code and any notification emails).
 - Expo's push notification service (delivers push alerts to devices).
 
@@ -60,7 +66,7 @@ We don't share your data with anyone else, and we don't transfer it outside thes
 
 HOW LONG WE KEEP IT
 
-We keep your data for as long as your account exists. If you delete your account (Settings → Delete my account, or by writing to us), your profile, trusted contacts, check-in history, and device token are permanently deleted within [X DAYS — FILL IN] and cannot be recovered. A trusted contact's own record of you isn't affected by your deletion, since that's their data, not yours — only the link between your two accounts is removed.
+We keep your data for as long as your account exists. If you delete your account (Settings → Delete my account, or by writing to us), your profile, trusted contacts, check-in history, and device token are deleted immediately and cannot be recovered — deleting your account triggers this straight away, not after a delay. A trusted contact's own record of you isn't affected by your deletion, since that's their data, not yours — only the link between your two accounts is removed.
 
 YOUR RIGHTS
 
@@ -73,7 +79,7 @@ Under GDPR, you can:
 - Object to or restrict how we use it, or withdraw consent where we rely on it.
 - Complain to your local data protection authority if you think we've got this wrong.
 
-To exercise any of these beyond what Settings already gives you directly, contact [PRIVACY CONTACT EMAIL].
+To exercise any of these beyond what Settings already gives you directly, contact magnussontheodor@gmail.com.
 
 SECURITY
 
@@ -89,7 +95,7 @@ If this policy changes in a way that matters, we'll ask you to review and re-acc
 
 export const TERMS_TEXT = `Last updated: ${PRIVACY_POLICY_VERSION}
 
-These terms are the agreement between you and [LEGAL ENTITY OR INDIVIDUAL NAME] ("we", "us") for using the ALIVE app. By creating an account, you agree to them.
+These terms are the agreement between you and ALIVE UF, a UF (Ung Företagsamhet) student enterprise, [SCHOOL / UF CHAPTER NAME AND ADDRESS], Sweden ("we", "us"), for using the ALIVE app. By creating an account, you agree to them.
 
 WHAT ALIVE DOES
 
@@ -125,8 +131,8 @@ To the fullest extent the law allows, we aren't liable for indirect or consequen
 
 GOVERNING LAW
 
-These terms are governed by the laws of [JURISDICTION — FILL IN].
+These terms are governed by the laws of Sweden.
 
 CONTACT
 
-Questions about these terms: [CONTACT EMAIL].`;
+Questions about these terms: magnussontheodor@gmail.com.`;
