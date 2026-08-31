@@ -9,8 +9,9 @@ import React, {
 } from 'react';
 import { View } from 'react-native';
 
-import { supabase } from '../lib/supabase';
 import { PRIVACY_POLICY_VERSION } from '../legal/content';
+import { isPreviewMode } from '../lib/previewMode';
+import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
 import {
   CheckInWindow,
@@ -92,12 +93,20 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const { session } = useAuth();
   const userId = session?.user.id;
 
+  // Preview builds start already onboarded, with plausible demo data
+  // filled in, rather than blank — that's the state most useful to
+  // land on when reviewing Home/Settings; "Restart onboarding" in
+  // Settings still works normally from here to review that flow too.
   const [loading, setLoading] = useState(true);
-  const [isOnboarded, setIsOnboarded] = useState(false);
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [isOnboarded, setIsOnboarded] = useState(isPreviewMode);
+  const [privacyAccepted, setPrivacyAccepted] = useState(isPreviewMode);
   const [subjectMode, setSubjectModeState] = useState<SubjectMode>('self');
-  const [userName, setUserNameState] = useState('');
-  const [contacts, setContactsState] = useState<TrustedContact[]>([]);
+  const [userName, setUserNameState] = useState(isPreviewMode ? 'Alex' : '');
+  const [contacts, setContactsState] = useState<TrustedContact[]>(
+    isPreviewMode
+      ? [{ id: 'preview-contact-1', name: 'Sam', phone: '070-123 45 67', inviteToken: 'preview-token', status: 'pending' }]
+      : []
+  );
   const [checkInWindow, setCheckInWindowState] = useState<CheckInWindow>(DEFAULT_CHECK_IN_WINDOW);
   const [graceMinutes, setGraceMinutesState] = useState<number>(DEFAULT_GRACE_MINUTES);
 
@@ -119,6 +128,12 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    // Initial state above is already the full preview seed — never
+    // queries Supabase for it.
+    if (isPreviewMode) {
+      setLoading(false);
+      return;
+    }
     if (!userId) return;
     let cancelled = false;
 

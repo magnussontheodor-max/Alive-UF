@@ -2,6 +2,21 @@ import type { Session } from '@supabase/supabase-js';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { isPreviewMode } from '../lib/previewMode';
+
+// A synthetic, always-signed-in session for preview builds — see
+// isPreviewMode's doc comment. user.id is deliberately '' rather than
+// a fake uuid: ProfileContext/CheckInContext both branch on `!userId`
+// to skip their Supabase calls, and '' is falsy, so every one of those
+// existing guards skips the network for free with no separate preview
+// branch needed in either file beyond their own initial data load.
+const PREVIEW_SESSION = {
+  access_token: 'preview',
+  token_type: 'bearer',
+  expires_in: 3600,
+  refresh_token: 'preview',
+  user: { id: '', email: 'preview@example.com' },
+} as unknown as Session;
 
 /**
  * Email one-time-code sign-in, not a magic link. Both are the same
@@ -39,10 +54,13 @@ type AuthState = {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(isPreviewMode ? PREVIEW_SESSION : null);
+  const [isLoading, setIsLoading] = useState(!isPreviewMode);
 
   useEffect(() => {
+    // Session above is already final for a preview build — never
+    // touches Supabase, on purpose (see isPreviewMode).
+    if (isPreviewMode) return;
     if (!isSupabaseConfigured) {
       setIsLoading(false);
       return;
@@ -65,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       session,
       sendCode: async (email: string) => {
+        if (isPreviewMode) return;
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: { shouldCreateUser: true },
@@ -72,13 +91,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error;
       },
       verifyCode: async (email: string, code: string) => {
+        if (isPreviewMode) return;
         const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
         if (error) throw error;
       },
       signOut: async () => {
+        if (isPreviewMode) return;
         await supabase.auth.signOut();
       },
       deleteAccount: async () => {
+        // Guarded explicitly, not left to fall through to userId
+        // being falsy like the other contexts' calls do: this one
+        // doesn't check userId at all before calling Supabase, so a
+        // tap on "Delete my account" in a preview build must never
+        // reach the real backend.
+        if (isPreviewMode) return;
         const { error } = await supabase.rpc('delete_own_account');
         if (error) throw error;
         // The row this session's access token pointed at is already

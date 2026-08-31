@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 
+import { isPreviewMode } from '../lib/previewMode';
 import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
 import { useAuth } from './AuthContext';
@@ -50,6 +51,12 @@ export function CheckInProvider({ children }: { children: React.ReactNode }) {
   const [lastCheckInAt, setLastCheckInAt] = useState<Date | null>(null);
 
   useEffect(() => {
+    // Starts un-checked-in, same as a real fresh day — never queries
+    // Supabase for it in a preview build.
+    if (isPreviewMode) {
+      setLoading(false);
+      return;
+    }
     if (!userId) return;
     let cancelled = false;
 

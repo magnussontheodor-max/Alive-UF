@@ -43,3 +43,7 @@ yarn-error.*
 
 # Supabase CLI local state
 supabase/.temp/
+
+# No-login preview build (scripts/build-preview.sh) — regenerated, not committed
+web-preview/
+dist-preview/
