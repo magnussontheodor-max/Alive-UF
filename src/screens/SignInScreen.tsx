@@ -26,7 +26,12 @@ export function SignInScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const canSendCode = email.trim().length > 3 && email.includes('@');
-  const canVerify = code.trim().length === 6;
+  // Not hardcoded to 6: Supabase's email OTP length is a project-level
+  // setting (default 6, but configurable up to 10) — accepting any
+  // all-digit code in that range means this screen works regardless of
+  // what a given project has it set to, rather than silently rejecting
+  // a real code Supabase already sent.
+  const canVerify = /^\d{6,10}$/.test(code.trim());
 
   const handleSendCode = async () => {
     if (!canSendCode || isSubmitting) return;
@@ -82,7 +87,7 @@ export function SignInScreen() {
               </>
             ) : (
               <>
-                <Text style={styles.tagline}>Enter the 6-digit code we sent to {email}.</Text>
+                <Text style={styles.tagline}>Enter the code we sent to {email}.</Text>
                 <View style={styles.field}>
                   <TextField
                     value={code}
