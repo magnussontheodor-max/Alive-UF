@@ -54,13 +54,16 @@ type AuthState = {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Preview builds start signed OUT, not pre-signed-in: the whole
-  // point of a preview is to see real screens, and PreAuthOnboarding
-  // (welcome/consent/how-it-works/persona) only ever renders before a
-  // session exists — starting pre-authenticated would skip past all of
-  // that, every time. verifyCode below is what actually "signs in" a
-  // preview build, once someone reaches SignInScreen.
-  const [session, setSession] = useState<Session | null>(null);
+  // Preview builds default to already signed in, landing straight on
+  // Home — reviewing one small change shouldn't mean re-clicking
+  // through welcome/consent/how-it-works/persona/sign-in every single
+  // time. Append ?preauth to the preview URL to start signed OUT
+  // instead, for the (rarer) times the thing being reviewed is
+  // PreAuthOnboarding itself — verifyCode below is what "signs in"
+  // from there, once someone reaches SignInScreen.
+  const startSignedOut =
+    isPreviewMode && typeof window !== 'undefined' && window.location?.search?.includes('preauth');
+  const [session, setSession] = useState<Session | null>(isPreviewMode && !startSignedOut ? PREVIEW_SESSION : null);
   const [isLoading, setIsLoading] = useState(!isPreviewMode);
 
   useEffect(() => {
