@@ -23,8 +23,8 @@ const styles = StyleSheet.create({
   },
   large: {
     ...typography.wordmark,
-    color: colors.accent,
-    fontSize: 34,
-    letterSpacing: 12,
+    color: colors.ink,
+    fontSize: 52,
+    letterSpacing: 9,
   },
 });

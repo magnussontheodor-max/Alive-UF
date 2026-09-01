@@ -1,3 +1,9 @@
+import { useFonts } from '@expo-google-fonts/fraunces/useFonts';
+// Importing each weight from its own subpath (rather than the package
+// root) keeps Metro from bundling all nine Fraunces weights + italics
+// when we only ever use two of them.
+import { Fraunces_500Medium } from '@expo-google-fonts/fraunces/500Medium';
+import { Fraunces_600SemiBold } from '@expo-google-fonts/fraunces/600SemiBold';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
@@ -20,17 +26,23 @@ import { ProfileProvider, useProfile } from './src/state/ProfileContext';
 import { colors } from './src/theme';
 
 export default function App() {
+  const [fontsLoaded] = useFonts({ Fraunces_500Medium, Fraunces_600SemiBold });
   // Held above AuthProvider, not inside it: the invite link can arrive
   // before sign-in finishes (that's the whole point — the contact
   // isn't a user yet), so this has to survive the SignInScreen -> Root
   // transition rather than resetting with it.
   const { pendingInviteToken, clearPendingInvite } = usePendingInvite();
 
+  if (!fontsLoaded) {
+    // Plain, background-colored frame — faster than a spinner, and
+    // never shows the wrong typeface flashing in.
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
+
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        {/* "light" — a dark status bar on the Beacon direction's near-black ground would be unreadable. */}
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <AuthGate pendingInviteToken={pendingInviteToken} clearPendingInvite={clearPendingInvite} />
       </AuthProvider>
     </SafeAreaProvider>
