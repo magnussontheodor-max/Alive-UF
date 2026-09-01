@@ -697,10 +697,18 @@ once — fine for a token shared privately with the specific person it's
 meant for, not yet hardened against a leaked link circulating further
 than intended.
 
-**No production build.** Everything above runs through `expo start` /
-Expo Go. Getting onto an actual App Store or Play Store listing is EAS
-Build + Submit, a separate, deliberate step once there's something
-ready to ship that way.
+**No production build yet — and `app.json`'s bundle identifier is a
+placeholder.** Everything above runs through `expo start` / Expo Go.
+Getting onto an actual App Store or Play Store listing is EAS Build +
+Submit, a separate, deliberate step once there's something ready to
+ship that way — `eas.json` and `ios.bundleIdentifier`/`android.package`
+are wired up for it, but `com.aliveuf.app` is a stand-in, not a real
+decision. It's fine for `eas build`'s internal-distribution profiles
+(development/preview) — those never touch a store — but a bundle
+identifier is effectively permanent once used for a real App Store
+Connect / Play Console submission, so replace it with the real
+reverse-domain choice before ever running the `production` profile for
+an actual submission.
 
 No icon library, no animation library beyond React Native's built-in
 `Animated`, no navigation library (see above), no web support

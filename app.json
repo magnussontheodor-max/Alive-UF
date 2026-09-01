@@ -8,9 +8,11 @@
     "userInterfaceStyle": "light",
     "scheme": "alive",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aliveuf.app"
     },
     "android": {
+      "package": "com.aliveuf.app",
       "adaptiveIcon": {
         "backgroundColor": "#F3EEE4",
         "foregroundImage": "./assets/android-icon-foreground.png",
