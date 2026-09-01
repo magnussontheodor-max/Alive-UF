@@ -18,25 +18,19 @@ type Props = {
 };
 
 /**
- * The single, unmistakable call to action of the app. Styled less like
- * a flat "go" button and more like a physical dial — a quiet outer
- * ring around a solid disc, the kind of detail Scandinavian product
- * design (Braun, Bang & Olufsen) uses to make a single control feel
- * deliberate rather than decorative.
- *
- * On press it doesn't just disappear — the label calmly gives way to a
- * hand-drawn checkmark that draws itself on, so the moment of "this
- * worked" has somewhere to land before the screen moves on.
+ * The beacon. Unlit at idle — a dark housing with just a dim amber
+ * outline, an invitation rather than a demand — and it genuinely
+ * lights on confirm: the fill itself animates from housing-dark to
+ * full signal-amber, not just a checkmark appearing on a button that
+ * was already "on". This is the one light source on the whole screen
+ * (see theme/colors.ts) — the literal mechanism of the product, not a
+ * decorative glow.
  */
 export function AliveButton({ label, onPress, confirmed }: Props) {
   const scale = useRef(new Animated.Value(1)).current;
   const reveal = useRef(new Animated.Value(0)).current;
-  // The one moment this button gets a delight thesis of its own: a
-  // single ring expanding once from the dial and settling, on confirm
-  // only — never looping, never on every tap. Extends the existing
-  // "physical dial" language (see the ring/button styles below) rather
-  // than adding a new decorative shape. Skipped entirely under reduced
-  // motion, same as reveal falls back to an instant swap there.
+  // A single ring blooming outward once, on confirm only — the light's
+  // glow spreading, not a decorative loop. Never fires on its own.
   const ripple = useRef(new Animated.Value(0)).current;
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -57,15 +51,18 @@ export function AliveButton({ label, onPress, confirmed }: Props) {
   useEffect(() => {
     if (!confirmed) return;
     if (reduceMotion) {
-      // No animated reveal, no ripple — the checkmark is simply there.
+      // No animated light-up, no ripple — the beacon is simply lit.
       reveal.setValue(1);
       return;
     }
+    // Not useNativeDriver: the fill-color interpolation below can't run
+    // on the native thread; this is a single one-time transition, not
+    // a continuous animation, so the cost is negligible.
     Animated.timing(reveal, {
       toValue: 1,
       duration: 480,
       delay: 90,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
     Animated.timing(ripple, {
       toValue: 1,
@@ -103,8 +100,19 @@ export function AliveButton({ label, onPress, confirmed }: Props) {
     onPress();
   };
 
+  const fillStyle = {
+    backgroundColor: reveal.interpolate({
+      inputRange: [0, 1],
+      outputRange: [colors.surface, colors.accent],
+    }),
+    borderColor: reveal.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['rgba(255, 180, 84, 0.5)', 'rgba(26, 19, 5, 0.18)'],
+    }),
+  };
   const labelStyle = {
     opacity: reveal.interpolate({ inputRange: [0, 0.4], outputRange: [1, 0], extrapolate: 'clamp' as const }),
+    color: colors.accent,
   };
   const markStyle = {
     opacity: reveal.interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 0, 1] }),
@@ -114,12 +122,11 @@ export function AliveButton({ label, onPress, confirmed }: Props) {
       },
     ],
   };
-  // Same center and starting size as the button itself — it reads as
-  // the dial's own confirm response, not an unrelated effect layered
-  // on top. Scale carries the expansion so it stays on the native
-  // thread; opacity fades it out over the same stretch.
+  // Same center and starting size as the button itself — the glow
+  // reads as the beacon's own light spreading, not an unrelated effect
+  // layered on top.
   const rippleStyle = {
-    opacity: ripple.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.32, 0] }),
+    opacity: ripple.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.4, 0] }),
     transform: [
       {
         scale: ripple.interpolate({
@@ -141,11 +148,13 @@ export function AliveButton({ label, onPress, confirmed }: Props) {
           accessibilityRole="button"
           accessibilityLabel={confirmed ? "You're checked in" : label}
           hitSlop={12}
-          style={styles.button}
+          style={styles.buttonWrap}
         >
-          <Animated.Text style={[styles.label, labelStyle]}>{label}</Animated.Text>
-          <Animated.View style={[styles.mark, markStyle]} pointerEvents="none">
-            <CheckMark progress={reveal} color={colors.onAccent} />
+          <Animated.View style={[styles.button, fillStyle]}>
+            <Animated.Text style={[styles.label, labelStyle]}>{label}</Animated.Text>
+            <Animated.View style={[styles.mark, markStyle]} pointerEvents="none">
+              <CheckMark progress={reveal} color={colors.onAccent} />
+            </Animated.View>
           </Animated.View>
         </Pressable>
       </Animated.View>
@@ -163,21 +172,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonWrap: {
+    width: SIZE,
+    height: SIZE,
+    borderRadius: SIZE / 2,
+  },
   button: {
     width: SIZE,
     height: SIZE,
     borderRadius: SIZE / 2,
-    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(243, 238, 228, 0.14)',
+    borderWidth: 1.5,
     ...Platform.select({
       ios: {
-        shadowColor: '#000000',
-        shadowOpacity: 0.18,
-        shadowRadius: 20,
-        shadowOffset: { width: 0, height: 10 },
+        shadowColor: colors.accent,
+        shadowOpacity: 0.35,
+        shadowRadius: 24,
+        shadowOffset: { width: 0, height: 0 },
       },
       android: {
         elevation: 6,
@@ -186,7 +198,6 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.button,
-    color: colors.onAccent,
     textAlign: 'center',
   },
   mark: {

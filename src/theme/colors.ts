@@ -1,26 +1,33 @@
 /**
- * ALIVE color palette — v2.
+ * ALIVE color palette — "Beacon" direction.
  *
- * Moved away from a plain off-white/bright-green "safety app" look
- * (the SnugSafety / Are You Dead Yet pattern: white background, a flat
- * green go-button) toward something closer to Scandinavian product and
- * editorial design: warm linen instead of stark white, a deep,
- * desaturated pine rather than a saturated "success" green, and warm
- * greys instead of cool ones. Nothing here is meant to say "you are
- * safe" the way traffic-light green does — it's meant to feel like a
- * considered, physical object.
+ * Replaces the earlier warm-cream/serif palette, which — despite
+ * being a deliberate move away from a flat white/bright-green
+ * "safety app" look — still landed in exactly the cluster AI-generated
+ * interfaces default to regardless of subject: warm cream ground,
+ * high-contrast serif display, a muted accent. Recognizable as
+ * "considered design" in the abstract, not as *this* product.
+ *
+ * Beacon instead: a near-black ground and one warm signal-lamp color
+ * that means "here" — the literal mechanism of the product (a light
+ * that says someone is present, visible without contact) rather than
+ * a generic calm-app mood. The check-in button doesn't sit on this
+ * ground, it's the one light source in it, the way a real beacon
+ * reads against open water at night.
  */
 export const colors = {
-  background: '#EEDEC5',
-  surface: '#FFFFFF',
+  background: '#0A0D12',
+  surface: '#12161F',
 
-  ink: '#20201A',
-  inkMuted: '#6E6A5B',
-  inkFaint: '#A6A08B',
+  ink: '#F2EFE9',
+  inkMuted: '#9A9690',
+  inkFaint: '#5C5A56',
 
-  accent: '#333F2C',
-  accentPressed: '#242D20',
-  onAccent: '#F3EEE4',
+  /** The signal lamp itself — every "on" state, the check-in button, the one warm note in an otherwise dark, quiet field. */
+  accent: '#FFB454',
+  accentPressed: '#E0993D',
+  /** Text/icon color sitting directly on the lit accent — dark, not white, for the graphic punch of ink on a lamp. */
+  onAccent: '#1A1305',
 
-  hairline: '#E1D9C8',
+  hairline: 'rgba(242, 239, 233, 0.10)',
 } as const;
