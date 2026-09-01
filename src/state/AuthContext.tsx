@@ -54,7 +54,13 @@ type AuthState = {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(isPreviewMode ? PREVIEW_SESSION : null);
+  // Preview builds start signed OUT, not pre-signed-in: the whole
+  // point of a preview is to see real screens, and PreAuthOnboarding
+  // (welcome/consent/how-it-works/persona) only ever renders before a
+  // session exists — starting pre-authenticated would skip past all of
+  // that, every time. verifyCode below is what actually "signs in" a
+  // preview build, once someone reaches SignInScreen.
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(!isPreviewMode);
 
   useEffect(() => {
@@ -91,12 +97,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error;
       },
       verifyCode: async (email: string, code: string) => {
-        if (isPreviewMode) return;
+        // Any 6-10 digit code "verifies" — this is what turns a
+        // preview build's signed-out start into a signed-in one, once
+        // someone reaches SignInScreen (normally, or via the "already
+        // have an account" skip). Nothing checks it against a real
+        // backend since there isn't one.
+        if (isPreviewMode) {
+          setSession(PREVIEW_SESSION);
+          return;
+        }
         const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
         if (error) throw error;
       },
       signOut: async () => {
-        if (isPreviewMode) return;
+        if (isPreviewMode) {
+          setSession(null);
+          return;
+        }
         await supabase.auth.signOut();
       },
       deleteAccount: async () => {
@@ -104,8 +121,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // being falsy like the other contexts' calls do: this one
         // doesn't check userId at all before calling Supabase, so a
         // tap on "Delete my account" in a preview build must never
-        // reach the real backend.
-        if (isPreviewMode) return;
+        // reach the real backend. Signing out locally still happens,
+        // same as the real flow, so the preview visibly returns to
+        // PreAuthOnboarding rather than looking like nothing happened.
+        if (isPreviewMode) {
+          setSession(null);
+          return;
+        }
         const { error } = await supabase.rpc('delete_own_account');
         if (error) throw error;
         // The row this session's access token pointed at is already
