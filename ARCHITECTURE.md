@@ -59,6 +59,11 @@ supabase/
                            escalation_notifications, but keyed by which
                            of the two self-reminders (see below) fired,
                            so they don't block each other.
+  migrations/0004_check_in_deletes.sql  The check_ins DELETE policy
+                           missing from 0001_init.sql (owner-only, same
+                           as everywhere else), plus an explicit
+                           search_path on the three SECURITY DEFINER
+                           functions.
   functions/
     check-escalations/     The scheduled Edge Function: notifies trusted
                            contacts on a missed check-in, and pushes the
@@ -497,11 +502,12 @@ live project to run against. One-time setup:
    as `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY`, then
    restart `expo start` — Expo only reads `.env` at startup.
 3. Run every migration file in `supabase/migrations/`, in order, once —
-   `0001_init.sql`, then `0002_gdpr.sql`, then `0003_reminders.sql`, and
-   whatever's added after them. `supabase db push` with the CLI picks up
-   all of them automatically; if you're pasting into the SQL Editor by
-   hand instead, paste each file in order yourself, since it's easy to
-   stop after the first one and miss the rest.
+   `0001_init.sql`, then `0002_gdpr.sql`, then `0003_reminders.sql`, then
+   `0004_check_in_deletes.sql`, and whatever's added after them.
+   `supabase db push` with the CLI picks up all of them automatically;
+   if you're pasting into the SQL Editor by hand instead, paste each
+   file in order yourself, since it's easy to stop after the first one
+   and miss the rest.
 4. Authentication → Email Templates: edit **both** "Confirm signup" and
    "Magic Link" — Supabase picks whichever one applies to the specific
    email (first-ever OTP for a brand-new address uses Confirm signup;

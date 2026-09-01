@@ -56,6 +56,8 @@ export function SettingsScreen({ onBack, onOpenHowItWorks }: Props) {
         supabase.from('check_ins').select('day, checked_in_at').eq('user_id', userId).order('day'),
       ]);
       if (profileResult.error) throw profileResult.error;
+      if (contactsResult.error) throw contactsResult.error;
+      if (checkInsResult.error) throw checkInsResult.error;
 
       const exportPayload = {
         exported_at: new Date().toISOString(),

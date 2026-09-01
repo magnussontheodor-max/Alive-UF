@@ -111,7 +111,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // The row this session's access token pointed at is already
         // gone server-side; sign out locally to clear it here too
         // rather than leaving a dead session sitting in AsyncStorage.
-        await supabase.auth.signOut();
+        // The account is already deleted at this point, so a failure
+        // here (network blip, etc.) must never surface as a deletion
+        // failure to the caller — it's local cleanup on top of a
+        // deletion that already succeeded, nothing more.
+        try {
+          await supabase.auth.signOut();
+        } catch {
+          // Swallowed on purpose — see comment above.
+        }
       },
     }),
     [isLoading, session]
