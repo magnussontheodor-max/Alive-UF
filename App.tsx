@@ -16,6 +16,8 @@ import { HomeScreen } from './src/screens/HomeScreen';
 import { HowItWorksScreen } from './src/screens/HowItWorksScreen';
 import { NotConfiguredScreen } from './src/screens/NotConfiguredScreen';
 import { OnboardingFlow } from './src/screens/OnboardingFlow';
+import { PreAuthOnboarding } from './src/screens/PreAuthOnboarding';
+import type { PreAuthDraft } from './src/screens/PreAuthOnboarding';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { SignInScreen } from './src/screens/SignInScreen';
 import { AuthProvider, useAuth } from './src/state/AuthContext';
@@ -60,6 +62,36 @@ type AuthGateProps = {
  */
 function AuthGate({ pendingInviteToken, clearPendingInvite }: AuthGateProps) {
   const { isConfigured, isLoading, session } = useAuth();
+  // What PreAuthOnboarding collected (consent, persona), waiting to be
+  // handed to OnboardingFlow once a session exists — see
+  // PreAuthOnboarding's doc comment and "No navigation library" in
+  // ARCHITECTURE.md for why sign-in now sits *after* the welcome/
+  // consent/how-it-works/persona steps instead of gating them.
+  const [preAuthDraft, setPreAuthDraft] = useState<PreAuthDraft | null>(null);
+  // Flips once PreAuthOnboarding finishes normally (persona's
+  // "Continue") *or* someone taps its "Already have an account? Sign
+  // in" escape hatch — either way, the next screen is SignInScreen.
+  const [readyForSignIn, setReadyForSignIn] = useState(false);
+
+  // Root cause fix for the orphaned-draft bug: `onPreAuthDraftConsumed`
+  // only clears `preAuthDraft` when OnboardingFlow actually ran and used
+  // it. That leaves it (and `readyForSignIn`) stale whenever a session
+  // ends *without* OnboardingFlow ever mounting — e.g. someone finishes
+  // PreAuthOnboarding, signs into an already-onboarded account (so
+  // OnboardingFlow never sees the draft), then deletes that account or
+  // its session simply expires. Without this, the next sign-in would
+  // skip straight back to SignInScreen (readyForSignIn still true) and,
+  // worse, hand a brand-new account the previous person's draft —
+  // silently recording *their* consent as if this new person had given
+  // it. Resetting both any time `session` goes falsy — not just via the
+  // narrower "OnboardingFlow consumed it" callback — guarantees a
+  // signed-out session can never inherit a previous account's pre-auth
+  // draft, no matter which of those paths ended it.
+  useEffect(() => {
+    if (session) return;
+    setPreAuthDraft(null);
+    setReadyForSignIn(false);
+  }, [session]);
 
   // Claims a trusted-contact invite the moment both a session and a
   // pending token exist, regardless of which arrived first — accepting
@@ -80,18 +112,39 @@ function AuthGate({ pendingInviteToken, clearPendingInvite }: AuthGateProps) {
 
   if (!isConfigured) return <NotConfiguredScreen />;
   if (isLoading) return <View style={{ flex: 1, backgroundColor: colors.background }} />;
-  if (!session) return <SignInScreen />;
+
+  if (!session) {
+    if (!readyForSignIn) {
+      return (
+        <PreAuthOnboarding
+          onDone={(draft) => {
+            setPreAuthDraft(draft);
+            setReadyForSignIn(true);
+          }}
+          onSkipToSignIn={() => setReadyForSignIn(true)}
+        />
+      );
+    }
+    return <SignInScreen />;
+  }
 
   return (
     <ProfileProvider>
       <CheckInProvider>
-        <Root />
+        <Root preAuthDraft={preAuthDraft} onPreAuthDraftConsumed={() => setPreAuthDraft(null)} />
       </CheckInProvider>
     </ProfileProvider>
   );
 }
 
 type Screen = 'home' | 'settings' | 'howItWorks';
+
+type RootProps = {
+  /** Passed straight through to OnboardingFlow — see its own doc comment for what a missing/incomplete draft means there. */
+  preAuthDraft: PreAuthDraft | null;
+  /** Passed straight through to OnboardingFlow, called once it's actually used the draft — see there for why. */
+  onPreAuthDraftConsumed: () => void;
+};
 
 /**
  * Picks onboarding vs. the real app, and within the real app which of
@@ -100,7 +153,7 @@ type Screen = 'home' | 'settings' | 'howItWorks';
  * OnboardingFlow: a home/settings/how-it-works triangle is simple
  * enough for a bit of local state (see ARCHITECTURE.md).
  */
-function Root() {
+function Root({ preAuthDraft, onPreAuthDraftConsumed }: RootProps) {
   const { isOnboarded } = useProfile();
   const [screen, setScreen] = useState<Screen>('home');
   useRegisterPushToken();
@@ -112,7 +165,9 @@ function Root() {
     if (!isOnboarded) setScreen('home');
   }, [isOnboarded]);
 
-  if (!isOnboarded) return <OnboardingFlow />;
+  if (!isOnboarded) {
+    return <OnboardingFlow preAuthDraft={preAuthDraft} onPreAuthDraftConsumed={onPreAuthDraftConsumed} />;
+  }
 
   if (screen === 'settings') {
     return (

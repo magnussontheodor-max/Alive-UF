@@ -12,31 +12,67 @@ import { CheckInTimeStep } from './onboarding/CheckInTimeStep';
 import { ConsentStep } from './onboarding/ConsentStep';
 import { ContactsStep } from './onboarding/ContactsStep';
 import { GracePeriodStep } from './onboarding/GracePeriodStep';
-import { HowItWorksStep } from './onboarding/HowItWorksStep';
 import { LegalScreen } from './LegalScreen';
 import { PersonaStep } from './onboarding/PersonaStep';
+import type { PreAuthDraft } from './PreAuthOnboarding';
 import { TextStep } from './onboarding/TextStep';
-import { WelcomeStep } from './onboarding/WelcomeStep';
 
-const STEPS = ['welcome', 'consent', 'howItWorks', 'persona', 'name', 'contacts', 'time', 'grace'] as const;
-type Step = (typeof STEPS)[number];
+// Welcome, consent, how-it-works, and persona normally happen *before*
+// sign-in now (PreAuthOnboarding — see App.tsx's AuthGate and
+// ARCHITECTURE.md), so this wizard's usual path starts at `name`.
+// `consent`/`persona` only reappear here as a fallback — see
+// `hasValidPreAuthDraft` below — for whoever reaches OnboardingFlow
+// without a completed pre-auth draft, so consent is never silently
+// skipped.
+const POST_PERSONA_STEPS = ['name', 'contacts', 'time', 'grace'] as const;
+const FALLBACK_STEPS = ['consent', 'persona', 'name', 'contacts', 'time', 'grace'] as const;
+type Step = (typeof FALLBACK_STEPS)[number];
 
 const EMPTY_CONTACT: TrustedContact = { name: '', phone: '' };
 
+type Props = {
+  /**
+   * What PreAuthOnboarding already collected, handed down through
+   * AuthGate/Root once a session exists. `null`/`undefined`, or a
+   * draft with `privacyAccepted: false`, means whoever's here didn't
+   * (or couldn't) finish that flow — see `hasValidPreAuthDraft` below
+   * for what that changes.
+   */
+  preAuthDraft?: PreAuthDraft | null;
+  /**
+   * Called once the draft has actually been applied (end of
+   * handleFinish) — AuthGate clears it in response. Without this, a
+   * restart from Settings (still the same signed-in session, so
+   * AuthGate never re-mounts to reset its own state) would keep
+   * handing this same, by-then-possibly-stale draft to every future
+   * run of this wizard instead of re-asking, same as any other
+   * already-onboarded person editing things afterward.
+   */
+  onPreAuthDraftConsumed?: () => void;
+};
+
 /**
- * A short, linear wizard — welcome, how it works, who this is for,
- * your name, your trusted contact(s), your check-in time, your grace
- * period — then straight into the real app. Each step writes into
- * local component state (`draft`), and only the final step commits it
- * to ProfileContext via completeOnboarding(). No navigation library: a
- * handful of screens with one "next/back" relationship don't need one
- * yet (see ARCHITECTURE.md).
+ * A short, linear wizard — your name, your trusted contact(s), your
+ * check-in time, your grace period — then straight into the real app.
+ * Each step writes into local component state (`draft`), and only the
+ * final step commits it to ProfileContext via completeOnboarding(). No
+ * navigation library: a handful of screens with one "next/back"
+ * relationship don't need one yet (see ARCHITECTURE.md).
  */
-export function OnboardingFlow() {
+export function OnboardingFlow({ preAuthDraft, onPreAuthDraftConsumed }: Props) {
   const profile = useProfile();
+  // The one thing this whole component branches on. A valid draft
+  // means consent was already recorded and persona already answered
+  // before sign-in — this wizard just continues from `name`. Anything
+  // else (skipped straight to sign-in, or a draft that somehow never
+  // got a "true" here) falls back to asking both again, right here,
+  // rather than ever completing onboarding with unrecorded consent.
+  const hasValidPreAuthDraft = preAuthDraft?.privacyAccepted === true;
+  const STEPS: readonly Step[] = hasValidPreAuthDraft ? POST_PERSONA_STEPS : FALLBACK_STEPS;
+
   const [stepIndex, setStepIndex] = useState(0);
-  const [consentDraft, setConsentDraft] = useState<boolean>(profile.privacyAccepted);
-  const [subjectModeDraft, setSubjectModeDraft] = useState<SubjectMode>(profile.subjectMode);
+  const [consentDraft, setConsentDraft] = useState<boolean>(preAuthDraft?.privacyAccepted ?? profile.privacyAccepted);
+  const [subjectModeDraft, setSubjectModeDraft] = useState<SubjectMode>(preAuthDraft?.subjectMode ?? profile.subjectMode);
   const [nameDraft, setNameDraft] = useState(profile.userName);
   const [contactsDraft, setContactsDraft] = useState<TrustedContact[]>(
     profile.contacts.length > 0 ? profile.contacts : [EMPTY_CONTACT]
@@ -68,10 +104,10 @@ export function OnboardingFlow() {
     profile.setCheckInWindow(timeDraft);
     profile.setGraceMinutes(graceDraft);
     profile.completeOnboarding();
+    onPreAuthDraftConsumed?.();
   };
 
-  const primaryLabel =
-    step === 'welcome' ? 'Get started' : step === 'grace' ? 'Start using ALIVE' : 'Continue';
+  const primaryLabel = step === 'grace' ? 'Start using ALIVE' : 'Continue';
 
   const primaryDisabled =
     (step === 'consent' && !consentDraft) ||
@@ -109,7 +145,7 @@ export function OnboardingFlow() {
       >
         <View style={styles.container}>
           <View style={styles.top}>
-            {step === 'welcome' ? null : (
+            {stepIndex === 0 ? null : (
               <OnboardingHeader step={stepIndex - 1} totalSteps={STEPS.length - 1} onBack={goBack} />
             )}
           </View>
@@ -128,7 +164,6 @@ export function OnboardingFlow() {
             // it off there rather than fight the nested gesture.
             scrollEnabled={step !== 'time'}
           >
-            {step === 'welcome' && <WelcomeStep />}
             {step === 'consent' && (
               <ConsentStep
                 accepted={consentDraft}
@@ -137,7 +172,6 @@ export function OnboardingFlow() {
                 onOpenTerms={() => setLegalDoc('terms')}
               />
             )}
-            {step === 'howItWorks' && <HowItWorksStep />}
             {step === 'persona' && <PersonaStep value={subjectModeDraft} onChange={setSubjectModeDraft} />}
             {step === 'name' && (
               <TextStep

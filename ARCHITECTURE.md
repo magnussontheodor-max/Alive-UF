@@ -20,9 +20,10 @@ you to actually run.
   store listing catches up (`npx expo install expo@latest && npx expo
   install --fix`, the same mechanism used to move to 54).
 - **Supabase** — Postgres, Auth, Row Level Security, and a scheduled
-  Edge Function, for check-ins, trusted contacts, and escalation state.
-  Wired up in code; needs a real project's URL and anon key in `.env`
-  to actually run — see "Real backend" below for exact setup steps.
+  Edge Function, for check-ins, trusted contacts, escalation state, and
+  the two self-reminders leading up to it. Wired up in code; needs a
+  real project's URL and anon key in `.env` to actually run — see "Real
+  backend" below for exact setup steps.
 - **Expo Notifications** — how a trusted contact is actually told a
   check-in was missed: a push to their device, not SMS (see "Real
   backend" for why).
@@ -39,9 +40,10 @@ over: everything user-specific now reads and writes Supabase for real.
 ## Folder structure
 
 ```
-App.tsx                  Root: font loading, then AuthGate (sign in /
-                         not-configured / the real app), then Root
-                         picks OnboardingFlow vs. Home/Settings/HowItWorks
+App.tsx                  Root: font loading, then AuthGate (pre-auth
+                         onboarding / sign in / not-configured / the
+                         real app), then Root picks OnboardingFlow vs.
+                         Home/Settings/HowItWorks
 
 index.ts                 Expo entry point (registers App)
 
@@ -49,9 +51,19 @@ supabase/
   migrations/0001_init.sql  The whole schema: profiles, trusted_contacts,
                            check_ins, push_tokens, escalation_notifications,
                            their RLS policies, and the signup trigger.
+  migrations/0002_gdpr.sql  privacy_accepted_at/privacy_policy_version on
+                           profiles, and delete_own_account() — see the
+                           GDPR section below.
+  migrations/0003_reminders.sql  reminder_notifications — the same
+                           once-per-day dedup pattern as
+                           escalation_notifications, but keyed by which
+                           of the two self-reminders (see below) fired,
+                           so they don't block each other.
   functions/
-    check-escalations/     The scheduled Edge Function that actually
-                           notifies trusted contacts — see "Real backend".
+    check-escalations/     The scheduled Edge Function: notifies trusted
+                           contacts on a missed check-in, and pushes the
+                           person themselves twice before that ever
+                           happens — see "Real backend".
 
 src/
   theme/                 The single source of truth for how ALIVE looks
@@ -68,8 +80,9 @@ src/
                            MAX_TRUSTED_CONTACTS (2).
 
   data/
-    howItWorks.ts           The three-sentence explanation of the product,
-                           as data — shared by the onboarding step and the
+    howItWorks.ts           The problem-first intro paragraph plus the
+                           three-row explanation of the product, as
+                           data — shared by the onboarding step and the
                            standalone screen so the copy exists once.
 
   lib/
@@ -98,8 +111,17 @@ src/
                            until AuthGate can claim it.
 
   screens/
-    SignInScreen.tsx        The only way into the app: email, then the
-                           code sent to it.
+    PreAuthOnboarding.tsx   The pitch: welcome/consent/how-it-works/
+                           persona, shown before there's any account to
+                           attach them to — see "Sign-in moved after the
+                           pitch" below. Hands its result to AuthGate as
+                           a small draft object once persona's
+                           "Continue" is pressed; also owns the
+                           welcome-step "Already have an account? Sign
+                           in" link that skips straight past all four.
+    SignInScreen.tsx        Email, then the code sent to it — reached
+                           after PreAuthOnboarding finishes or is
+                           skipped, not before it.
     NotConfiguredScreen.tsx Shown instead of crashing when .env has no
                            real Supabase project in it yet.
     HomeScreen.tsx          The "Are they okay?" screen: greeting, the
@@ -112,27 +134,41 @@ src/
     HowItWorksScreen.tsx     The same explainer shown once in onboarding,
                            kept reachable afterward from Settings — both
                            screens render the same HowItWorksRows list.
-    OnboardingFlow.tsx      Orchestrates the welcome/how-it-works/persona/
-                           name/contacts/time/grace wizard; owns which
-                           step is showing and writes the result into
-                           ProfileContext.
+    OnboardingFlow.tsx      Orchestrates the name/contacts/time/grace
+                           wizard; owns which step is showing and writes
+                           the result into ProfileContext. Normally
+                           starts straight at `name` — consent and
+                           persona already happened in PreAuthOnboarding
+                           — but falls back to asking both again itself
+                           if it's ever handed no valid draft for them;
+                           see "Sign-in moved after the pitch" below.
     onboarding/
-      WelcomeStep.tsx       Step 1 content: wordmark + tagline.
-      HowItWorksStep.tsx    Step 2 content: HowItWorksRows, the same
-                           numbered 3-point list Settings shows.
-      PersonaStep.tsx       Step 3 content: who ALIVE is for (self, or
-                           someone the user cares about). Also reused by
+      WelcomeStep.tsx       PreAuthOnboarding step 1: wordmark + the
+                           headline/supporting line making the case for
+                           ALIVE before anything else is asked.
+      ConsentStep.tsx        PreAuthOnboarding step 2 (normally) — GDPR's
+                           recorded "I agree", plus links to the actual
+                           documents (LegalScreen). Also OnboardingFlow's
+                           own fallback step 1 when it's run without a
+                           completed pre-auth draft.
+      HowItWorksStep.tsx    PreAuthOnboarding step 3: HowItWorksRows, the
+                           same numbered 3-point list Settings shows.
+      PersonaStep.tsx       PreAuthOnboarding step 4 (normally) — who
+                           ALIVE is for (self, or someone the user cares
+                           about). Also OnboardingFlow's fallback step 2,
+                           and reused as-is by SettingsScreen.
+      TextStep.tsx          OnboardingFlow content: one question, one
+                           text field (the checked-in person's name).
+      ContactsStep.tsx      OnboardingFlow content: name + phone for one
+                           or two trusted contacts, with add/remove.
+                           Also reused by SettingsScreen — see "Why this
+                           shape" below.
+      CheckInTimeStep.tsx   OnboardingFlow content: a precise check-in
+                           time, on two WheelPickers. Also reused by
                            SettingsScreen.
-      TextStep.tsx          Step 4 content: one question, one text field
-                           (the checked-in person's name).
-      ContactsStep.tsx      Step 5 content: name + phone for one or two
-                           trusted contacts, with add/remove. Also reused
-                           by SettingsScreen — see "Why this shape" below.
-      CheckInTimeStep.tsx   Step 6 content: a precise check-in time, on
-                           two WheelPickers. Also reused by SettingsScreen.
-      GracePeriodStep.tsx   Step 7 content: how long to wait after a
-                           missed check-in before telling contacts. Also
-                           reused by SettingsScreen.
+      GracePeriodStep.tsx   OnboardingFlow content: how long to wait
+                           after a missed check-in before telling
+                           contacts. Also reused by SettingsScreen.
 
   components/
     AliveButton.tsx         The primary action: press animation, haptics,
@@ -258,22 +294,90 @@ that will run at 3pm on a Tuesday, not a parallel hand-built mock.
 first time the app had more than one screen, and it was tempting to
 reach for React Navigation or Expo Router to handle that. What it
 actually needed was "show one of several things, in order, with a way
-to go back" — `OnboardingFlow` does that with a single `useState`
-index, the same pattern already used for the check-in confirmation's
-idle/confirming/confirmed states. Settings and "How ALIVE works" added
-a second, small triangle (Home ↔ Settings ↔ How it works), handled the
-same way one level up, in `Root` (`App.tsx`) — again just a `useState`
-holding which of three screens is showing. Neither of these is "a real
-information architecture" yet: no tabs, nothing that needs a back
-*stack* rather than a single "where did I come from" value. There is
-now exactly one deep link (`alive://join/<token>`, the trusted-contact
-invite — see "Real backend"), handled directly by `usePendingInvite`
-rather than a router, because it's one path with one job: hold a token
-until sign-in finishes. The right moment to add a real navigation
-library is when a second one of these shows up with its own screen to
-jump to — most likely a tapped push notification wanting to open
-straight onto a specific screen, which today's local `useState` can't
-do (a tap currently just opens the app to whatever Root already had).
+to go back" — `PreAuthOnboarding` and `OnboardingFlow` each do that
+with their own single `useState` index, the same pattern already used
+for the check-in confirmation's idle/confirming/confirmed states.
+Settings and "How ALIVE works" added a second, small triangle (Home ↔
+Settings ↔ How it works), handled the same way one level up, in `Root`
+(`App.tsx`) — again just a `useState` holding which of three screens is
+showing. `AuthGate`, one level up again, holds a third small piece of
+state the same way: whether the pre-auth pitch has finished (or been
+skipped) yet, so it knows whether to show `PreAuthOnboarding` or
+`SignInScreen`. Neither of these is "a real information architecture"
+yet: no tabs, nothing that needs a back *stack* rather than a single
+"where did I come from" value. There is now exactly one deep link
+(`alive://join/<token>`, the trusted-contact invite — see "Real
+backend"), handled directly by `usePendingInvite` rather than a router,
+because it's one path with one job: hold a token until sign-in
+finishes. The right moment to add a real navigation library is when a
+second one of these shows up with its own screen to jump to — most
+likely a tapped push notification wanting to open straight onto a
+specific screen, which today's local `useState` can't do (a tap
+currently just opens the app to whatever Root already had).
+
+**Sign-in moved after the pitch, not before it.** The whole app used to
+gate on a session first: `AuthGate` showed `SignInScreen` whenever
+there was no session, and `OnboardingFlow` — welcome screen included —
+never even mounted until after that. That's backwards for a product
+that has to earn "give me your email" before asking for it: a
+brand-new person should meet what ALIVE actually is (the welcome
+headline, how it works, who it's for) before being asked to create an
+account for it, the same reasoning as "problem before mechanism" in the
+copy itself (see the onboarding v2 UX pass). `PreAuthOnboarding` is
+that meet-the-product sequence — welcome, consent, how it works,
+persona — held entirely in its own local `useState` drafts, same shape
+as `OnboardingFlow`'s, since there's no account yet to write anything
+to. `AuthGate` holds the result (a small `{ subjectMode,
+privacyAccepted }` draft) across the transition to `SignInScreen` and,
+once a session exists, hands it to `OnboardingFlow`, which now starts
+straight at `name` instead of repeating ground already covered.
+
+The one thing this reordering can't skip is GDPR consent actually being
+recorded (see "GDPR" below) — and a person can reach a signed-in,
+not-yet-onboarded `OnboardingFlow` two ways that *don't* carry a
+completed draft: tapping the welcome step's "Already have an account?
+Sign in" link (a returning person re-authenticating shouldn't have to
+sit through the pitch again, so it skips consent/how-it-works/persona
+entirely — see below), or restarting onboarding from Settings while
+already signed in (there's no pre-auth phase to have come from at all).
+`OnboardingFlow` treats both the same way: no valid
+`privacyAccepted: true` draft means it falls back to asking for consent
+and persona itself, as its own first two steps, rather than ever
+completing onboarding with unrecorded consent. `AuthGate` also clears
+the draft once `OnboardingFlow` actually applies it (`handleFinish`),
+so a Settings restart — same signed-in session, `AuthGate` never
+remounts to reset itself — doesn't keep silently re-using a
+by-then-stale draft from the original sign-up instead of falling back
+correctly.
+
+That `onPreAuthDraftConsumed` callback only covers the case where
+`OnboardingFlow` actually ran and used the draft — it says nothing
+about a session that ends *without* `OnboardingFlow` ever mounting,
+which happens whenever someone finishes `PreAuthOnboarding` and then
+signs into an already-onboarded account. The invariant that actually
+has to hold is broader: **a signed-out session must never be able to
+inherit a previous account's pre-auth draft.** Without it, the stale
+`preAuthDraft`/`readyForSignIn` pair sits there until the next sign-in
+attempt — skipping `PreAuthOnboarding` entirely for whoever's about to
+create the next account, *and* handing their brand-new,
+not-yet-onboarded `OnboardingFlow` a draft with `privacyAccepted: true`
+that belonged to somebody else, which `handleFinish` would then use to
+call `profile.acceptPrivacyPolicy()` — recording GDPR consent this
+person never actually gave. So `AuthGate` also resets both
+`preAuthDraft` and `readyForSignIn` in a `useEffect` keyed on
+`session`, any time `session` goes falsy — covering account deletion,
+session expiry, and manual sign-out alike, not just the one path
+`onPreAuthDraftConsumed` was written for.
+
+The welcome step's "Already have an account? Sign in" link (in
+`PreAuthOnboarding`, not `WelcomeStep.tsx` itself — that component
+still only knows how to be the welcome step's content, on the same
+"components don't know why they're shown" principle as PersonaStep
+below) is deliberately quiet: an underlined caption, not a button,
+matching `DemoFooter`/Settings' link-row register rather than competing
+with "Get started". It only appears on welcome, not consent/how-it-
+works/persona, because by then someone's already chosen to keep going
+through the pitch.
 
 **Trusted contacts are typed in by hand, not picked from the phone's
 address book.** A real contact picker (`expo-contacts`) means a native
@@ -392,8 +496,12 @@ live project to run against. One-time setup:
    key into a `.env` file at the repo root (copy `.env.example` first)
    as `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY`, then
    restart `expo start` — Expo only reads `.env` at startup.
-3. Run `supabase/migrations/0001_init.sql` once, either pasted into the
-   SQL Editor or via `supabase db push` with the CLI.
+3. Run every migration file in `supabase/migrations/`, in order, once —
+   `0001_init.sql`, then `0002_gdpr.sql`, then `0003_reminders.sql`, and
+   whatever's added after them. `supabase db push` with the CLI picks up
+   all of them automatically; if you're pasting into the SQL Editor by
+   hand instead, paste each file in order yourself, since it's easy to
+   stop after the first one and miss the rest.
 4. Authentication → Email Templates: edit **both** "Confirm signup" and
    "Magic Link" — Supabase picks whichever one applies to the specific
    email (first-ever OTP for a brand-new address uses Confirm signup;
@@ -424,7 +532,8 @@ live project to run against. One-time setup:
    "Supabase Edge Function" → `check-escalations` → every 5 minutes (or
    similar). This is the piece that actually notices a missed
    check-in — every step above can be done correctly and nothing will
-   ever fire without this one.
+   ever fire without this one. The same run also covers the two
+   self-reminders (below); there's nothing extra to schedule for those.
 7. Push needs an EAS project id (`npx eas init`, free) before
    `useRegisterPushToken` has anywhere to register a device — until
    that's done it fails quietly rather than crashing.
@@ -434,10 +543,15 @@ signup by a trigger), `trusted_contacts` (who to notify — each row
 carries an `invite_token` that a second account claims via
 `accept_invite()`, a `security definer` Postgres function, to become
 the linked watcher), `check_ins` (one append-only row per person per
-day), `push_tokens`, and `escalation_notifications` (stops the
-scheduled function from notifying the same missed day twice, even
-across overlapping runs). Every table has Row Level Security on: a
-person reads/writes their own rows, and a *linked* trusted contact can
+day), `push_tokens`, `escalation_notifications` (stops the scheduled
+function from notifying the same missed day twice, even across
+overlapping runs), and `reminder_notifications` (the same dedup shape,
+but one row per person per day *per reminder kind* — `window_closing`
+and `grace_ending` are independent events that can both legitimately
+fire on the same day for the same person, so a `kind` column and a
+three-way unique constraint keep each one idempotent on its own instead
+of the first reminder blocking the second). Every table has Row Level
+Security on: a person reads/writes their own rows, and a *linked* trusted contact can
 additionally read — never write — the profile, check-ins, and contact
 record of whoever they're watching over. That boundary is enforced by
 Postgres itself, not by app code remembering to check it, which is
@@ -447,18 +561,33 @@ correctly walled off as more of it accumulates.
 
 **Timezone.** `profiles.timezone` is captured once, silently, from the
 device (`Intl.DateTimeFormat().resolvedOptions().timeZone`) when
-onboarding finishes. The escalation function runs with no device of
-its own, so this is the only record of what "10:00" means for each
-person — without it, every deadline would be read as UTC.
+onboarding finishes. `check-escalations` runs with no device of its
+own, so this is the only record of what "10:00" means for each person
+— without it, every deadline (and both reminder times computed from
+it) would be read as UTC.
 
-**Scale.** The escalation function currently scans every onboarded
-profile on each run — fine at thousands of users, and simple enough to
-reason about while the product is still this young. If that scan ever
-becomes the bottleneck, the fix is a computed, indexed
-`next_deadline_utc` column recalculated on check-in or settings change
-(an added column and an indexed range query), not a rewrite — noted
-directly in the function's own comments, not just here, so it's found
-by whoever's actually touching that code when it matters.
+**The two self-reminders.** Escalation only ever tells someone's
+*contacts*, and only after the fact. `check-escalations` also pushes
+the person themselves, twice, on the way there — their own
+`push_tokens`, not their contacts' — computed in the same pass over
+`profiles`, from the same deadline math, rather than as a second Edge
+Function re-scanning the same table on its own schedule: a "window
+closing" push 30 minutes before the deadline (mirroring the client's
+own `closingSoon` status in `checkInStatus.ts`, which until now nothing
+server-side acted on), and a "grace ending" push 10 minutes before
+escalation would actually fire. Both are one-shot per person per day,
+gated the same way escalation is (not checked in yet, not already
+sent) via `reminder_notifications`, and neither ever fires for someone
+who's already checked in.
+
+**Scale.** `check-escalations` currently scans every onboarded profile
+on each run — fine at thousands of users, and simple enough to reason
+about while the product is still this young. If that scan ever becomes
+the bottleneck, the fix is a computed, indexed `next_deadline_utc`
+column recalculated on check-in or settings change (an added column
+and an indexed range query), not a rewrite — noted directly in the
+function's own comments, not just here, so it's found by whoever's
+actually touching that code when it matters.
 
 ## GDPR
 
@@ -469,12 +598,28 @@ the two documents users are asked to actually read, not just link to:
 
 - **Consent, recorded, not assumed.** `profiles.privacy_accepted_at` /
   `privacy_policy_version` (`supabase/migrations/0002_gdpr.sql`) are
-  null until `ConsentStep` — the second onboarding step, right after
-  the welcome screen and before anything else is collected — is
-  affirmatively accepted. `PRIVACY_POLICY_VERSION` in
-  `src/legal/content.ts` is what gets stamped; bump it and anyone who
-  already accepted an older version needs to accept again (not wired
-  automatically yet — see below).
+  null until `ConsentStep` — normally `PreAuthOnboarding`'s second step,
+  right after the welcome screen and before anything else is collected,
+  well before an account even exists — is affirmatively accepted. The
+  acceptance itself is only actually written once `OnboardingFlow`
+  finishes (`ProfileContext.acceptPrivacyPolicy()`, called from
+  `handleFinish`), since there's no profile row to write it to until
+  then; `ConsentStep`'s answer just rides along as part of the draft
+  handed from `PreAuthOnboarding` through sign-in until that point. If
+  `OnboardingFlow` ever runs without a completed draft to carry that
+  answer (see "Sign-in moved after the pitch, not before it" above), it
+  asks `ConsentStep` again itself rather than completing onboarding with
+  nothing recorded. Because that draft rides in `AuthGate`'s own state
+  across the sign-in transition, and not scoped to any particular
+  account, `AuthGate` resets it to `null` (along with `readyForSignIn`)
+  any time `session` goes falsy — see "Sign-in moved after the pitch,
+  not before it" above — so a signed-out session can never hand a new
+  account someone else's already-`privacyAccepted: true` draft and have
+  `handleFinish` record consent for a person who never saw `ConsentStep`
+  at all. `PRIVACY_POLICY_VERSION` in `src/legal/content.ts`
+  is what gets stamped; bump it and anyone who already accepted an
+  older version needs to accept again (not wired automatically yet —
+  see below).
 - **Right of access / portability (Art. 15/20).** Settings → "Download
   my data" queries every row that exists about the signed-in account
   (profile, trusted contacts, check-ins — all already scoped by RLS to
