@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
 import { CheckMark } from './CheckMark';
@@ -7,6 +7,8 @@ import { colors, typography } from '../theme';
 
 const SIZE = 196;
 const RING_GAP = 18;
+/** How far past the outer ring the confirm ripple expands before fading out. */
+const RIPPLE_OVERSHOOT = 22;
 
 type Props = {
   label: string;
@@ -29,17 +31,50 @@ type Props = {
 export function AliveButton({ label, onPress, confirmed }: Props) {
   const scale = useRef(new Animated.Value(1)).current;
   const reveal = useRef(new Animated.Value(0)).current;
+  // The one moment this button gets a delight thesis of its own: a
+  // single ring expanding once from the dial and settling, on confirm
+  // only — never looping, never on every tap. Extends the existing
+  // "physical dial" language (see the ring/button styles below) rather
+  // than adding a new decorative shape. Skipped entirely under reduced
+  // motion, same as reveal falls back to an instant swap there.
+  const ripple = useRef(new Animated.Value(0)).current;
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
-    if (confirmed) {
-      Animated.timing(reveal, {
-        toValue: 1,
-        duration: 480,
-        delay: 90,
-        useNativeDriver: true,
-      }).start();
+    let cancelled = false;
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (!cancelled) setReduceMotion(enabled);
+    });
+    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', (enabled) => {
+      setReduceMotion(enabled);
+    });
+    return () => {
+      cancelled = true;
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!confirmed) return;
+    if (reduceMotion) {
+      // No animated reveal, no ripple — the checkmark is simply there.
+      reveal.setValue(1);
+      return;
     }
-  }, [confirmed, reveal]);
+    Animated.timing(reveal, {
+      toValue: 1,
+      duration: 480,
+      delay: 90,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(ripple, {
+      toValue: 1,
+      duration: 650,
+      delay: 90,
+      easing: Easing.out(Easing.exp),
+      useNativeDriver: true,
+    }).start();
+  }, [confirmed, reduceMotion, reveal, ripple]);
 
   const handlePressIn = () => {
     if (confirmed) return;
@@ -79,9 +114,25 @@ export function AliveButton({ label, onPress, confirmed }: Props) {
       },
     ],
   };
+  // Same center and starting size as the button itself — it reads as
+  // the dial's own confirm response, not an unrelated effect layered
+  // on top. Scale carries the expansion so it stays on the native
+  // thread; opacity fades it out over the same stretch.
+  const rippleStyle = {
+    opacity: ripple.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.32, 0] }),
+    transform: [
+      {
+        scale: ripple.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, (SIZE + RIPPLE_OVERSHOOT * 2) / SIZE],
+        }),
+      },
+    ],
+  };
 
   return (
     <View style={styles.ring}>
+      <Animated.View style={[styles.ripple, rippleStyle]} pointerEvents="none" />
       <Animated.View style={{ transform: [{ scale }] }}>
         <Pressable
           onPressIn={handlePressIn}
@@ -140,5 +191,14 @@ const styles = StyleSheet.create({
   },
   mark: {
     position: 'absolute',
+  },
+  ripple: {
+    position: 'absolute',
+    top: RING_GAP,
+    left: RING_GAP,
+    width: SIZE,
+    height: SIZE,
+    borderRadius: SIZE / 2,
+    backgroundColor: colors.accent,
   },
 });
