@@ -1,78 +1,123 @@
-# Startup OS — prototype
+# Spark UF
 
-A visual, interactive prototype of **Startup OS**, an AI co-founder that guides
-first-time Swedish entrepreneurs from "I want to start a business" to a
-validated, built, and launch-ready digital company.
+An intelligent co-founder for first-time entrepreneurs in Sweden.
 
-This is a **product/UX prototype**, not the production app: all data is
-mocked, there is no backend, database, auth, or real AI integration. The goal
-is to make the product experience and journey feel real and compelling.
+Spark UF is not a chatbot, an idea generator, or a collection of AI buttons. It
+maintains a structured understanding of one startup, tracks what is actually
+known versus assumed, works out which uncertainty matters most right now, and
+gives the founder exactly one next action.
+
+```
+founder input → understand → startup memory → identify what is unknown
+     → agent action → evidence → update memory → next best action
+```
+
+That loop is the product.
 
 ## Running it
 
 ```bash
 npm install
-npm run dev
+npm run dev            # http://localhost:3000
 ```
 
-Then open http://localhost:3000.
+It runs with no backend and no API key. Both are optional upgrades:
 
-## What's here
+| Variable | Effect when set |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Data moves from the local store to Postgres with row level security |
+| `ANTHROPIC_API_KEY` | Agents reason with a live model instead of built-in rules |
 
-- **Dashboard** — the startup's current state, its Next Best Action, a
-  Startup Snapshot, the highest-risk assumption, recent Startup Memory
-  activity, and what's queued next.
-- **My Startup** — the full, persistent understanding Startup OS has of the
-  company (snapshot, founder profile, tracked assumptions, memory log,
-  agents involved).
-- **Idea** — a short questionnaire that generates three scored business
-  opportunities for founders without an idea yet.
-- **Research** — market / competitor / customer / trend / risk findings,
-  open unknowns, and the assumptions they feed into Validation.
-- **Validation** — the core hypothesis, evidence gathered so far, a
-  confidence score, and a runnable experiment.
-- **Product** — the MVP specification: core user, core workflow, what's in
-  scope for v1, and what's deliberately deferred.
-- **Build** — a simulated build pipeline showing Startup OS orchestrating
-  AI coding agents step by step, ending in a shipped MVP.
-- **Legal** — a Swedish company-setup checklist generated for this specific
-  startup (not legal advice).
-- **Launch** — overall launch readiness across the pieces that matter.
-- **AI Co-Founder** — a slide-over chat available from anywhere in the app;
-  telling it what you learned from customers updates Startup Memory and
-  reprioritizes the next action.
+Neither changes any application code — the repository interfaces and the
+provider abstraction switch implementations. The current mode is always shown in
+the top bar, never hidden.
 
-The fictional example company throughout is **LeadFlow AI** — AI-powered
-lead qualification for small Swedish B2B companies — currently at the
-Validation stage.
+To apply the database schema:
+
+```bash
+supabase db execute --file data/supabase/migrations/0001_init.sql
+```
+
+## What it refuses to do
+
+The hard requirement is no AI slop, and it is enforced in code rather than in
+prompts:
+
+- **Unsourced numbers are rejected.** A claim containing a quantity with no
+  attribution never reaches Startup Memory (`domain/rules/grounding.ts`).
+- **Generic advice is rejected by pattern.** "Talk to your customers", "validate
+  your idea", "build a simple MVP" are matched and discarded. If the system
+  cannot say something specific to this founder, it says nothing.
+- **Facts without evidence are demoted.** A claim stated as fact with nothing
+  behind it becomes a hypothesis, visibly.
+- **Confidence cannot be asserted, only derived.** It is computed from evidence
+  weight and always carries its explanation. With no evidence it is `NONE`.
+- **Opportunities require a witnessed problem.** The Opportunity Agent has no
+  code path that produces an opportunity from anything else. With no observed
+  problem it returns blocked, and says why.
 
 ## Architecture
 
-The prototype is intentionally structured around the conceptual system the
-real product will become, even though everything is mocked today:
+Dependencies point inward. Nothing above a layer knows how the one below is
+implemented.
 
 ```
-lib/types.ts         Startup, Founder, StartupMemory, Task, Agent, etc.
-lib/mock-data.ts      LeadFlow AI's mock data — the "database" for now
-lib/orchestrator.ts   Mocked Orchestrator: reads memory, decides next action
-lib/stages.ts         The 8-stage founder journey
+app/            UI and server actions
+orchestrator/   the loop, next-best-action generation, state application
+agents/         five agents, one interface, no direct communication
+ai/             LLMProvider abstraction (Anthropic adapter + offline rules)
+domain/         pure TypeScript: model + rules, zero I/O, unit-testable
+data/           repository interfaces, local store, Supabase + SQL migrations
 ```
 
-The **Orchestrator** is the only thing that is meant to talk to every part
-of the startup. Founders never pick an agent directly — the Orchestrator
-reads Startup Memory, decides what the startup needs next, and selects the
-right agent (Idea, Research, Validation, Product Architect, Build, or
-Legal) to act. In this prototype that loop is mocked (`decideNextAction`
-in `lib/orchestrator.ts`), but the shape is written so a real
-LLM-backed implementation can replace the mock without changing the UI
-layer.
+**Domain.** `Claim` carries an epistemic status (`FACT` / `INFERENCE` /
+`HYPOTHESIS`) and its provenance. `Confidence` carries the evidence it rests on
+and a sentence explaining itself. `Evidence` is weighted by reliability ×
+relevance × epistemic status, because a competitor's marketing page and five
+customer interviews are not the same thing.
 
-Every stage page answers the same four questions — **Where am I? What have
-I accomplished? What's blocking me? What should I do next?** — via the
-shared `OrientationBar` component, so orientation is never more than a
-glance away.
+**Rules** (`domain/rules/`) are deterministic and pure:
+
+- `stage-gates.ts` — every stage transition is a predicate with named unmet
+  requirements. AI never advances a stage.
+- `next-best-action.ts` — ranks open assumptions by
+  `importance × uncertainty × stageRelevance × testability`.
+- `confidence.ts` — derives confidence from evidence, counts contradicting
+  evidence at 1.5×, and caps startup confidence at its weakest load-bearing
+  assumption.
+- `grounding.ts` — the anti-slop enforcement point described above.
+
+**Orchestrator.** The only thing that writes to Startup Memory. Reads state,
+evaluates the gate, decides whether an agent should act, selects it, grounds the
+result, applies it, and creates exactly one task. The database enforces the
+one-open-task rule with a partial unique index.
+
+**Agents.** Structured input, structured output, no direct communication. Each
+declares its mission and its boundaries, and both are shown in the UI. Agents
+never write to the database and never decide what happens next.
+
+## Status
+
+| Stage | State |
+|---|---|
+| Founder | Built — adaptive interview, structured profile, honest advantage assessment |
+| Opportunity | Built — problem-first, grounded in witnessed problems, founder approval |
+| Research | Partial — gate rules and evidence tracking live; Research Agent not built |
+| Validation | Partial — assumption ranking live; Validation Agent not built |
+| Product | Partial — gate rules and spec model live; Product Agent not built |
+| Build | Not built |
+| Setup, Launch | Not built |
+
+Unfinished stages say so on screen rather than showing a placeholder that looks
+finished.
+
+## Demo workspace
+
+The dashboard offers a demo workspace. It seeds a founder profile only — every
+opportunity, assumption, claim and task in it is produced by the real agents and
+orchestrator from that input. It is badged **Demo data** throughout.
 
 ## Stack
 
-Next.js (App Router) + TypeScript + Tailwind CSS. No backend, no database,
-no real AI calls — everything is mock data in `lib/`.
+Next.js (App Router), TypeScript, Tailwind CSS, Supabase/Postgres, zod. No UI
+component library: the design system is a small set of local components.

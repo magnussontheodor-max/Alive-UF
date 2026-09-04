@@ -3,7 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
-import CoFounderLauncher from "@/components/CoFounderLauncher";
+import { getCurrentStartup } from "@/lib/current";
+import { backendMode } from "@/data";
+import { reasoningMode } from "@/ai";
+import { getStage } from "@/domain";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,23 +14,38 @@ const inter = Inter({
   display: "swap",
 });
 
+// Every page reads the signed-in founder's own startup, so nothing here may be
+// statically prerendered — a cached page would serve one founder's memory to
+// everyone. Applies to all nested routes.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
-  title: "Startup OS — LeadFlow AI",
-  description: "Your AI co-founder. From idea to launch, one guided path.",
+  title: "Spark UF",
+  description:
+    "An intelligent co-founder for first-time entrepreneurs in Sweden. Understands your startup, tracks what is known and unknown, and tells you what to do next.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const startup = await getCurrentStartup();
+
   return (
     <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased">
         <div className="flex min-h-screen">
-          <Sidebar />
-          <div className="flex-1 flex flex-col min-w-0">
-            <TopBar />
-            <main className="flex-1 min-w-0">{children}</main>
+          <Sidebar
+            startupName={startup?.name ?? null}
+            stage={startup ? getStage(startup.stage).label : null}
+            isDemo={startup?.isDemo ?? false}
+          />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <TopBar mode={backendMode()} reasoning={reasoningMode()} />
+            <main className="min-w-0 flex-1">{children}</main>
           </div>
         </div>
-        <CoFounderLauncher />
       </body>
     </html>
   );
