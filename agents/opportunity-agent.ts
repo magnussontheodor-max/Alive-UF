@@ -423,10 +423,22 @@ function buildFitStatement(
   return `You have ${parts.join(", and ")}.`;
 }
 
+/**
+ * A label for the opportunity, taken from the founder's own words rather than
+ * invented. Cuts at a clause boundary so it reads as a phrase rather than a
+ * sentence truncated mid-thought, and never fabricates a product name.
+ */
 function shortTitle(problem: ObservedProblem, domain: string): string {
-  const words = problem.description.split(/\s+/).slice(0, 8).join(" ");
-  const trimmed = words.replace(/[.,;:]$/, "");
-  return trimmed.length < problem.description.length ? `${trimmed}…` : trimmed || domain;
+  const text = problem.description.trim();
+  if (text.length <= 64) return capitalise(text.replace(/[.,;:]$/, ""));
+
+  const clause = text.split(/,| that | which | because | so that /i)[0].trim();
+  const source = clause.length >= 24 && clause.length <= 64 ? clause : text;
+  if (source.length <= 64) return capitalise(source.replace(/[.,;:]$/, ""));
+
+  const cut = source.slice(0, 64);
+  const atWord = cut.slice(0, cut.lastIndexOf(" "));
+  return `${capitalise((atWord || cut).replace(/[.,;:]$/, ""))}…`;
 }
 
 function capitalise(text: string): string {

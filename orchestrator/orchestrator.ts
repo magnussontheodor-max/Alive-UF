@@ -434,7 +434,7 @@ function buildAssumptionTask(
     founderAction:
       assumption.validationMethod === "UNKNOWN"
         ? "Choose how this could realistically be tested with the time and access you have."
-        : `Run a ${method.toLowerCase()} focused on this one question.`,
+        : `Run ${method.toLowerCase()} focused on this one question.`,
     successCriteria: [
       "Evidence recorded for or against the assumption",
       "The assumption's status updated to reflect what you found",
@@ -500,8 +500,12 @@ async function createFounderInputTask(
   });
 }
 
+/** Trims to a word boundary — a title cut mid-word reads as a bug, not a summary. */
 function truncate(text: string, max: number): string {
-  return text.length <= max ? text : `${text.slice(0, max - 1)}…`;
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  const atWord = cut.slice(0, cut.lastIndexOf(" "));
+  return `${(atWord || cut).replace(/[.,;:]$/, "")}…`;
 }
 
 export { AGENT_LABEL };

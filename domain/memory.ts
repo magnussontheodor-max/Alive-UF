@@ -59,10 +59,10 @@ export interface MemoryRisk {
 }
 
 export function buildMemoryView(memory: StartupMemory): MemoryView {
-  const allClaims: Claim[] = [
+  const allClaims: Claim[] = dedupeClaims([
     ...(memory.founderProfile?.claims ?? []),
     ...memory.opportunities.flatMap((o) => o.claims),
-  ];
+  ]);
 
   const known = allClaims.filter((c) => c.status === "FACT");
   const believed = allClaims.filter(
@@ -130,4 +130,41 @@ export function evidenceFor(memory: StartupMemory, assumptionId: string) {
       e.contradicts.includes(assumptionId)
     ),
   };
+}
+
+/**
+ * Two agents can record the same observation in slightly different words — the
+ * Founder Agent noting a problem you described, the Opportunity Agent citing
+ * the same problem as the basis of an opportunity. Showing both back to the
+ * founder reads as carelessness, so the view collapses them on their
+ * substance, keeping the best-evidenced version.
+ */
+function dedupeClaims(claims: Claim[]): Claim[] {
+  const byKey = new Map<string, Claim>();
+  for (const claim of claims) {
+    const key = claimKey(claim);
+    const existing = byKey.get(key);
+    if (!existing || claim.basis.length > existing.basis.length) {
+      byKey.set(key, claim);
+    }
+  }
+  return [...byKey.values()];
+}
+
+/** Normalised substance of a claim, ignoring how it was phrased. */
+function claimKey(claim: Claim): string {
+  const LEAD_INS = [
+    "you personally observed this problem",
+    "you observed this problem directly",
+    "you have first-hand exposure to",
+    "you observed",
+  ];
+  let text = claim.statement.toLowerCase().replace(/[.,;:!?]/g, " ");
+  for (const phrase of LEAD_INS) {
+    if (text.startsWith(phrase)) {
+      text = text.slice(phrase.length);
+      break;
+    }
+  }
+  return `${claim.status}:${text.replace(/\s+/g, " ").trim()}`;
 }
