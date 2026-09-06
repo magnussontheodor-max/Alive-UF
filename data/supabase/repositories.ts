@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { Id } from "@/domain";
+import { Id, WaitlistEntry, normaliseEmail } from "@/domain";
 import { Repositories } from "../repositories";
 
 // ---------------------------------------------------------------------------
@@ -174,6 +174,24 @@ export function createSupabaseRepositories(client: SupabaseClient): Repositories
         agentRuns.listBy("startup_id", startupId, { column: "started_at", ascending: false }, limit),
       create: (run) => agentRuns.insert(run),
       update: (id, patch) => agentRuns.patch(id, patch),
+    },
+
+    waitlist: {
+      async add(entry) {
+        const email = normaliseEmail(entry.email);
+        const { data, error } = await client
+          .from("waitlist")
+          .insert(toRow({ ...entry, email }))
+          .select()
+          .single();
+
+        // 23505 is a unique violation: this email is already on the list. That
+        // is an expected outcome, not a failure, and the person should be told
+        // they are already in rather than shown an error.
+        if (error?.code === "23505") return { kind: "ALREADY_ON_LIST" };
+        if (error) return { kind: "FAILED", reason: error.message };
+        return { kind: "ADDED", entry: fromRow<WaitlistEntry>(data) as WaitlistEntry };
+      },
     },
   };
 }

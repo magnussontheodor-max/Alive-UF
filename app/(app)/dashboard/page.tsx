@@ -21,7 +21,7 @@ import {
   rankAssumptions,
   selectedOpportunity,
 } from "@/domain";
-import { createStartupAction, seedDemoAction } from "./actions";
+import { createStartupAction, seedDemoAction } from "../actions";
 
 export default async function DashboardPage() {
   const memory = await getCurrentMemory();

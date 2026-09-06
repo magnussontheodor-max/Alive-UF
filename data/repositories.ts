@@ -12,6 +12,8 @@ import {
   Startup,
   StartupMemory,
   Task,
+  WaitlistEntry,
+  WaitlistOutcome,
 } from "@/domain";
 
 // ---------------------------------------------------------------------------
@@ -95,6 +97,14 @@ export interface AgentRunRepository {
   update(id: Id, patch: Partial<AgentRun>): Promise<AgentRun>;
 }
 
+export interface WaitlistRepository {
+  /**
+   * Adds an entry, reporting honestly when the email is already on the list
+   * rather than silently succeeding. Never throws for an expected outcome.
+   */
+  add(entry: WaitlistEntry): Promise<WaitlistOutcome>;
+}
+
 export interface Repositories {
   founders: FounderRepository;
   startups: StartupRepository;
@@ -107,6 +117,7 @@ export interface Repositories {
   tasks: TaskRepository;
   productSpecs: ProductSpecRepository;
   agentRuns: AgentRunRepository;
+  waitlist: WaitlistRepository;
   /** Which backend is active. Surfaced in the UI so the mode is never hidden. */
   backend: "local" | "supabase";
 }

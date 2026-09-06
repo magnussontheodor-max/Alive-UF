@@ -8,6 +8,7 @@ export * from "./decision";
 export * from "./experiment";
 export * from "./task";
 export * from "./product";
+export * from "./waitlist";
 export * from "./agent-run";
 export * from "./memory";
 export * from "./rules/grounding";

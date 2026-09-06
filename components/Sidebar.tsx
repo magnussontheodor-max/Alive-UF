@@ -16,7 +16,7 @@ import {
 } from "./icons";
 
 const primaryNav = [
-  { href: "/", label: "Dashboard", icon: IconGrid },
+  { href: "/dashboard", label: "Dashboard", icon: IconGrid },
   { href: "/task", label: "Next step", icon: IconSpark },
 ];
 
@@ -46,8 +46,7 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (href: string) => pathname.startsWith(href);
 
   const renderGroup = (
     items: { href: string; label: string; icon: typeof IconGrid }[],

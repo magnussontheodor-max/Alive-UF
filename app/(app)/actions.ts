@@ -50,7 +50,7 @@ export async function createStartupAction(formData: FormData) {
 export async function seedDemoAction() {
   await seedDemoStartup();
   refresh();
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function resetWorkspaceAction() {
@@ -298,7 +298,7 @@ export async function selectOpportunityAction(formData: FormData) {
 
   await orchestrate(repos, startup.id);
   refresh();
-  redirect("/");
+  redirect("/dashboard");
 }
 
 function topScoring(opportunities: Opportunity[]): Opportunity | null {
