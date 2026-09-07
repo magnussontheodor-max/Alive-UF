@@ -1,9 +1,6 @@
-// The whole product as one list. Every step is visible at once: the section is
-// meant to be read in a few seconds, not clicked through.
-//
-// A green number, a tracked uppercase label, and the answer in sentence case
-// beside it. Everything is visible at once: the section is read in a few
-// seconds rather than clicked through.
+// Three tight columns — a green number, a tracked label, the description —
+// with a hairline between rows and none after the last. All seven fit on one
+// screen, so the section is read rather than scrolled through.
 
 const STEPS = [
   {
@@ -45,10 +42,10 @@ const STEPS = [
 
 export default function Steps() {
   return (
-    <ol className="b-steps">
+    <ol className="mt-6">
       {STEPS.map((step, i) => (
         <li key={step.id} className="b-step">
-          {/* The number is decoration beside a labelled row, not content. */}
+          {/* Decoration beside a labelled row, not content. */}
           <span className="b-num" aria-hidden="true">
             {String(i + 1).padStart(2, "0")}
           </span>

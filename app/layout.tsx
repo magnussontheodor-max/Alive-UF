@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Chakra_Petch } from "next/font/google";
 import "./globals.css";
 
-// The only face on the site. Weight and letter-spacing carry the whole
-// hierarchy: heavy uppercase for headings, tracked uppercase for the small
-// interface words, light sentence case for anything read as prose.
-const inter = Inter({
+// The only face on the site. Every word is uppercase, so weight and
+// letter-spacing carry the whole hierarchy: short labels take extreme
+// tracking, running sentences never more than 0.13em.
+const chakra = Chakra_Petch({
   subsets: ["latin"],
+  weight: ["600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sv" className={inter.variable}>
+    <html lang="sv" className={chakra.variable}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

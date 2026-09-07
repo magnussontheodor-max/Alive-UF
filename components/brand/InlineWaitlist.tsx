@@ -4,9 +4,8 @@ import { useId, useRef, useState } from "react";
 import { joinWaitlistAction } from "@/app/(marketing)/actions";
 import { readUtm, track } from "@/lib/analytics";
 
-// The only action on the page: one field beside one button, on the same left
-// edge as the headline. The confirmation replaces the form rather than
-// appearing beside it, so there is no ambiguity about whether it worked.
+// The page's only action, inside the green block. Field and button share one
+// fill and one radius; only the text colour separates them.
 
 export default function InlineWaitlist({ source = "hero" }: { source?: string }) {
   const [state, setState] = useState<"idle" | "sending" | "done" | "already" | "error">("idle");
@@ -43,21 +42,13 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
 
   if (state === "done" || state === "already") {
     return (
-      <div role="status" className="max-w-[44rem]">
-        <p className="b-label b-eyebrow">Du står på listan</p>
-        <p className="b-body mt-3">
+      <div role="status" className="b-signup">
+        <p className="b-done-label">Du står på listan</p>
+        <p className="b-done-note mt-3">
           {state === "already"
             ? "Adressen fanns redan på listan. Vi hör av oss när Spark öppnar."
             : "Vi hör av oss när Spark öppnar. Inget nyhetsbrev under tiden."}
         </p>
-        <span
-          aria-hidden="true"
-          className="mt-6 block h-px w-16 origin-left"
-          style={{
-            background: "var(--accent)",
-            animation: "growLine .7s cubic-bezier(.22,1,.36,1) forwards",
-          }}
-        />
       </div>
     );
   }
@@ -65,7 +56,7 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
   const sending = state === "sending";
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit} noValidate className="b-signup">
       <label htmlFor={id} className="sr-only">
         E-postadress
       </label>
@@ -85,19 +76,18 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
             started.current = true;
             track({ name: "waitlist_form_started", source });
           }}
-          className="disabled:opacity-50"
         />
-        <button type="submit" disabled={sending} className="b-cta">
+        <button type="submit" disabled={sending}>
           {sending ? "Skickar" : "Få tidig tillgång"}
         </button>
       </div>
       {error && (
-        <p id={`${id}-fel`} className="mt-3 text-[0.85rem]" style={{ color: "var(--accent)" }}>
+        <p id={`${id}-fel`} className="b-msg mt-3">
           {error}
         </p>
       )}
       {state === "error" && (
-        <p role="alert" className="mt-3 text-[0.85rem]" style={{ color: "var(--accent)" }}>
+        <p role="alert" className="b-msg mt-3">
           Anmälan kunde inte sparas just nu. Försök igen om en stund.
         </p>
       )}

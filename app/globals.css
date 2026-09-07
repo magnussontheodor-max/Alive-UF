@@ -39,280 +39,270 @@
 /* ===========================================================================
    Brand surface (the public site)
    Scoped under .brand so the application's own design system is untouched.
-   One typeface, one dark register, everything on one left edge. Weight and
-   letter-spacing carry the hierarchy; structure comes from hairlines.
+   One face, every word uppercase, flat surfaces. Green appears in exactly
+   four places: the hero block, the step numbers, and the two wordmarks.
    =========================================================================== */
 
 .brand {
-  --paper: #0e0d0b;
-  --ink: #f6f4f0;
-  --ink-soft: #a29d95;
-  --ink-faint: #6f6a63;
-  --rule: #26241f;
-  --rule-soft: #1c1a17;
-  --accent: #3de686;
+  --black: #08090a;
+  --green: #24f08b;
+  --green-ink: #04150c;
+  --bone: #ede9dd;
+  --grey: #8a9490;
+  --dim: #4a544e;
+  --dim-green: #5f7a6b;
+  --line: #1b2620;
+  --line-soft: #12180f;
 
-  /* The page's left and right edge, named once. */
-  --gutter: clamp(1.25rem, 0.55rem + 3vw, 4rem);
+  --pad: 34px;
 
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--black);
+  color: var(--bone);
+  font-weight: 600;
+  /* Every word on the page is uppercase, without exception. */
+  text-transform: uppercase;
 }
 
 .brand ::selection {
-  background: var(--accent);
-  color: #06120b;
+  background: var(--green);
+  color: var(--green-ink);
 }
 
-/* --- type scale ----------------------------------------------------------
-   Headings are heavy uppercase; the small interface words (eyebrow, nav,
-   labels, numbers, buttons) are tracked uppercase; anything read as prose is
-   sentence case at a normal weight. No second family is needed for any of it.
+/* Content sits on one 1100px column; only the green block's background runs
+   the full width of the window. */
+.b-inner {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+/* --- 1 · nav — on black, above the green, never on it -------------------- */
+
+.b-nav { padding-block: 26px 24px; }
+.b-nav .b-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.b-mark {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--green);
+}
+
+.b-navlinks { display: flex; align-items: center; gap: 14px; }
+
+.b-navlink {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--dim);
+}
+
+.b-navsep { font-size: 10px; color: var(--dim); }
+
+/* --- 2 · hero — full bleed green ----------------------------------------
+   One ink colour inside the block, three opacities for hierarchy. A second
+   hue in here would read as a banner ad rather than as architecture.
    ------------------------------------------------------------------------- */
 
+.b-hero {
+  background: var(--green);
+  color: var(--green-ink);
+}
+.b-hero .b-inner { padding-block: var(--pad); }
+
+.b-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  opacity: 0.7;
+}
+
 .b-display {
-  font-size: clamp(2.15rem, 1.3rem + 3.6vw, 4.5rem);
-  line-height: 1.04;
+  font-size: 58px;
   font-weight: 700;
-  letter-spacing: -0.015em;
-  text-transform: uppercase;
-}
-
-.b-h2 {
-  font-size: clamp(1.5rem, 1.1rem + 1.7vw, 2.35rem);
-  line-height: 1.12;
-  font-weight: 700;
-  letter-spacing: -0.008em;
-  text-transform: uppercase;
-}
-
-.b-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.b-eyebrow { color: var(--accent); }
-
-.b-nav-link {
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  transition: color 0.2s ease;
-}
-.b-nav-link:hover { color: var(--ink); }
-
-/* The step numbers are the one place the accent appears outside the CTA. */
-.b-num {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent);
+  /* Large caps need pulling together, not spreading apart. */
+  letter-spacing: -0.01em;
+  line-height: 0.9;
 }
 
 .b-subline {
-  font-size: clamp(0.98rem, 0.94rem + 0.2vw, 1.05rem);
-  line-height: 1.65;
-  font-weight: 400;
-  color: var(--ink-soft);
-  max-width: 62ch;
+  max-width: 450px;
+  font-size: 12px;
+  font-weight: 600;
+  /* Running sentences never take more than 0.13em, or they fall apart. */
+  letter-spacing: 0.13em;
+  /* Å, Ä and Ö sit above cap height and hit the line above at normal leading. */
+  line-height: 1.85;
+  opacity: 0.78;
 }
 
-.b-body {
-  font-size: 0.95rem;
-  line-height: 1.65;
-  font-weight: 400;
-  color: var(--ink-soft);
-  max-width: 65ch;
-}
+/* --- the signup: field and button share one fill ------------------------- */
 
-/* Keeps a hyphenated word whole, so the headline breaks before it. */
-.b-nb { white-space: nowrap; }
+.b-signup { max-width: 450px; }
+.b-signup-row { display: flex; gap: 10px; }
 
-/* --- rhythm -------------------------------------------------------------- */
-
-.b-shell {
-  width: 100%;
-  max-width: 76rem;
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-}
-
-.b-section {
-  padding-block: clamp(3.5rem, 1.8rem + 5.5vw, 6.5rem);
-  border-top: 1px solid var(--rule);
-}
-
-.b-hero {
-  padding-top: clamp(2.25rem, 1rem + 4vw, 4rem);
-  padding-bottom: clamp(3rem, 1.5rem + 5vw, 5.5rem);
-}
-
-/* --- controls: square, not pill ------------------------------------------ */
-
-.b-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--accent);
-  color: #06120b;
-  border: 1px solid var(--accent);
-  border-radius: 2px;
-  padding: 0.85rem 1.5rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+.b-signup-row input,
+.b-signup-row button {
+  background: var(--green-ink);
+  border: 0;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  white-space: nowrap;
-  transition: background-color 0.18s ease, color 0.18s ease;
-}
-.b-cta:hover { background: transparent; color: var(--accent); }
-.b-cta:disabled { opacity: 0.55; cursor: default; }
-
-.brand :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-/* --- the signup line ----------------------------------------------------- */
-
-.b-signup-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  align-items: stretch;
-  max-width: 32rem;
+  padding: 14px 16px;
 }
 .b-signup-row input {
   flex: 1;
   min-width: 0;
-  background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  padding: 0.85rem 1rem;
-  font-size: 0.95rem;
-  color: var(--ink);
+  color: var(--bone);
   outline: none;
-  transition: border-color 0.18s ease;
 }
-.b-signup-row input::placeholder { color: var(--ink-faint); }
-.b-signup-row input:focus { border-color: var(--ink-faint); }
-.b-signup-row input[aria-invalid="true"] { border-color: var(--accent); }
+.b-signup-row input::placeholder { color: var(--dim-green); opacity: 1; }
+.b-signup-row button {
+  color: var(--bone);
+  white-space: nowrap;
+  padding-inline: 20px;
+}
+.b-signup-row button:disabled { opacity: 0.6; cursor: default; }
 
-@media (min-width: 520px) {
-  .b-signup-row { flex-direction: row; align-items: stretch; }
+.b-msg {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.8;
 }
 
-/* --- the seven steps -----------------------------------------------------
-   Dense rows: a green number, a tracked label, and the answer in sentence
-   case beside it. The whole section is meant to be read, not clicked through.
-   ------------------------------------------------------------------------- */
+.b-done-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  opacity: 0.7;
+}
+.b-done-note {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.85;
+  opacity: 0.78;
+}
 
-.b-steps { border-top: 1px solid var(--rule); }
+/* --- 3 · steps — columns tight together, all seven on one screen --------- */
+
+.b-section { padding-block: 38px 34px; }
+
+.b-h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: normal;
+  color: var(--bone);
+}
 
 .b-step {
   display: grid;
-  grid-template-columns: 2.25rem 1fr;
-  column-gap: 1rem;
-  row-gap: 0.4rem;
+  grid-template-columns: 24px 100px 1fr;
+  gap: 20px;
   align-items: baseline;
-  padding-block: 0.9rem;
-  border-bottom: 1px solid var(--rule-soft);
+  padding-block: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.b-step:last-child { border-bottom: 0; }
+
+.b-num {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: normal;
+  color: var(--green);
 }
 
 .b-step-label {
-  font-size: 0.75rem;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink);
+  letter-spacing: 0.2em;
+  color: var(--bone);
 }
 
 .b-step-body {
-  grid-column: 2;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  font-weight: 400;
-  color: var(--ink-soft);
-  max-width: 62ch;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.8;
+  color: var(--grey);
 }
 
-@media (min-width: 768px) {
+/* --- the memory claim, in the same register ------------------------------ */
+
+.b-statement { border-top: 1px solid var(--line); }
+.b-statement p {
+  max-width: 560px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.8;
+  color: var(--grey);
+}
+
+/* --- 4 · footer ---------------------------------------------------------- */
+
+.b-footer {
+  border-top: 1px solid var(--line);
+  padding-block: 26px;
+}
+.b-footer .b-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.b-foot-line {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.8;
+  color: var(--grey);
+}
+
+.b-foot-mark {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--green);
+}
+
+.b-foot-date {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.8;
+  color: var(--dim);
+}
+
+.brand :focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* --- mobile -------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .brand { --pad: 20px; }
+  .b-display { font-size: 34px; }
+  .b-signup-row { flex-direction: column; }
+  .b-signup-row button { padding-inline: 16px; }
+  /* number and label on one line, the description under them */
   .b-step {
-    grid-template-columns: 2.75rem 8.5rem 1fr;
-    column-gap: 1.5rem;
-    row-gap: 0;
+    grid-template-columns: 24px 1fr;
+    gap: 0 16px;
+    row-gap: 8px;
   }
-  .b-step-body { grid-column: 3; }
-}
-
-/* --- motion: present at rest, settled in on entry ------------------------ */
-
-@media (prefers-reduced-motion: no-preference) {
-  .b-rise {
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .b-rise[data-shown="true"] { opacity: 1; transform: none; }
-  .b-d1 { transition-delay: 0.05s; }
-  .b-d2 { transition-delay: 0.1s; }
-  .b-d3 { transition-delay: 0.15s; }
-  .b-d4 { transition-delay: 0.2s; }
-}
-
-@keyframes growLine {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-/* --- atmosphere ----------------------------------------------------------
-   Two faint layers behind the page, fixed so they do not scroll with it: a
-   slow drift of green light, and a fine grain. Both are well under the
-   threshold where you would name them if asked what you saw.
-   ------------------------------------------------------------------------- */
-
-.b-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.b-bg-glow {
-  position: absolute;
-  width: 80vw;
-  height: 80vw;
-  max-width: 1100px;
-  max-height: 1100px;
-  left: -15vw;
-  top: -30vw;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(61, 230, 134, 0.07), transparent 62%);
-  animation: drift 34s ease-in-out infinite alternate;
-}
-
-@keyframes drift {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(9vw, 7vw, 0) scale(1.14); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .b-bg-glow { animation: none; }
-}
-
-.b-bg-grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  .b-step-body { grid-column: 1 / -1; }
+  .b-footer .b-inner { flex-direction: column; align-items: flex-start; gap: 18px; }
 }

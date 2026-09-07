@@ -6,24 +6,17 @@ import SparkMark from "@/components/brand/SparkMark";
 export default function BrandLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="brand flex min-h-screen flex-col">
-      <main className="relative z-[1] flex-1">{children}</main>
+      <div className="flex-1">{children}</div>
 
-      <footer
-        className="relative z-[1]"
-        style={{ borderTop: "1px solid var(--rule)" }}
-      >
-        <div className="b-shell py-10 sm:py-14">
-          <p className="b-body">
-            Byggt i Stockholm av ett team som själva startar för första gången.
-          </p>
-
-          <div
-            className="mt-8 flex flex-wrap items-baseline justify-between gap-5 pt-6"
-            style={{ borderTop: "1px solid var(--rule-soft)" }}
-          >
-            <SparkMark />
-            <p className="b-label">Lanseras hösten 2026</p>
+      <footer className="b-footer">
+        <div className="b-inner">
+          <div>
+            <p className="b-foot-line">
+              Byggt i Stockholm av ett team som själva startar för första gången.
+            </p>
+            <SparkMark className="b-foot-mark mt-3.5" />
           </div>
+          <p className="b-foot-date">Lanseras hösten 2026</p>
         </div>
       </footer>
     </div>

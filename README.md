@@ -129,28 +129,28 @@ product lives at `/dashboard` under `app/(app)`. The app group carries
 `force-dynamic` because every page reads one founder's memory, while the brand
 surface reads nothing and is statically prerendered.
 
-It is one dark register throughout, left-aligned to a single edge: the
-opening (eyebrow, headline, one line, one email field), the seven steps of the
-journey as a numbered list where every step is visible at once, and then the
-one thing that makes Spark different — which lands after the steps, once the
-reader has seen how much there is to carry. Nothing is centred.
+It is four parts: a nav on black, a full-bleed green block carrying the
+opening, the seven steps of the journey, and the footer. The green runs to
+both edges of the window — a green panel with black margins reads as a banner
+ad, a full-width band reads as architecture — while everything else sits on
+one centred 1100px column.
 
-Depth comes from two fixed layers behind the page rather than photography: a
-slowly drifting green light and a fine grain. Every colour is a token under
-`.brand`, so the register is changed in one place.
+Green appears in exactly four places: the hero block, the step numbers, and
+the two wordmarks. Nowhere else — no green borders, buttons or hover states.
+On black there are three text colours (bone, grey, dim); inside the green
+block there is one ink at three opacities. There are no gradients anywhere.
 
-**Typography.** One face, Inter, for the whole page. Weight and letter-spacing
-carry the hierarchy: heavy uppercase for headings, tracked uppercase for the
-small interface words (eyebrow, nav, labels, numbers, buttons), sentence case
-at a normal weight for anything read as prose. The step numbers are the only
-place the accent green appears besides the call to action.
+**Typography.** One face, Chakra Petch, and every word on the page is
+uppercase. Weight and letter-spacing carry the hierarchy: short labels take
+extreme tracking (0.20–0.26em), running sentences never more than 0.13em, and
+the headline takes *negative* tracking, because large caps need pulling
+together rather than spreading apart. Multi-line text sits at 1.8–1.85
+line-height: å, ä and ö sit above cap height and collide with the line above
+at normal leading.
 
 `app/fonts/Might.ttf` is no longer referenced. It is licensed for **personal
 use only** — see `app/fonts/Might-LICENCE.txt` — so bringing it back means
-buying a commercial licence from funtypefonts.com first. The wordmark uses Orbitron. Might is licensed for
-**personal use only** — see `app/fonts/Might-LICENCE.txt`; a commercial licence
-must be bought from funtypefonts.com before launch. Swapping it is one
-declaration in `app/layout.tsx`.
+buying a commercial licence from funtypefonts.com first.
 
 Nothing on the page claims traction that does not exist: no counts,
 testimonials, statistics or customers.
