@@ -1,28 +1,44 @@
 // ---------------------------------------------------------------------------
 // Analytics
 //
-// A typed event list and a no-op sink. No provider is configured yet, and
-// rather than pull in a vendor SDK for a page that does not need one, the
-// call sites are written now and the transport is left as a single function
-// to replace.
+// A typed event list and one function to replace. The default sink forwards to
+// Umami when its script is present and does nothing when it is not, so the
+// page works identically with analytics blocked, disabled or not yet set up.
 //
-// To connect PostHog (or anything else) later, implement `send` — nothing at
-// any call site changes.
+// Umami is cookie-free and stores no personal data, which is why there is no
+// cookie banner on this site. Nothing here may ever send an email address or
+// anything else that identifies a person — only that an event happened.
 // ---------------------------------------------------------------------------
+
+declare global {
+  interface Window {
+    umami?: {
+      track: (event: string, data?: Record<string, unknown>) => void;
+    };
+  }
+}
 
 export type AnalyticsEvent =
   | { name: "page_view"; path: string }
+  | { name: "signup_completed" }
   | { name: "hero_cta_click" }
-  | { name: "waitlist_form_started"; source: string }
-  | { name: "waitlist_submitted"; source: string; outcome: "added" | "already_on_list" | "failed" }
+  | { name: "signup_form_started" }
   | { name: "journey_stage_clicked"; stage: string }
   | { name: "product_visual_interaction"; visual: string };
 
 type Sink = (event: AnalyticsEvent) => void;
 
-const noop: Sink = () => {};
+/** Page views are counted by Umami's own script, so only custom events are
+ *  forwarded here — sending both would double-count every visit. */
+const umamiSink: Sink = (event) => {
+  if (typeof window === "undefined" || !window.umami) return;
+  if (event.name === "page_view") return;
 
-let sink: Sink = noop;
+  const { name, ...rest } = event;
+  window.umami.track(name, Object.keys(rest).length ? rest : undefined);
+};
+
+let sink: Sink = umamiSink;
 
 /** Swap in a real provider once one exists. */
 export function setAnalyticsSink(next: Sink): void {

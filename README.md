@@ -124,10 +124,10 @@ component library: the design system is a small set of local components.
 
 ## The public site
 
-`/` is the pre-launch brand surface, in the `app/(marketing)` route group; the
-product lives at `/dashboard` under `app/(app)`. The app group carries
-`force-dynamic` because every page reads one founder's memory, while the brand
-surface reads nothing and is statically prerendered.
+`/` is the pre-launch page, in the `app/(marketing)` route group; the product
+lives at `/dashboard` under `app/(app)`. The app group carries `force-dynamic`
+because every page reads one founder's memory, while the pre-launch page reads
+nothing and is statically prerendered.
 
 It is four parts: a nav on black, a full-bleed green block carrying the
 opening, the seven steps of the journey, and the footer. The green runs to
@@ -136,9 +136,9 @@ ad, a full-width band reads as architecture — while everything else sits on
 one centred 1100px column.
 
 Green appears in exactly four places: the hero block, the step numbers, and
-the two wordmarks. Nowhere else — no green borders, buttons or hover states.
-On black there are three text colours (bone, grey, dim); inside the green
-block there is one ink at three opacities. There are no gradients anywhere.
+the two wordmarks. Nowhere else. On black there are three text colours (bone,
+grey, dim); inside the green block there is one ink at three opacities. There
+are no gradients anywhere.
 
 **Typography.** One face, Chakra Petch, and every word on the page is
 uppercase. Weight and letter-spacing carry the hierarchy: short labels take
@@ -148,25 +148,196 @@ together rather than spreading apart. Multi-line text sits at 1.8–1.85
 line-height: å, ä and ö sit above cap height and collide with the line above
 at normal leading.
 
+Every colour is a token at the top of the `.brand` block in `app/globals.css`.
+Changing the palette is that one block and nothing else.
+
 `app/fonts/Might.ttf` is no longer referenced. It is licensed for **personal
 use only** — see `app/fonts/Might-LICENCE.txt` — so bringing it back means
 buying a commercial licence from funtypefonts.com first.
 
-Nothing on the page claims traction that does not exist: no counts,
-testimonials, statistics or customers.
+## Signups
 
-Waitlist signups go through `WaitlistRepository`, following the same pattern as
-the rest of the data layer — Supabase when configured, the local store
-otherwise. Apply the table with:
-
-```bash
-supabase db execute --file data/supabase/migrations/0002_waitlist.sql
+```
+formulär → POST /api/signup → validering → rate limit → signups-tabellen
+                                                     → email_queue → Brevo
 ```
 
-`first_name` is nullable because the page captures an email only;
-`source` records which surface a signup came from. Row level security inverts
-for this table: anonymous visitors may insert and nothing else, so a signup
-cannot read back anyone else's address.
+Everything about the endpoint is ordered deliberately (`app/api/signup/route.ts`):
 
-Analytics events are named and called at the right places (`lib/analytics.ts`)
-but go to a no-op sink; connecting a provider means implementing one function.
+1. **Honeypot first**, before anything costs a database round trip. A filled
+   hidden field answers 200 and saves nothing — a bot told it failed simply
+   retries with the field empty.
+2. **Rate limit next**, before validation, so a flood of malformed bodies is
+   as cheap to refuse as a flood of well-formed ones. Five requests per IP per
+   ten minutes, counted in Postgres (`check_rate_limit`) rather than in a
+   module variable: Vercel's functions do not share memory between
+   invocations, so an in-process counter limits nothing in production while
+   looking convincing locally. The prune, count and insert happen inside one
+   SQL function so two simultaneous requests cannot both pass. IPs are stored
+   as an HMAC, never as addresses.
+3. **Validation on the server.** The browser validates too, for a fast and
+   kind message, but a form post can be made with curl.
+4. **Save.** A repeat address returns the same confirmation as a first-time
+   signup, writes no second row and sends no second email — telling whoever
+   typed the address that it is "already on the list" turns the form into a
+   way to test who is on it.
+5. **Email last**, and it can never fail the signup. The row is already saved.
+
+**Email addresses are canonicalised.** Chrome IDNA-encodes the domain of an
+`<input type="email">` before the value can be read, so `anna@företag.se`
+arrives as `anna@xn--fretag-wxa.se` from a browser and unencoded from curl.
+Stored as typed those are two rows the unique index cannot see. `normaliseEmail`
+keeps the punycode form — which is what travels over SMTP anyway — and
+`displayEmail` turns it back for the admin table and the CSV.
+
+**Time.** Everything is stored in UTC (`timestamptz`). Every human-facing
+rendering goes through `lib/time.ts` and is converted to Europe/Stockholm
+explicitly, never left to the runtime's default zone — Vercel runs in UTC and
+a laptop does not, so an implicit conversion means launch-week numbers differ
+by an hour or two depending on where they are read.
+
+**Email provider.** Every send goes through `sendEmail()` in
+`lib/email/provider.ts`; nothing that calls it knows Brevo exists. Moving to
+SES means adding one file beside `brevo.ts` and changing `EMAIL_PROVIDER`.
+With no keys configured the message is printed rather than sent, so a local
+run never pretends to have delivered.
+
+**The queue.** Every message is written to `email_queue` before it is
+attempted and only marked sent afterwards, so nothing is lost. Brevo's free
+tier allows 300 a day; a quota refusal (402/429) is not counted as a failed
+attempt but rescheduled past the next UTC midnight, and the daily cron sends
+what is waiting.
+
+Apply the schema with:
+
+```bash
+supabase db execute --file data/supabase/migrations/0003_signups.sql
+```
+
+Row level security is enabled on all three tables **with no policies at all**,
+so `anon` and `authenticated` can neither read nor write them. Every access is
+through the API routes using the service role key, which bypasses RLS. Note
+that `revoke ... from anon, authenticated` is not enough on its own for
+`check_rate_limit`: Postgres grants EXECUTE on a new function to `PUBLIC`, and
+both roles inherit it from there, so the migration revokes from `PUBLIC` too.
+
+## GDPR
+
+`/integritetspolicy` is a complete Swedish draft — **it is a draft, not legal
+advice**, and the `[PLACEHOLDERS]` in it must be filled in before launch. It
+is linked from the footer and in microcopy directly under the form.
+
+Both self-service routes take an HMAC-signed token rather than a row id, so
+they cannot be guessed, and the action is inside the signed payload, so an
+unsubscribe link cannot be replayed against the deletion endpoint:
+
+- `/api/unsubscribe?token=…` sets `unsubscribed = true` and keeps the row —
+  the record is what stops us mailing that address again.
+- `/api/delete-me?token=…` deletes the row outright, and any mail still queued
+  to that address with it.
+
+Analytics is Umami, self-hosted and cookie-free, which is why the site has no
+cookie banner. `lib/analytics.ts` forwards only that an event happened, never
+an address. Page views are counted by Umami's own script; only
+`signup_completed` is sent from the app, so visits are not double-counted.
+
+## Admin
+
+`/admin` and `/api/admin/*` sit behind HTTP Basic Auth, enforced in
+`middleware.ts` rather than in the page — middleware never reaches the browser,
+so the comparison and the password cannot end up in a client bundle. With
+`ADMIN_USER`/`ADMIN_PASSWORD` unset the area returns 503 rather than opening.
+
+It shows the total, the last seven days, the table (email, the free text, the
+date in Stockholm time, source) and a CSV export. The CSV prefixes any cell
+starting with `=`, `+`, `-` or `@` with an apostrophe: those are executed as
+formulas when the file is opened in Excel or Sheets, so an unescaped free-text
+field turns our own export into an attack on whoever opens it.
+
+## Cron
+
+Vercel's free plan allows exactly one cron job, so `/api/cron` is the whole
+scheduler and runs three things in order, each isolated so one failure does
+not stop the next:
+
+1. **Keepalive** — a free-tier Supabase project pauses after 7 days of
+   inactivity, which would take the form down after one quiet week.
+2. **Drain `email_queue`** — whatever yesterday's ceiling deferred.
+3. **Backup** — the whole table as CSV, mailed to `ADMIN_EMAIL`.
+
+It requires `CRON_SECRET` in `x-cron-secret` or as `Authorization: Bearer`,
+which is the form Vercel Cron sends. The schedule lives in `vercel.json`
+(03:00 UTC daily).
+
+## Deploying
+
+### 1 · Supabase
+
+1. Create a project (choose an EU region — the privacy policy says the data
+   stays in the EU).
+2. Run the migration: `supabase db execute --file data/supabase/migrations/0003_signups.sql`,
+   or paste it into the SQL editor.
+3. Copy the project URL, the `anon` key and the `service_role` key from
+   Project Settings → API into the environment variables below.
+
+### 2 · Brevo
+
+1. Create an account and verify the sending domain under Senders, Domains &
+   Dedicated IPs.
+2. Create an API key under SMTP & API → API Keys and set `BREVO_API_KEY`.
+3. Set `EMAIL_FROM` to an address on the verified domain.
+
+**DNS for deliverability.** Without all three, the confirmation lands in spam
+or is rejected. Replace the domain with yours and take the exact DKIM values
+from Brevo's own panel — the selector and key below are placeholders:
+
+| Type | Name | Value |
+|---|---|---|
+| TXT | `@` | `v=spf1 include:spf.brevo.com mx ~all` |
+| TXT | `mail._domainkey` | `k=rsa; p=…` (copy verbatim from Brevo) |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:dmarc@dindomän.se; fo=1` |
+
+Start DMARC at `p=none` and read the reports for a couple of weeks before
+tightening to `p=quarantine` and then `p=reject`. Going straight to `reject`
+with SPF or DKIM misconfigured silently drops your own mail.
+
+If a `v=spf1` record already exists, merge `include:spf.brevo.com` into it —
+a domain may have only one SPF record, and a second one makes both invalid.
+
+### 3 · Vercel
+
+1. Import the repository.
+2. Add every variable from `.env.example` under Settings → Environment
+   Variables. `SUPABASE_SERVICE_ROLE_KEY`, `TOKEN_SECRET`, `CRON_SECRET`,
+   `ADMIN_PASSWORD` and `BREVO_API_KEY` are secrets — no `NEXT_PUBLIC_` prefix,
+   and never committed.
+3. Deploy. `vercel.json` registers the cron automatically.
+
+### 4 · The domain
+
+1. Add the domain under Settings → Domains in Vercel.
+2. Point DNS at Vercel — an `A` record for the apex at `76.76.21.21`, and a
+   `CNAME` for `www` at `cname.vercel-dns.com`. Vercel shows the exact values
+   for your project; use those if they differ.
+3. Set `NEXT_PUBLIC_SITE_URL` to the final `https://` origin **with no
+   trailing slash** and redeploy. It is what canonical tags, the sitemap, the
+   OG tags and — most importantly — the unsubscribe and deletion links in
+   every email are built from. Set it wrong and those links point nowhere.
+
+## Checked
+
+Verified against a real Postgres 16 and a real browser, not by inspection:
+
+- the migration applies cleanly and is safe to re-run
+- the `updated_at` trigger fires on UPDATE; the unique index rejects duplicates;
+  the 500-character check rejects over-long text
+- RLS is on for all three tables with zero policies; `anon` is refused both the
+  table and `check_rate_limit`
+- the limiter allows exactly five per window, isolates callers, and expires
+- both email spellings, from browser and from curl, produce one row and one
+  message
+- a forged token, a tampered signature and a cross-action replay are all refused
+- Basic Auth returns 401 without credentials and 503 with none configured
+- the cron route refuses an absent or wrong secret and runs all three jobs
+- Lighthouse 100/100/100/100 on `/` and `/integritetspolicy`
+

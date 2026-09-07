@@ -13,8 +13,7 @@ import {
   ProductSpec,
   Startup,
   Task,
-  WaitlistEntry,
-  normaliseEmail,
+
 } from "@/domain";
 import { Repositories } from "../repositories";
 
@@ -42,7 +41,6 @@ interface StoreShape {
   tasks: Task[];
   productSpecs: ProductSpec[];
   agentRuns: AgentRun[];
-  waitlist: WaitlistEntry[];
 }
 
 function emptyStore(): StoreShape {
@@ -58,7 +56,6 @@ function emptyStore(): StoreShape {
     tasks: [],
     productSpecs: [],
     agentRuns: [],
-    waitlist: [],
   };
 }
 
@@ -306,16 +303,5 @@ export function createLocalRepositories(): Repositories {
       },
     },
 
-    waitlist: {
-      async add(entry) {
-        const store = getStore();
-        const email = normaliseEmail(entry.email);
-        if (store.waitlist.some((e) => normaliseEmail(e.email) === email)) {
-          return { kind: "ALREADY_ON_LIST" };
-        }
-        const stored = insert(store.waitlist, { ...entry, email });
-        return { kind: "ADDED", entry: await stored };
-      },
-    },
   };
 }

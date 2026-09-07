@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import InlineWaitlist from "@/components/brand/InlineWaitlist";
+import SignupForm from "@/components/brand/SignupForm";
 import Nav from "@/components/brand/Nav";
 import PageView from "@/components/brand/PageView";
 import Steps from "@/components/brand/Steps";
@@ -37,7 +37,7 @@ export default function BrandPage() {
             </p>
 
             <div className="mt-[26px]">
-              <InlineWaitlist source="hero" />
+              <SignupForm />
             </div>
           </div>
         </section>

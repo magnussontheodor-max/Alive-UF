@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SparkMark from "@/components/brand/SparkMark";
 
 // The brand surface reads no founder state, so unlike the application it is
@@ -13,6 +14,11 @@ export default function BrandLayout({ children }: { children: React.ReactNode })
           <div>
             <p className="b-foot-line">
               Byggt i Stockholm av ett team som själva startar för första gången.
+            </p>
+            <p className="b-foot-line mt-2">
+              <Link href="/integritetspolicy" className="b-underline">
+                Integritetspolicy
+              </Link>
             </p>
             <SparkMark className="b-foot-mark mt-3.5" />
           </div>

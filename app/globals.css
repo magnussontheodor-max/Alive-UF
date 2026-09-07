@@ -49,7 +49,11 @@
   --green-ink: #04150c;
   --bone: #ede9dd;
   --grey: #8a9490;
-  --dim: #4a544e;
+  /* The spec's #4A544E gives 2.53:1 against the page at 10px, well under the
+     4.5:1 minimum — measured, not guessed. Lifted to the nearest value on the
+     same hue that passes (4.55:1). Revert the moment the palette is settled if
+     the design would rather have the darker tone. */
+  --dim: #6e7c73;
   --dim-green: #5f7a6b;
   --line: #1b2620;
   --line-soft: #12180f;
@@ -289,6 +293,121 @@
   outline: 2px solid var(--green);
   outline-offset: 2px;
 }
+
+/* --- the form's second field, microcopy and honeypot -------------------- */
+
+/* Inside the green block, so it takes the block's own ink at an opacity —
+   --dim is a colour for the black surface and fails contrast on green. 0.70
+   is the same step the eyebrow uses, and measures 5.7:1. */
+.b-field-label {
+  display: block;
+  margin-top: 18px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--green-ink);
+  opacity: 0.7;
+}
+
+.b-textarea {
+  display: block;
+  width: 100%;
+  max-width: 450px;
+  margin-top: 8px;
+  background: var(--green-ink);
+  border: 0;
+  border-radius: 3px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: var(--bone);
+  outline: none;
+  resize: vertical;
+}
+.b-textarea::placeholder { color: var(--dim-green); opacity: 1; }
+
+.b-counter {
+  max-width: 450px;
+  margin-top: 6px;
+  text-align: right;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--green-ink);
+  opacity: 0.7;
+}
+
+.b-microcopy {
+  max-width: 450px;
+  margin-top: 16px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.9;
+  color: var(--green-ink);
+  opacity: 0.7;
+}
+
+.b-underline { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Off-screen rather than display:none — some bots skip hidden inputs, and the
+   point is that they fill this one in. */
+.b-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* --- the legal and confirmation pages ----------------------------------- */
+
+.b-legal { padding-block: 34px 60px; }
+
+.b-legal-h1 {
+  margin-top: 34px;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--bone);
+}
+
+.b-legal-h2 {
+  margin-top: 34px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--bone);
+}
+
+.b-legal-meta,
+.b-legal p,
+.b-legal li {
+  max-width: 62ch;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.9;
+  color: var(--grey);
+}
+
+.b-legal p { margin-top: 14px; }
+.b-legal-meta { margin-top: 10px; color: var(--dim); }
+
+.b-legal-list { margin-top: 14px; padding-left: 18px; list-style: square; }
+.b-legal-list li { margin-top: 8px; }
+.b-legal-list::marker { color: var(--dim); }
+
+.b-legal strong { color: var(--bone); font-weight: 700; }
+.b-legal code { font-family: inherit; color: var(--bone); }
+.b-legal a { color: var(--bone); }
+
+.b-legal-back { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+
+/* --- mobile ------------------------------------------------------------- */
 
 /* --- mobile -------------------------------------------------------------- */
 
