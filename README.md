@@ -122,19 +122,22 @@ orchestrator from that input. It is badged **Demo data** throughout.
 Next.js (App Router), TypeScript, Tailwind CSS, Supabase/Postgres, zod. No UI
 component library: the design system is a small set of local components.
 
-## Landing page
+## The public site
 
-The public pre-launch page lives at `/` in the `app/(marketing)` route group; the
-product moved to `/dashboard` under `app/(app)`. The split matters: the app group
-carries `force-dynamic` because every page reads one founder's memory, while the
-marketing group reads nothing and is statically prerendered.
+`/` is the pre-launch brand surface, in the `app/(marketing)` route group; the
+product lives at `/dashboard` under `app/(app)`. The app group carries
+`force-dynamic` because every page reads one founder's memory, while the brand
+surface reads nothing and is statically prerendered.
 
-The page shows **Spark UF's own startup state** rather than a fictional company —
-its real stage, its real next action, and its actual open questions. The honesty
-rules the product enforces in code apply to the page as well: nothing is marked
-`FACT` unless it happened, and no figure appears that has not been measured. All
-of that content is in `components/marketing/spark-startup.ts`, so it can be
-audited in one read.
+It is a coming-soon page, not a SaaS landing page: no product screenshots, no
+cards, no illustration. Typography and negative space carry it, structure comes
+from hairlines, and the palette is warm paper, near-black, and one ember accent
+used at about one percent coverage. Those tokens are scoped under `.brand` in
+`globals.css` so the application's own design system is untouched.
+
+Nothing on it claims traction that does not exist: no counts, testimonials,
+statistics or customers. The one worked example, in the section contrasting
+Spark with a generic AI answer, is labelled as illustrative.
 
 Waitlist signups go through `WaitlistRepository`, following the same pattern as
 the rest of the data layer — Supabase when configured, the local store

@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { track } from "@/lib/analytics";
 
-/** Reports the page view once. No provider is attached yet, so this is a no-op
- *  until one is — the call site is what matters. */
+/** Reports the view once. The sink is a no-op until a provider is connected. */
 export default function PageView({ path }: { path: string }) {
   useEffect(() => {
     track({ name: "page_view", path });
