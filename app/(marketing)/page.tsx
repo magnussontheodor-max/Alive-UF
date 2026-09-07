@@ -37,17 +37,20 @@ export default function BrandPage() {
             </Rise>
 
             <Rise delay={1}>
-              <h1 className="b-display mt-6">Din AI-medgrundare.</h1>
+              {/* The line breaks after "Din": the hyphenated word stays whole. */}
+              <h1 className="b-display mt-5 max-w-[14ch]">
+                Din <span className="b-nb">AI-medgrundare.</span>
+              </h1>
             </Rise>
 
             <Rise delay={2}>
-              <p className="b-subline mt-8 sm:mt-10">
-                Från första idén till något människor faktiskt vill ha. Spark gör jobbet med
-                dig: research, validering, produkt.
+              <p className="b-subline mt-5 sm:mt-7">
+                Från första idén till något människor faktiskt vill ha. Spark gör jobbet med dig
+                — research, validering, produkt.
               </p>
             </Rise>
 
-            <Rise delay={3} className="mt-10 max-w-[38rem] sm:mt-12">
+            <Rise delay={3} className="mt-7 sm:mt-10">
               <InlineWaitlist source="hero" />
             </Rise>
           </div>
@@ -59,7 +62,7 @@ export default function BrandPage() {
             <Rise>
               <h2 className="b-h2">Hela resan, ett steg i taget.</h2>
             </Rise>
-            <Rise delay={1} className="mt-10 sm:mt-16">
+            <Rise delay={1} className="mt-7 sm:mt-10">
               <Steps />
             </Rise>
           </div>
@@ -71,10 +74,10 @@ export default function BrandPage() {
         <section id="om" className="b-section scroll-mt-4">
           <div className="b-shell">
             <Rise>
-              <h2 className="b-h2">Spark minns allt.</h2>
+              <h2 className="b-h2 max-w-[20ch]">Spark minns allt.</h2>
             </Rise>
             <Rise delay={1}>
-              <p className="b-subline mt-8 sm:mt-9">
+              <p className="b-subline mt-5">
                 Du behöver inte förklara vem du är, vad du bygger eller vad du gjorde förra
                 veckan. Öppna Spark, så vet du vad du ska göra.
               </p>

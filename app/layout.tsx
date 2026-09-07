@@ -1,33 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+// The only face on the site. Weight and letter-spacing carry the whole
+// hierarchy: heavy uppercase for headings, tracked uppercase for the small
+// interface words, light sentence case for anything read as prose.
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap",
-});
-
-// Might: the display face for the public site. Condensed and uppercase-only,
-// so it carries headlines, labels and controls but never running paragraphs.
-//
-// LICENCE: personal use only (app/fonts/Might-LICENCE.txt). A commercial
-// licence must be bought from funtypefonts.com before launch. To swap it out,
-// change this one declaration — everything reads it through --font-display.
-const might = localFont({
-  src: "./fonts/Might.ttf",
-  variable: "--font-display",
-  display: "swap",
-  adjustFontFallback: false,
-});
-
-// The squarish, wide-tracked techno register of the reference specimen, used
-// for the wordmark and the smallest labels only.
-const techno = Orbitron({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-techno",
   display: "swap",
 });
 
@@ -53,7 +33,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sv" className={`${inter.variable} ${might.variable} ${techno.variable}`}>
+    <html lang="sv" className={inter.variable}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

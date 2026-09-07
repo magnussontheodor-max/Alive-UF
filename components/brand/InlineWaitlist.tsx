@@ -45,14 +45,14 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
     return (
       <div role="status" className="max-w-[44rem]">
         <p className="b-label b-eyebrow">Du står på listan</p>
-        <p className="b-body mt-3.5">
+        <p className="b-body mt-3">
           {state === "already"
             ? "Adressen fanns redan på listan. Vi hör av oss när Spark öppnar."
             : "Vi hör av oss när Spark öppnar. Inget nyhetsbrev under tiden."}
         </p>
         <span
           aria-hidden="true"
-          className="mt-7 block h-px w-20 origin-left"
+          className="mt-6 block h-px w-16 origin-left"
           style={{
             background: "var(--accent)",
             animation: "growLine .7s cubic-bezier(.22,1,.36,1) forwards",
@@ -92,12 +92,12 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
         </button>
       </div>
       {error && (
-        <p id={`${id}-fel`} className="mt-3.5 text-[0.9rem]" style={{ color: "var(--accent)" }}>
+        <p id={`${id}-fel`} className="mt-3 text-[0.85rem]" style={{ color: "var(--accent)" }}>
           {error}
         </p>
       )}
       {state === "error" && (
-        <p role="alert" className="mt-3.5 text-[0.9rem]" style={{ color: "var(--accent)" }}>
+        <p role="alert" className="mt-3 text-[0.85rem]" style={{ color: "var(--accent)" }}>
           Anmälan kunde inte sparas just nu. Försök igen om en stund.
         </p>
       )}

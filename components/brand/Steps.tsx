@@ -1,10 +1,9 @@
 // The whole product as one list. Every step is visible at once: the section is
 // meant to be read in a few seconds, not clicked through.
 //
-// Labels, numbers and answers all take the display face, which has no
-// lowercase glyphs — so the answers set as condensed uppercase, and get extra
-// tracking and leading to stay readable. Copy here therefore avoids an em
-// dash: the face has no glyph for one and draws a doubled rule instead.
+// A green number, a tracked uppercase label, and the answer in sentence case
+// beside it. Everything is visible at once: the section is read in a few
+// seconds rather than clicked through.
 
 const STEPS = [
   {
@@ -25,7 +24,7 @@ const STEPS = [
   {
     id: "market",
     label: "Marknad",
-    body: "Kunder, konkurrenter och risker, innan du lägger månader på fel sak.",
+    body: "Kunder, konkurrenter och risker — innan du lägger månader på fel sak.",
   },
   {
     id: "validation",
@@ -50,7 +49,7 @@ export default function Steps() {
       {STEPS.map((step, i) => (
         <li key={step.id} className="b-step">
           {/* The number is decoration beside a labelled row, not content. */}
-          <span className="b-step-num" aria-hidden="true">
+          <span className="b-num" aria-hidden="true">
             {String(i + 1).padStart(2, "0")}
           </span>
           <p className="b-step-label">{step.label}</p>
