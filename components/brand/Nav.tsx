@@ -27,7 +27,7 @@ export default function Nav() {
 
         <nav className="hidden items-center gap-9 sm:flex" aria-label="Sidnavigering">
           {LINKS.map((link) => (
-            <a key={link.href} href={link.href} className="b-link text-[0.875rem]">
+            <a key={link.href} href={link.href} className="b-link b-nav-link">
               {link.label}
             </a>
           ))}
@@ -58,7 +58,7 @@ export default function Nav() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="text-[1.25rem] tracking-[-0.02em]"
+              className="b-nav-link text-[1.35rem]"
             >
               {link.label}
             </a>

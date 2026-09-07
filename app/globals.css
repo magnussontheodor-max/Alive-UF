@@ -50,8 +50,8 @@
   --ink-faint: #8c887d;
   --rule: #e2dfd7;
   --rule-soft: #eeece6;
-  --ember: #b5451f;
-  --ember-soft: #f3e7e0;
+  --accent: #12a75a;          /* on paper: dark enough to read */
+  --accent-soft: #e4f6ec;
 
   background: var(--paper);
   color: var(--ink);
@@ -59,31 +59,37 @@
 }
 
 .brand ::selection {
-  background: var(--ember);
+  background: var(--accent);
   color: var(--paper);
 }
 
 /* --- type scale ---------------------------------------------------------- */
 
 .b-display {
-  font-size: clamp(2.6rem, 1.1rem + 6vw, 6.25rem);
-  line-height: 0.98;
-  letter-spacing: -0.042em;
-  font-weight: 500;
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: clamp(2.5rem, 1.5rem + 3.4vw, 4.75rem);
+  line-height: 0.94;
+  letter-spacing: 0.005em;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .b-h2 {
-  font-size: clamp(1.9rem, 1.1rem + 3vw, 3.4rem);
-  line-height: 1.06;
-  letter-spacing: -0.032em;
-  font-weight: 500;
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: clamp(1.85rem, 1.15rem + 2.5vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .b-statement {
-  font-size: clamp(1.35rem, 0.95rem + 1.5vw, 2.05rem);
-  line-height: 1.28;
-  letter-spacing: -0.022em;
-  font-weight: 500;
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: clamp(1.35rem, 1rem + 1.4vw, 1.95rem);
+  line-height: 1.2;
+  letter-spacing: 0.015em;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .b-lead {
@@ -100,18 +106,18 @@
 
 /* Micro-labels: mono, uppercase, wide. The technical register of the page. */
 .b-label {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.17em;
   text-transform: uppercase;
   color: var(--ink-faint);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .b-num {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
   color: var(--ink-faint);
 }
@@ -161,17 +167,23 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  background: var(--ink);
-  color: var(--paper);
-  border: 1px solid var(--ink);
+  background: var(--accent);
+  color: #06120b;
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  padding: 0.95rem 1.6rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  padding: 0.95rem 1.7rem;
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
-.b-cta:hover { background: transparent; color: var(--ink); transform: translateY(-1px); }
+.b-cta:hover {
+  background: transparent;
+  color: var(--accent);
+  transform: translateY(-1px);
+}
 
 .b-cta-sm {
   padding: 0.55rem 1.05rem;
@@ -179,7 +191,7 @@
 }
 
 .brand :focus-visible {
-  outline: 2px solid var(--ember);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -270,18 +282,18 @@
   --ink-faint: #77726a;
   --rule: #2a2823;
   --rule-soft: #211f1b;
-  --ember: #e2673a;
+  --accent: #3de686;          /* on the dark frame: the specimen's green */
 
   background: var(--paper);
   color: var(--ink);
 }
 
 .b-invert .b-cta {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: var(--accent);
+  color: #06120b;
+  border-color: var(--accent);
 }
-.b-invert .b-cta:hover { background: transparent; color: var(--ink); }
+.b-invert .b-cta:hover { background: transparent; color: var(--accent); }
 
 /* --- scroll cue ---------------------------------------------------------- */
 
@@ -291,3 +303,17 @@
 }
 .b-cue { animation: cue 2.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .b-cue { animation: none; } }
+
+/* The wordmark and the smallest meta text carry the squarish techno face. */
+.b-techno {
+  font-family: var(--font-techno), var(--font-display), sans-serif;
+  text-transform: uppercase;
+}
+
+/* Navigation and other short interface words take the display face. */
+.b-nav-link {
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

@@ -21,14 +21,18 @@ const schema = z.object({
     .trim()
     .max(80, "Det där namnet är ovanligt långt — kontrollera gärna.")
     .nullish(),
+  // Deliberately not zod's .email(), which is ASCII-only and would reject
+  // addresses like anna@företag.se — plausible for a Swedish product. Shape is
+  // all that can honestly be checked here; deliverability is proven by sending.
   email: z
     .string()
     .trim()
     .min(1, "Skriv din e-postadress.")
     .max(254)
-    .email("Kontrollera e-postadressen.")
-    // zod accepts "a@b"; a waitlist address needs a real domain to be reachable.
-    .refine((value) => /^[^@\s]+@[^@\s.]+\.[^@\s]{2,}$/.test(value), "Kontrollera e-postadressen."),
+    .refine(
+      (value) => /^[^@\s]+@[^@\s.]+\.[^@\s]{2,}$/u.test(value),
+      "Kontrollera e-postadressen."
+    ),
   source: z.string().trim().max(60).default("landing"),
   utmSource: z.string().trim().max(120).nullish(),
   utmMedium: z.string().trim().max(120).nullish(),

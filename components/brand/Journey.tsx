@@ -12,12 +12,12 @@ const STAGES = [
   {
     id: "start",
     label: "Start",
-    body: "Berätta om dig själv, dina mål och din situation. Spark börjar med dig — inte med en idé.",
+    body: "Berätta om dig själv, dina mål och din situation. Spark börjar med dig, inte med en idé.",
   },
   {
     id: "ideas",
     label: "Idéer",
-    body: "Få möjligheter som passar just dig — inte slumpmässiga startup-idéer hämtade någon annanstans ifrån.",
+    body: "Få möjligheter som passar just dig, inte slumpmässiga startup-idéer hämtade någon annanstans ifrån.",
   },
   {
     id: "opportunity",
@@ -37,7 +37,7 @@ const STAGES = [
   {
     id: "product",
     label: "Produkt",
-    body: "Gör om det du lärt dig till en fokuserad MVP — liten nog att faktiskt bli klar.",
+    body: "Gör om det du lärt dig till en fokuserad MVP, liten nog att faktiskt bli klar.",
   },
   {
     id: "build",
@@ -85,7 +85,7 @@ export default function Journey() {
                   />
                   <span className="b-num block">{String(i + 1).padStart(2, "0")}</span>
                   <span
-                    className="mt-3 block text-[1.0625rem] tracking-[-0.015em] transition-colors duration-300"
+                    className="b-nav-link mt-3 block transition-colors duration-300"
                     style={{ color: on ? "var(--ink)" : "var(--ink-faint)" }}
                   >
                     {stage.label}
@@ -118,7 +118,7 @@ export default function Journey() {
               >
                 <span className="b-num shrink-0">{String(i + 1).padStart(2, "0")}</span>
                 <span
-                  className="flex-1 text-[1.15rem] tracking-[-0.02em]"
+                  className="b-nav-link flex-1"
                   style={{ color: on ? "var(--ink)" : "var(--ink-soft)" }}
                 >
                   {stage.label}

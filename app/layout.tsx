@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { Inter, Orbitron } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,12 +9,25 @@ const inter = Inter({
   display: "swap",
 });
 
-// Used only for the brand surface's micro-labels and stage numbering, where a
-// mono gives the technical register that uppercase Inter cannot.
-const mono = IBM_Plex_Mono({
+// Might: the display face for the public site. Condensed and uppercase-only,
+// so it carries headlines, labels and controls but never running paragraphs.
+//
+// LICENCE: personal use only (app/fonts/Might-LICENCE.txt). A commercial
+// licence must be bought from funtypefonts.com before launch. To swap it out,
+// change this one declaration — everything reads it through --font-display.
+const might = localFont({
+  src: "./fonts/Might.ttf",
+  variable: "--font-display",
+  display: "swap",
+  adjustFontFallback: false,
+});
+
+// The squarish, wide-tracked techno register of the reference specimen, used
+// for the wordmark and the smallest labels only.
+const techno = Orbitron({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
+  weight: ["400", "500", "600"],
+  variable: "--font-techno",
   display: "swap",
 });
 
@@ -39,7 +53,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sv" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="sv" className={`${inter.variable} ${might.variable} ${techno.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

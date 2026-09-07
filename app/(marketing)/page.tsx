@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Countdown from "@/components/brand/Countdown";
 import InlineWaitlist from "@/components/brand/InlineWaitlist";
 import Journey from "@/components/brand/Journey";
 import Nav from "@/components/brand/Nav";
@@ -20,50 +19,44 @@ export default function BrandPage() {
       <PageView path="/" />
 
       {/* ── The opening frame ────────────────────────────────────────────
-          A single dark moment that owns the viewport: navigation, the claim,
-          one line, one action, and the countdown along the bottom edge.
-          Depth comes from grain and a warm falloff, never from imagery.      */}
+          One centred moment that owns the viewport: the mark, the claim, one
+          line, one field. Depth comes from grain and a soft green light, never
+          from imagery. No countdown — there is no launch date to count to.   */}
       <section className="b-invert b-fold">
         <Nav />
 
-        <div className="b-shell flex flex-1 flex-col justify-center py-20 sm:py-24">
+        <div className="b-shell flex flex-1 flex-col items-center justify-center py-20 text-center sm:py-24">
           <Rise>
-            <p className="b-label">Lanseras snart i Sverige</p>
+            <p className="b-label" style={{ color: "var(--accent)" }}>
+              Lanseras snart i Sverige
+            </p>
           </Rise>
 
           <Rise delay={1}>
-            <h1 className="b-display mt-8 max-w-[15ch]">
+            <h1 className="b-display mt-7 max-w-[20ch]">
               Din <span className="whitespace-nowrap">AI-medgrundare</span> för att starta
               företag.
             </h1>
           </Rise>
 
           <Rise delay={2}>
-            <p className="b-statement mt-10 max-w-[26ch]" style={{ color: "var(--ink-soft)" }}>
-              Från första idén till något människor faktiskt vill ha.
+            <p className="b-lead mx-auto mt-7 max-w-[50ch]">
+              Från första idén till något människor faktiskt vill ha. Spark hjälper dig hitta
+              idéer, utvärdera möjligheter, undersöka marknaden och validera det viktigaste.
             </p>
           </Rise>
 
-          <Rise delay={3} className="mt-12 max-w-[34rem]">
+          <Rise delay={3} className="mt-10 flex w-full flex-col items-center">
             <InlineWaitlist source="hero" />
-            <p className="b-body mt-4 text-[0.8125rem]">
-              Bli en av de första att testa. Bara din e-post.
-            </p>
+            <p className="b-label mt-5">Bli en av de första att testa</p>
           </Rise>
         </div>
 
-        {/* bottom edge: the countdown, and the cue to read on */}
         <div className="b-shell pb-9">
-          <div
-            className="flex flex-wrap items-end justify-between gap-6 pt-8"
-            style={{ borderTop: "1px solid var(--rule)" }}
-          >
-            {/* Not wrapped in a reveal: it sits on the fold's bottom edge,
-                where a scroll observer would never fire. */}
-            <Countdown iso={process.env.NEXT_PUBLIC_LAUNCH_DATE} />
+          <div className="flex justify-center pt-8" style={{ borderTop: "1px solid var(--rule)" }}>
             <a
               href="#sa-fungerar-det"
-              className="b-label b-cue flex items-center gap-2.5 hover:opacity-100"
+              className="b-label b-cue flex items-center gap-2.5"
               style={{ color: "var(--ink-faint)" }}
             >
               Så fungerar det
@@ -79,7 +72,7 @@ export default function BrandPage() {
         <div className="b-shell">
           <Rise className="mb-14 flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="b-h2 max-w-[21ch]">Hela resan, ett steg i taget.</h2>
-            <p className="b-label">Sju steg</p>
+            <p className="b-label" style={{ color: "var(--accent)" }}>Sju steg</p>
           </Rise>
           <Rise delay={1}>
             <Journey />
@@ -92,7 +85,9 @@ export default function BrandPage() {
       <section className="b-section" style={{ borderTop: "1px solid var(--rule)" }}>
         <div className="b-shell">
           <Rise>
-            <p className="b-label mb-12">Så vad gör Spark egentligen?</p>
+            <p className="b-label mb-12" style={{ color: "var(--accent)" }}>
+              Så vad gör Spark egentligen?
+            </p>
           </Rise>
 
           <Rise delay={1}>
@@ -134,7 +129,7 @@ export default function BrandPage() {
             <Rise delay={1}>
               <p className="b-label">Vanlig AI</p>
               <p
-                className="mt-6 text-[1.15rem] tracking-[-0.02em]"
+                className="b-nav-link mt-6 text-[1.2rem]"
                 style={{ color: "var(--ink-soft)" }}
               >
                 &rdquo;Vad borde jag göra med min startup?&rdquo;
@@ -149,7 +144,7 @@ export default function BrandPage() {
                 ].map((item, i) => (
                   <li
                     key={item}
-                    className="py-2.5 text-[0.95rem]"
+                    className="b-nav-link py-2.5"
                     style={{
                       // Each suggestion a little fainter: the pile blurs together.
                       // Floored so the last one is still comfortably readable.
@@ -171,7 +166,7 @@ export default function BrandPage() {
             {/* Spark: context, reasoning, one action */}
             <Rise delay={2}>
               <div className="flex items-baseline gap-3">
-                <p className="b-label" style={{ color: "var(--ink)" }}>
+                <p className="b-label" style={{ color: "var(--accent)" }}>
                   Spark
                 </p>
                 <span
@@ -194,7 +189,7 @@ export default function BrandPage() {
                     style={{ borderBottom: "1px solid var(--rule-soft)" }}
                   >
                     <dt className="b-label col-span-5 sm:col-span-4">{term}</dt>
-                    <dd className="col-span-7 text-[0.95rem] sm:col-span-8">{value}</dd>
+                    <dd className="b-nav-link col-span-7 sm:col-span-8">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -208,7 +203,7 @@ export default function BrandPage() {
               </div>
 
               <p className="b-num mt-10 block max-w-[40ch] leading-relaxed">
-                Illustrerande exempel — inte insamlade kunddata.
+                Illustrerande exempel, inte insamlade kunddata.
               </p>
             </Rise>
           </div>
@@ -241,7 +236,7 @@ export default function BrandPage() {
                   style={{ borderBottom: "1px solid var(--rule-soft)" }}
                 >
                   <span className="b-num">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-[1.15rem] tracking-[-0.02em]">{item}</span>
+                  <span className="b-nav-link">{item}</span>
                 </li>
               ))}
             </ul>
@@ -273,7 +268,7 @@ export default function BrandPage() {
                 >
                   <span className="b-num">{String(i + 1).padStart(2, "0")}</span>
                   <span
-                    className="text-[1.05rem] tracking-[-0.02em]"
+                    className="b-nav-link"
                     style={{ color: i === 4 ? "var(--ink)" : "var(--ink-soft)" }}
                   >
                     {step}

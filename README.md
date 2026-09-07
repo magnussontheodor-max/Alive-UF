@@ -129,16 +129,19 @@ product lives at `/dashboard` under `app/(app)`. The app group carries
 `force-dynamic` because every page reads one founder's memory, while the brand
 surface reads nothing and is statically prerendered.
 
-It opens on a full-viewport dark frame — navigation, the claim, one line, one
-email field, and a countdown along the bottom edge — then continues on warm
-paper to explain the product, and closes dark again. Depth comes from a fine
+It opens on a full-viewport dark frame — navigation, the claim, one line and
+one email field, centred — then continues on warm paper to explain the product,
+and closes dark again. Depth comes from a fine
 grain and a warm falloff rather than photography or gradients. Every colour is
 a token under `.brand`, which is why inverting a section is one class
 (`.b-invert`) and every component inside it follows.
 
-**The countdown needs a date.** Set `NEXT_PUBLIC_LAUNCH_DATE` (RFC 3339, e.g.
-`2026-11-03T09:00:00+01:00`) and it appears. Without one it renders nothing —
-an invented "35 days left" would be the only dishonest thing on the page.
+**Typography.** Headlines, labels and controls are set in Might
+(`app/fonts/Might.ttf`), which is uppercase-only, so running paragraphs stay in
+Inter for legibility. The wordmark uses Orbitron. Might is licensed for
+**personal use only** — see `app/fonts/Might-LICENCE.txt`; a commercial licence
+must be bought from funtypefonts.com before launch. Swapping it is one
+declaration in `app/layout.tsx`.
 
 Nothing on the page claims traction that does not exist: no counts,
 testimonials, statistics or customers. The one worked example, contrasting

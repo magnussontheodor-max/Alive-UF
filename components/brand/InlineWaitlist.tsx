@@ -56,7 +56,7 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
   const sending = state === "sending";
 
   return (
-    <form onSubmit={onSubmit} noValidate className="w-full max-w-[30rem]">
+    <form onSubmit={onSubmit} noValidate className="w-full max-w-[34rem]">
       <label htmlFor={id} className="sr-only">
         E-postadress
       </label>
@@ -70,7 +70,7 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
           type="email"
           inputMode="email"
           autoComplete="email"
-          placeholder="din@epost.se"
+          placeholder="Din e-postadress"
           disabled={sending}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-fel` : undefined}
