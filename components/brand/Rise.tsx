@@ -2,9 +2,12 @@
 
 import { createElement, useEffect, useRef, useState } from "react";
 
-// Entry motion. Elements settle in on scroll, and are shown immediately when
-// the reader prefers reduced motion or the observer is unavailable — nothing
-// is ever left invisible waiting for an event.
+// Entry motion.
+//
+// A sweep on scroll rather than an IntersectionObserver: an observer only
+// reports what is intersecting *now*, so anything scrolled past in one jump —
+// an anchor link, a flick on a phone — would stay invisible for good. Readers
+// who prefer reduced motion see everything immediately.
 
 export default function Rise({
   children,
@@ -16,7 +19,7 @@ export default function Rise({
   children: React.ReactNode;
   delay?: 1 | 2 | 3 | 4;
   className?: string;
-  as?: "div" | "section" | "header" | "li" | "p";
+  as?: "div" | "section" | "header" | "li" | "p" | "ol";
   id?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -25,24 +28,35 @@ export default function Rise({
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      typeof IntersectionObserver === "undefined"
-    ) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setShown(true);
       return;
     }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.04 }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
+
+    let pending = false;
+
+    const stop = () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+
+    function sweep() {
+      pending = false;
+      if (!node || node.getBoundingClientRect().top >= window.innerHeight * 0.94) return;
+      setShown(true);
+      stop();
+    }
+
+    function schedule() {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(sweep);
+    }
+
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return stop;
   }, []);
 
   return createElement(

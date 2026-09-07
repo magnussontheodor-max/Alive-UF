@@ -4,8 +4,9 @@ import { useId, useRef, useState } from "react";
 import { joinWaitlistAction } from "@/app/(marketing)/actions";
 import { readUtm, track } from "@/lib/analytics";
 
-// The single action in the opening frame: one field beside one button, as in
-// the references. The full form lower down asks for a first name as well.
+// The only action on the page: one field beside one button, on the same left
+// edge as the headline. The confirmation replaces the form rather than
+// appearing beside it, so there is no ambiguity about whether it worked.
 
 export default function InlineWaitlist({ source = "hero" }: { source?: string }) {
   const [state, setState] = useState<"idle" | "sending" | "done" | "already" | "error">("idle");
@@ -42,28 +43,33 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
 
   if (state === "done" || state === "already") {
     return (
-      <p role="status" className="text-[1.05rem]" style={{ color: "var(--ink)" }}>
-        Du är med.{" "}
-        <span style={{ color: "var(--ink-soft)" }}>
+      <div role="status" className="max-w-[44rem]">
+        <p className="b-label b-eyebrow">Du står på listan</p>
+        <p className="b-body mt-3.5">
           {state === "already"
-            ? "Adressen fanns redan på listan."
-            : "Vi hör av oss när Spark öppnar."}
-        </span>
-      </p>
+            ? "Adressen fanns redan på listan. Vi hör av oss när Spark öppnar."
+            : "Vi hör av oss när Spark öppnar. Inget nyhetsbrev under tiden."}
+        </p>
+        <span
+          aria-hidden="true"
+          className="mt-7 block h-px w-20 origin-left"
+          style={{
+            background: "var(--accent)",
+            animation: "growLine .7s cubic-bezier(.22,1,.36,1) forwards",
+          }}
+        />
+      </div>
     );
   }
 
   const sending = state === "sending";
 
   return (
-    <form onSubmit={onSubmit} noValidate className="w-full max-w-[34rem]">
+    <form onSubmit={onSubmit} noValidate>
       <label htmlFor={id} className="sr-only">
         E-postadress
       </label>
-      <div
-        className="flex items-center gap-3 pb-3"
-        style={{ borderBottom: `1px solid ${error ? "var(--ember)" : "var(--rule)"}` }}
-      >
+      <div className="b-signup-row">
         <input
           id={id}
           name="email"
@@ -79,20 +85,19 @@ export default function InlineWaitlist({ source = "hero" }: { source?: string })
             started.current = true;
             track({ name: "waitlist_form_started", source });
           }}
-          className="min-w-0 flex-1 bg-transparent text-[1.05rem] outline-none placeholder:text-[var(--ink-faint)] disabled:opacity-50"
-          style={{ color: "var(--ink)" }}
+          className="disabled:opacity-50"
         />
-        <button type="submit" disabled={sending} className="b-cta b-cta-sm shrink-0">
+        <button type="submit" disabled={sending} className="b-cta">
           {sending ? "Skickar" : "Få tidig tillgång"}
         </button>
       </div>
       {error && (
-        <p id={`${id}-fel`} className="mt-2.5 text-[0.8125rem]" style={{ color: "var(--ember)" }}>
+        <p id={`${id}-fel`} className="mt-3.5 text-[0.9rem]" style={{ color: "var(--accent)" }}>
           {error}
         </p>
       )}
       {state === "error" && (
-        <p role="alert" className="mt-2.5 text-[0.8125rem]" style={{ color: "var(--ember)" }}>
+        <p role="alert" className="mt-3.5 text-[0.9rem]" style={{ color: "var(--accent)" }}>
           Anmälan kunde inte sparas just nu. Försök igen om en stund.
         </p>
       )}

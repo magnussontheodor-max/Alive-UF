@@ -39,19 +39,22 @@
 /* ===========================================================================
    Brand surface (the public site)
    Scoped under .brand so the application's own design system is untouched.
-   Typography and negative space do the work here: no cards, no shadows, no
-   badges. Structure comes from hairlines and rhythm.
+   One dark register, left-aligned to a single grid. Structure comes from
+   hairlines, numbers and rhythm: no cards, no shadows, no badges.
    =========================================================================== */
 
 .brand {
-  --paper: #f8f7f4;
-  --ink: #14130f;
-  --ink-soft: #57544c;
-  --ink-faint: #8c887d;
-  --rule: #e2dfd7;
-  --rule-soft: #eeece6;
-  --accent: #12a75a;          /* on paper: dark enough to read */
-  --accent-soft: #e4f6ec;
+  --paper: #0e0d0b;
+  --ink: #f6f4f0;
+  --ink-soft: #a29d95;
+  --ink-faint: #6f6a63;
+  --rule: #26241f;
+  --rule-soft: #1c1a17;
+  --accent: #3de686;
+
+  /* Drives both the page padding and the column grid drawn behind it, so the
+     two can never drift apart. */
+  --gutter: clamp(1.25rem, 0.55rem + 3vw, 4rem);
 
   background: var(--paper);
   color: var(--ink);
@@ -60,15 +63,19 @@
 
 .brand ::selection {
   background: var(--accent);
-  color: var(--paper);
+  color: #06120b;
 }
 
-/* --- type scale ---------------------------------------------------------- */
+/* --- type scale ----------------------------------------------------------
+   Uppercase carries the headline, section headings, labels, numbers and
+   controls. Everything a reader reads in sentences stays lowercase in Inter:
+   å, ä and ö are hard to read in a condensed uppercase face.
+   ------------------------------------------------------------------------- */
 
 .b-display {
   font-family: var(--font-display), "Inter", sans-serif;
-  font-size: clamp(2.5rem, 1.5rem + 3.4vw, 4.75rem);
-  line-height: 0.94;
+  font-size: clamp(3.1rem, 1.7rem + 6.4vw, 8.5rem);
+  line-height: 0.9;
   letter-spacing: 0.005em;
   font-weight: 400;
   text-transform: uppercase;
@@ -76,48 +83,43 @@
 
 .b-h2 {
   font-family: var(--font-display), "Inter", sans-serif;
-  font-size: clamp(1.85rem, 1.15rem + 2.5vw, 3.1rem);
-  line-height: 1.02;
-  letter-spacing: 0.01em;
+  font-size: clamp(2rem, 1.2rem + 3vw, 3.75rem);
+  line-height: 1;
+  letter-spacing: 0.008em;
   font-weight: 400;
   text-transform: uppercase;
 }
 
-.b-statement {
-  font-family: var(--font-display), "Inter", sans-serif;
-  font-size: clamp(1.35rem, 1rem + 1.4vw, 1.95rem);
-  line-height: 1.2;
-  letter-spacing: 0.015em;
-  font-weight: 400;
-  text-transform: uppercase;
-}
-
-.b-lead {
-  font-size: clamp(1.02rem, 0.97rem + 0.24vw, 1.15rem);
-  line-height: 1.66;
+/* The line under a heading: sentence case, lighter, ~60 characters wide. */
+.b-subline {
+  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.25rem);
+  line-height: 1.6;
   color: var(--ink-soft);
+  max-width: 60ch;
 }
 
 .b-body {
-  font-size: 0.95rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.6;
   color: var(--ink-soft);
+  max-width: 65ch;
 }
 
-/* Micro-labels: mono, uppercase, wide. The technical register of the page. */
 .b-label {
   font-family: var(--font-display), "Inter", sans-serif;
   font-size: 0.9375rem;
-  letter-spacing: 0.17em;
+  letter-spacing: 0.19em;
   text-transform: uppercase;
   color: var(--ink-faint);
   font-weight: 400;
 }
 
+.b-eyebrow { color: var(--accent); }
+
 .b-num {
   font-family: var(--font-display), "Inter", sans-serif;
   font-size: 1rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
   color: var(--ink-faint);
 }
@@ -126,19 +128,21 @@
 
 .b-shell {
   width: 100%;
-  max-width: 76rem;
+  max-width: 82rem;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 0.55rem + 3vw, 4rem);
+  padding-inline: var(--gutter);
 }
 
 .b-section {
-  padding-block: clamp(5rem, 2.5rem + 9vw, 11rem);
+  padding-block: clamp(4.5rem, 2rem + 8vw, 9rem);
+  border-top: 1px solid var(--rule);
 }
 
-.b-rule {
-  border: 0;
-  border-top: 1px solid var(--rule);
-  margin: 0;
+.b-hero {
+  /* Deliberately tighter above the headline than a section: the opening
+     should not begin with a field of dead black. */
+  padding-top: clamp(2.5rem, 1rem + 5vw, 5rem);
+  padding-bottom: clamp(4rem, 2rem + 6vw, 7rem);
 }
 
 /* --- links and controls -------------------------------------------------- */
@@ -154,9 +158,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -3px;
+  bottom: -4px;
   height: 1px;
-  background: var(--ink);
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -166,17 +170,19 @@
 .b-cta {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  justify-content: center;
+  gap: 0.55rem;
   background: var(--accent);
   color: #06120b;
   border: 1px solid var(--accent);
   border-radius: 999px;
-  padding: 0.95rem 1.7rem;
+  padding: 1rem 1.75rem;
   font-family: var(--font-display), "Inter", sans-serif;
   font-size: 1rem;
   font-weight: 400;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  white-space: nowrap;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 .b-cta:hover {
@@ -184,10 +190,11 @@
   color: var(--accent);
   transform: translateY(-1px);
 }
+.b-cta:disabled { opacity: 0.55; cursor: default; transform: none; }
 
 .b-cta-sm {
-  padding: 0.55rem 1.05rem;
-  font-size: 0.8125rem;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.875rem;
 }
 
 .brand :focus-visible {
@@ -196,25 +203,108 @@
   border-radius: 2px;
 }
 
+/* --- the signup line ----------------------------------------------------- */
+
+.b-signup-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: stretch;
+}
+.b-signup-row input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.85rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.b-signup-row input::placeholder { color: var(--ink-faint); }
+.b-signup-row input:focus { border-bottom-color: var(--ink); }
+.b-signup-row input[aria-invalid="true"] { border-bottom-color: var(--accent); }
+
+/* Once there is room, field and button share one rule rather than two. */
+@media (min-width: 560px) {
+  .b-signup-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.85rem;
+  }
+  .b-signup-row input { border-bottom: 0; padding-bottom: 0; }
+}
+
+/* --- the seven steps -----------------------------------------------------
+   A number in the gutter, an uppercase label, the description beside it.
+   Everything visible at once: the section is read, not clicked through.
+   ------------------------------------------------------------------------- */
+
+.b-steps { border-top: 1px solid var(--rule); }
+
+.b-step {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr;
+  column-gap: 1rem;
+  row-gap: 0.5rem;
+  align-items: start;
+  padding-block: 1.5rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.b-step-num {
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: clamp(1.3rem, 1rem + 1vw, 1.9rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+
+.b-step-label {
+  font-family: var(--font-display), "Inter", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.11em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.b-step-body {
+  grid-column: 2;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+@media (min-width: 768px) {
+  .b-step {
+    grid-template-columns: 5rem 11rem 1fr;
+    column-gap: 2rem;
+    row-gap: 0;
+    padding-block: 1.85rem;
+    align-items: baseline;
+  }
+  .b-step-body { grid-column: 3; }
+}
+
 /* --- motion: present at rest, settled in on entry ------------------------ */
 
 @media (prefers-reduced-motion: no-preference) {
   .b-rise {
     opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateY(10px);
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .b-rise[data-shown="true"] { opacity: 1; transform: none; }
-  .b-d1 { transition-delay: 0.06s; }
-  .b-d2 { transition-delay: 0.12s; }
-  .b-d3 { transition-delay: 0.18s; }
-  .b-d4 { transition-delay: 0.24s; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: none; }
+  .b-d1 { transition-delay: 0.05s; }
+  .b-d2 { transition-delay: 0.1s; }
+  .b-d3 { transition-delay: 0.15s; }
+  .b-d4 { transition-delay: 0.2s; }
 }
 
 @keyframes growLine {
@@ -223,88 +313,64 @@
 }
 
 /* --- atmosphere ----------------------------------------------------------
-   The references get depth from photography. Photography, 3D and gradients
-   are out, so depth comes from a fine grain and a soft warm falloff instead:
-   enough that the page reads as a surface rather than a blank document, faint
-   enough that you would not name it if asked what you saw.
+   Three faint layers behind the page, fixed so they do not scroll with it:
+   the column grid the whole page is set against, a slow drift of green
+   light, and a fine grain. Each is well under the threshold where you would
+   name it if asked what you saw.
    ------------------------------------------------------------------------- */
 
-.b-grain::before {
-  content: "";
+.b-bg {
   position: fixed;
   inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.4;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
-}
-
-.b-grain > * {
-  position: relative;
-  z-index: 2;
-}
-
-/* A warm falloff behind the opening, in the paper's own hue. */
-.b-fold {
-  position: relative;
-  /* clips the falloff layer, which is deliberately wider than the frame */
-  overflow: hidden;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Warm light, well under the threshold where you would call it a gradient:
-   enough to give the frame depth, never enough to compete with the type. */
-.b-fold::before {
-  content: "";
-  position: absolute;
-  inset: -25% -12% -10%;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(60% 50% at 82% 8%, rgba(255, 238, 220, 0.075), transparent 64%),
-    radial-gradient(55% 45% at 8% 92%, rgba(226, 103, 58, 0.07), transparent 66%);
+  overflow: hidden;
 }
 
-.b-fold > * { position: relative; z-index: 1; }
-
-/* --- the inverted beat ---------------------------------------------------
-   One dark moment near the end. Because every component reads its colours
-   from these tokens, inverting them here is all it takes.
-   ------------------------------------------------------------------------- */
-
-.b-invert {
-  --paper: #100f0d;
-  --ink: #f6f4f0;
-  --ink-soft: #a5a099;
-  --ink-faint: #77726a;
-  --rule: #2a2823;
-  --rule-soft: #211f1b;
-  --accent: #3de686;          /* on the dark frame: the specimen's green */
-
-  background: var(--paper);
-  color: var(--ink);
+/* The same columns the content sits on: four on a phone, twelve above that. */
+.b-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: calc((100% - 2 * var(--gutter)) / 4) 100%;
+  background-position: var(--gutter) 0;
+  background-repeat: repeat-x;
+}
+@media (min-width: 768px) {
+  .b-bg-grid { background-size: calc((100% - 2 * var(--gutter)) / 12) 100%; }
 }
 
-.b-invert .b-cta {
-  background: var(--accent);
-  color: #06120b;
-  border-color: var(--accent);
+.b-bg-glow {
+  position: absolute;
+  width: 80vw;
+  height: 80vw;
+  max-width: 1100px;
+  max-height: 1100px;
+  left: -15vw;
+  top: -30vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(61, 230, 134, 0.075), transparent 62%);
+  animation: drift 34s ease-in-out infinite alternate;
 }
-.b-invert .b-cta:hover { background: transparent; color: var(--accent); }
 
-/* --- scroll cue ---------------------------------------------------------- */
-
-@keyframes cue {
-  0%, 100% { transform: translateY(0); opacity: 0.55; }
-  50% { transform: translateY(5px); opacity: 1; }
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(9vw, 7vw, 0) scale(1.14); }
 }
-.b-cue { animation: cue 2.6s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .b-cue { animation: none; } }
 
-/* The wordmark and the smallest meta text carry the squarish techno face. */
+@media (prefers-reduced-motion: reduce) {
+  .b-bg-glow { animation: none; }
+}
+
+.b-bg-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+}
+
+/* The wordmark carries the squarish techno face. */
 .b-techno {
   font-family: var(--font-techno), var(--font-display), sans-serif;
   text-transform: uppercase;
@@ -314,6 +380,6 @@
 .b-nav-link {
   font-family: var(--font-display), "Inter", sans-serif;
   font-size: 1rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }

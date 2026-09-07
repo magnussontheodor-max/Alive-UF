@@ -129,23 +129,26 @@ product lives at `/dashboard` under `app/(app)`. The app group carries
 `force-dynamic` because every page reads one founder's memory, while the brand
 surface reads nothing and is statically prerendered.
 
-It opens on a full-viewport dark frame — navigation, the claim, one line and
-one email field, centred — then continues on warm paper to explain the product,
-and closes dark again. Depth comes from a fine
-grain and a warm falloff rather than photography or gradients. Every colour is
-a token under `.brand`, which is why inverting a section is one class
-(`.b-invert`) and every component inside it follows.
+It is one dark register throughout, left-aligned to a single column grid:
+the opening (eyebrow, headline, one line, one email field), one section for
+the thing that makes Spark different, and the seven steps of the journey as a
+numbered list where every step is visible at once. Nothing is centred.
 
-**Typography.** Headlines, labels and controls are set in Might
-(`app/fonts/Might.ttf`), which is uppercase-only, so running paragraphs stay in
-Inter for legibility. The wordmark uses Orbitron. Might is licensed for
+Depth comes from three fixed layers behind the page rather than photography:
+the same column grid the content sits on, a slowly drifting green light, and a
+fine grain. Every colour is a token under `.brand`, so the register is changed
+in one place.
+
+**Typography.** The headline, section headings, labels, numbers and controls
+are set in Might (`app/fonts/Might.ttf`), which is uppercase-only. Everything
+read in sentences stays lowercase in Inter: å, ä and ö are hard to read in a
+condensed uppercase face. The wordmark uses Orbitron. Might is licensed for
 **personal use only** — see `app/fonts/Might-LICENCE.txt`; a commercial licence
 must be bought from funtypefonts.com before launch. Swapping it is one
 declaration in `app/layout.tsx`.
 
 Nothing on the page claims traction that does not exist: no counts,
-testimonials, statistics or customers. The one worked example, contrasting
-Spark with a generic AI answer, is labelled illustrative.
+testimonials, statistics or customers.
 
 Waitlist signups go through `WaitlistRepository`, following the same pattern as
 the rest of the data layer — Supabase when configured, the local store
@@ -155,7 +158,7 @@ otherwise. Apply the table with:
 supabase db execute --file data/supabase/migrations/0002_waitlist.sql
 ```
 
-`first_name` is nullable because the opening frame captures an email only;
+`first_name` is nullable because the page captures an email only;
 `source` records which surface a signup came from. Row level security inverts
 for this table: anonymous visitors may insert and nothing else, so a signup
 cannot read back anyone else's address.
