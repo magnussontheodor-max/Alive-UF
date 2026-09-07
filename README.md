@@ -130,20 +130,23 @@ product lives at `/dashboard` under `app/(app)`. The app group carries
 surface reads nothing and is statically prerendered.
 
 It is one dark register throughout, left-aligned to a single edge: the
-opening (eyebrow, headline, one line, one email field), one section for
-the thing that makes Spark different, and the seven steps of the journey as a
-numbered list where every step is visible at once. Nothing is centred.
+opening (eyebrow, headline, one line, one email field), the seven steps of the
+journey as a numbered list where every step is visible at once, and then the
+one thing that makes Spark different — which lands after the steps, once the
+reader has seen how much there is to carry. Nothing is centred.
 
 Depth comes from two fixed layers behind the page rather than photography: a
 slowly drifting green light and a fine grain. Every colour is a token under
 `.brand`, so the register is changed in one place.
 
-**Typography.** The headline, section headings, labels, numbers, controls and
-the seven answers are set in Might (`app/fonts/Might.ttf`). The face has no
-lowercase glyphs, so all of that renders as condensed uppercase; the answers
-carry extra tracking and leading to stay readable at length, and their copy
-avoids an em dash, for which the face draws a doubled rule. The hero line and
-the footer stay in Inter. The wordmark uses Orbitron. Might is licensed for
+**Typography.** Everything on the page is set in Might
+(`app/fonts/Might.ttf`) except the email field, whose value a visitor types in
+mixed case. The face has no lowercase glyphs, so all of it renders as condensed
+uppercase; running copy carries extra tracking and leading to stay readable at
+length, and sits in greige rather than full ink so it never competes with a
+heading. Copy avoids the em dash, for which the face draws a doubled rule.
+Measures are set in `rem`: `ch` is taken from the fallback metrics, and this
+face sets far narrower than Inter. The wordmark uses Orbitron. Might is licensed for
 **personal use only** — see `app/fonts/Might-LICENCE.txt`; a commercial licence
 must be bought from funtypefonts.com before launch. Swapping it is one
 declaration in `app/layout.tsx`.

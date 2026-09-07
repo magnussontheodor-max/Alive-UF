@@ -89,19 +89,29 @@
   text-transform: uppercase;
 }
 
-/* The line under a heading: sentence case, lighter, ~60 characters wide. */
+/* Running copy takes the display face as well, in the register of the
+   footer's LANSERAS HÖSTEN 2026: condensed uppercase, tracked out, greige
+   rather than full ink so it never competes with a heading. Measures are in
+   rem, not ch — ch is taken from the fallback, and this face sets far
+   narrower than Inter. */
 .b-subline {
-  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.25rem);
-  line-height: 1.6;
+  font-family: var(--font-display), "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.3rem);
+  line-height: 1.45;
+  letter-spacing: 0.06em;
   color: var(--ink-soft);
-  max-width: 60ch;
+  max-width: 36rem;
 }
 
 .b-body {
-  font-size: 1rem;
-  line-height: 1.6;
+  font-family: var(--font-display), "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  letter-spacing: 0.06em;
   color: var(--ink-soft);
-  max-width: 65ch;
+  max-width: 36rem;
 }
 
 .b-label {
@@ -284,7 +294,7 @@
   font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
   line-height: 1.42;
   letter-spacing: 0.045em;
-  color: var(--ink);
+  color: var(--ink-soft);
   max-width: 34rem;
 }
 

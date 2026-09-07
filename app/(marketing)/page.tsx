@@ -42,28 +42,13 @@ export default function BrandPage() {
 
             <Rise delay={2}>
               <p className="b-subline mt-8 sm:mt-10">
-                Från första idén till något människor faktiskt vill ha. Spark gör jobbet med dig
-                — research, validering, produkt.
+                Från första idén till något människor faktiskt vill ha. Spark gör jobbet med
+                dig: research, validering, produkt.
               </p>
             </Rise>
 
             <Rise delay={3} className="mt-10 max-w-[38rem] sm:mt-12">
               <InlineWaitlist source="hero" />
-            </Rise>
-          </div>
-        </section>
-
-        {/* ── What makes Spark different ─────────────────────────────────
-            One claim, one line under it, and nothing else in the section. */}
-        <section id="om" className="b-section scroll-mt-4">
-          <div className="b-shell">
-            <Rise>
-              <h2 className="b-h2 max-w-[18ch]">Varje gång du loggar in vet Spark var du är.</h2>
-            </Rise>
-            <Rise delay={1}>
-              <p className="b-subline mt-8 sm:mt-9">
-                Ingen kontext att förklara om. Inget att komma ihåg. Bara nästa steg.
-              </p>
             </Rise>
           </div>
         </section>
@@ -76,6 +61,23 @@ export default function BrandPage() {
             </Rise>
             <Rise delay={1} className="mt-10 sm:mt-16">
               <Steps />
+            </Rise>
+          </div>
+        </section>
+
+        {/* ── What makes Spark different ─────────────────────────────────
+            It lands after the seven steps: the reader has just seen how much
+            there is to carry, which is what makes this the answer. */}
+        <section id="om" className="b-section scroll-mt-4">
+          <div className="b-shell">
+            <Rise>
+              <h2 className="b-h2">Spark minns allt.</h2>
+            </Rise>
+            <Rise delay={1}>
+              <p className="b-subline mt-8 sm:mt-9">
+                Du behöver inte förklara vem du är, vad du bygger eller vad du gjorde förra
+                veckan. Öppna Spark, så vet du vad du ska göra.
+              </p>
             </Rise>
           </div>
         </section>
