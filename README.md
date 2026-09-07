@@ -139,14 +139,15 @@ Depth comes from two fixed layers behind the page rather than photography: a
 slowly drifting green light and a fine grain. Every colour is a token under
 `.brand`, so the register is changed in one place.
 
-**Typography.** Everything on the page is set in Might
-(`app/fonts/Might.ttf`) except the email field, whose value a visitor types in
-mixed case. The face has no lowercase glyphs, so all of it renders as condensed
-uppercase; running copy carries extra tracking and leading to stay readable at
-length, and sits in greige rather than full ink so it never competes with a
-heading. Copy avoids the em dash, for which the face draws a doubled rule.
-Measures are set in `rem`: `ch` is taken from the fallback metrics, and this
-face sets far narrower than Inter. The wordmark uses Orbitron. Might is licensed for
+**Typography.** One face, Inter, for the whole page. Weight and letter-spacing
+carry the hierarchy: heavy uppercase for headings, tracked uppercase for the
+small interface words (eyebrow, nav, labels, numbers, buttons), sentence case
+at a normal weight for anything read as prose. The step numbers are the only
+place the accent green appears besides the call to action.
+
+`app/fonts/Might.ttf` is no longer referenced. It is licensed for **personal
+use only** — see `app/fonts/Might-LICENCE.txt` — so bringing it back means
+buying a commercial licence from funtypefonts.com first. The wordmark uses Orbitron. Might is licensed for
 **personal use only** — see `app/fonts/Might-LICENCE.txt`; a commercial licence
 must be bought from funtypefonts.com before launch. Swapping it is one
 declaration in `app/layout.tsx`.
