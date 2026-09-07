@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Countdown from "@/components/brand/Countdown";
+import InlineWaitlist from "@/components/brand/InlineWaitlist";
 import Journey from "@/components/brand/Journey";
+import Nav from "@/components/brand/Nav";
 import PageView from "@/components/brand/PageView";
 import Rise from "@/components/brand/Rise";
 import Waitlist from "@/components/brand/Waitlist";
@@ -16,46 +19,63 @@ export default function BrandPage() {
     <>
       <PageView path="/" />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────
-          Typography carries this. No product shot, no illustration.        */}
-      <section className="b-shell pb-24 pt-24 sm:pb-32 sm:pt-36">
-        <Rise>
-          <p className="b-label">Lanseras snart i Sverige</p>
-        </Rise>
+      {/* ── The opening frame ────────────────────────────────────────────
+          A single dark moment that owns the viewport: navigation, the claim,
+          one line, one action, and the countdown along the bottom edge.
+          Depth comes from grain and a warm falloff, never from imagery.      */}
+      <section className="b-invert b-fold">
+        <Nav />
 
-        <Rise delay={1}>
-          <h1 className="b-display mt-9 max-w-[17ch]">
-            Din <span className="whitespace-nowrap">AI-medgrundare</span> för att starta företag.
-          </h1>
-        </Rise>
+        <div className="b-shell flex flex-1 flex-col justify-center py-20 sm:py-24">
+          <Rise>
+            <p className="b-label">Lanseras snart i Sverige</p>
+          </Rise>
 
-        <div className="mt-14 grid gap-10 md:mt-20 md:grid-cols-12 md:gap-8">
-          <Rise delay={2} className="md:col-span-6 md:col-start-1">
-            <p className="b-statement max-w-[22ch]">
+          <Rise delay={1}>
+            <h1 className="b-display mt-8 max-w-[15ch]">
+              Din <span className="whitespace-nowrap">AI-medgrundare</span> för att starta
+              företag.
+            </h1>
+          </Rise>
+
+          <Rise delay={2}>
+            <p className="b-statement mt-10 max-w-[26ch]" style={{ color: "var(--ink-soft)" }}>
               Från första idén till något människor faktiskt vill ha.
             </p>
           </Rise>
 
-          <Rise delay={3} className="md:col-span-5 md:col-start-8">
-            <p className="b-lead max-w-[46ch]">
-              Spark hjälper dig hitta idéer, utvärdera möjligheter, undersöka marknaden, validera
-              det viktigaste och bygga vidare på det som fungerar.
+          <Rise delay={3} className="mt-12 max-w-[34rem]">
+            <InlineWaitlist source="hero" />
+            <p className="b-body mt-4 text-[0.8125rem]">
+              Bli en av de första att testa. Bara din e-post.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-6">
-              <a href="#tidig-tillgang" className="b-cta">
-                Få tidig tillgång
-              </a>
-              <a href="#sa-fungerar-det" className="b-link text-[0.9375rem]">
-                Se hur det fungerar
-              </a>
-            </div>
           </Rise>
+        </div>
+
+        {/* bottom edge: the countdown, and the cue to read on */}
+        <div className="b-shell pb-9">
+          <div
+            className="flex flex-wrap items-end justify-between gap-6 pt-8"
+            style={{ borderTop: "1px solid var(--rule)" }}
+          >
+            {/* Not wrapped in a reveal: it sits on the fold's bottom edge,
+                where a scroll observer would never fire. */}
+            <Countdown iso={process.env.NEXT_PUBLIC_LAUNCH_DATE} />
+            <a
+              href="#sa-fungerar-det"
+              className="b-label b-cue flex items-center gap-2.5 hover:opacity-100"
+              style={{ color: "var(--ink-faint)" }}
+            >
+              Så fungerar det
+              <span aria-hidden="true">↓</span>
+            </a>
+          </div>
         </div>
       </section>
 
       {/* ── The journey ──────────────────────────────────────────────────
           The site's centrepiece: an index of the whole product.            */}
-      <section id="sa-fungerar-det" className="b-section scroll-mt-20">
+      <section id="sa-fungerar-det" className="b-section scroll-mt-8">
         <div className="b-shell">
           <Rise className="mb-14 flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="b-h2 max-w-[21ch]">Hela resan, ett steg i taget.</h2>
@@ -266,11 +286,7 @@ export default function BrandPage() {
       </section>
 
       {/* ── Waitlist ─────────────────────────────────────────────────────  */}
-      <section
-        id="tidig-tillgang"
-        className="b-section scroll-mt-20"
-        style={{ borderTop: "1px solid var(--rule)" }}
-      >
+      <section id="tidig-tillgang" className="b-invert b-section scroll-mt-8">
         <div className="b-shell grid gap-14 md:grid-cols-12">
           <Rise className="md:col-span-5">
             <h2 className="b-h2 max-w-[12ch]">Var med från början.</h2>

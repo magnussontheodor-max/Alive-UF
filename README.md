@@ -129,15 +129,20 @@ product lives at `/dashboard` under `app/(app)`. The app group carries
 `force-dynamic` because every page reads one founder's memory, while the brand
 surface reads nothing and is statically prerendered.
 
-It is a coming-soon page, not a SaaS landing page: no product screenshots, no
-cards, no illustration. Typography and negative space carry it, structure comes
-from hairlines, and the palette is warm paper, near-black, and one ember accent
-used at about one percent coverage. Those tokens are scoped under `.brand` in
-`globals.css` so the application's own design system is untouched.
+It opens on a full-viewport dark frame — navigation, the claim, one line, one
+email field, and a countdown along the bottom edge — then continues on warm
+paper to explain the product, and closes dark again. Depth comes from a fine
+grain and a warm falloff rather than photography or gradients. Every colour is
+a token under `.brand`, which is why inverting a section is one class
+(`.b-invert`) and every component inside it follows.
 
-Nothing on it claims traction that does not exist: no counts, testimonials,
-statistics or customers. The one worked example, in the section contrasting
-Spark with a generic AI answer, is labelled as illustrative.
+**The countdown needs a date.** Set `NEXT_PUBLIC_LAUNCH_DATE` (RFC 3339, e.g.
+`2026-11-03T09:00:00+01:00`) and it appears. Without one it renders nothing —
+an invented "35 days left" would be the only dishonest thing on the page.
+
+Nothing on the page claims traction that does not exist: no counts,
+testimonials, statistics or customers. The one worked example, contrasting
+Spark with a generic AI answer, is labelled illustrative.
 
 Waitlist signups go through `WaitlistRepository`, following the same pattern as
 the rest of the data layer — Supabase when configured, the local store
@@ -147,8 +152,10 @@ otherwise. Apply the table with:
 supabase db execute --file data/supabase/migrations/0002_waitlist.sql
 ```
 
-Row level security inverts for that table: anonymous visitors may insert and
-nothing else, so a signup cannot read back anyone else's address.
+`first_name` is nullable because the opening frame captures an email only;
+`source` records which surface a signup came from. Row level security inverts
+for this table: anonymous visitors may insert and nothing else, so a signup
+cannot read back anyone else's address.
 
 Analytics events are named and called at the right places (`lib/analytics.ts`)
 but go to a no-op sink; connecting a provider means implementing one function.

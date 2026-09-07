@@ -12,7 +12,8 @@
 
 create table waitlist (
   id           text primary key,
-  first_name   text not null check (length(trim(first_name)) between 1 and 80),
+  -- nullable: the opening frame captures an email only
+  first_name   text check (first_name is null or length(trim(first_name)) between 1 and 80),
   email        text not null check (position('@' in email) > 1),
   source       text not null default 'landing',
   utm_source   text,

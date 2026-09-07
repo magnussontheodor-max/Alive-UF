@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import SparkMark from "./SparkMark";
 
-// Deliberately not a header bar: a hairline, the wordmark, two links and one
-// small action. On mobile everything but the wordmark folds behind MENU.
+// Not a header bar: the navigation sits inside the opening frame, as it does
+// in the references. Two links, one action, a hairline under it.
 
 const LINKS = [
   { href: "#sa-fungerar-det", label: "Hur det fungerar" },
@@ -16,50 +16,43 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header
-      className="sticky top-0 z-40 backdrop-blur-md"
-      style={{ background: "color-mix(in srgb, var(--paper) 86%, transparent)" }}
-    >
-      <div className="b-shell">
-        <div
-          className="flex h-[72px] items-center justify-between"
-          style={{ borderBottom: "1px solid var(--rule)" }}
-        >
-          <Link href="/" aria-label="Spark, till startsidan">
-            <SparkMark />
-          </Link>
+    <div className="b-shell">
+      <div
+        className="flex h-[72px] items-center justify-between"
+        style={{ borderBottom: "1px solid var(--rule)" }}
+      >
+        <Link href="/" aria-label="Spark, till startsidan">
+          <SparkMark />
+        </Link>
 
-          <nav className="hidden items-center gap-9 sm:flex" aria-label="Sidnavigering">
-            {LINKS.map((link) => (
-              <a key={link.href} href={link.href} className="b-link text-[0.875rem]">
-                {link.label}
-              </a>
-            ))}
-            <a href="#tidig-tillgang" className="b-cta b-cta-sm">
-              Få tidig tillgång
+        <nav className="hidden items-center gap-9 sm:flex" aria-label="Sidnavigering">
+          {LINKS.map((link) => (
+            <a key={link.href} href={link.href} className="b-link text-[0.875rem]">
+              {link.label}
             </a>
-          </nav>
+          ))}
+          <a href="#tidig-tillgang" className="b-cta b-cta-sm">
+            Få tidig tillgång
+          </a>
+        </nav>
 
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-controls="mobil-meny"
-            className="b-label sm:hidden"
-            style={{ color: "var(--ink)" }}
-          >
-            {open ? "Stäng" : "Meny"}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls="mobil-meny"
+          className="b-label sm:hidden"
+          style={{ color: "var(--ink)" }}
+        >
+          {open ? "Stäng" : "Meny"}
+        </button>
       </div>
 
-      <div
-        id="mobil-meny"
-        hidden={!open}
-        className="sm:hidden"
-        style={{ borderBottom: "1px solid var(--rule)", background: "var(--paper)" }}
-      >
-        <div className="b-shell flex flex-col gap-5 py-7">
+      <div id="mobil-meny" hidden={!open} className="sm:hidden">
+        <div
+          className="flex flex-col gap-5 py-7"
+          style={{ borderBottom: "1px solid var(--rule)" }}
+        >
           {LINKS.map((link) => (
             <a
               key={link.href}
@@ -75,6 +68,6 @@ export default function Nav() {
           </a>
         </div>
       </div>
-    </header>
+    </div>
   );
 }

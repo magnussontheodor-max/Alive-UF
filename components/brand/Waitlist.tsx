@@ -30,6 +30,12 @@ export default function Waitlist({ source = "landing" }: { source?: string }) {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    // This surface asks for a name, so it enforces one; the action treats the
+    // field as optional because the opening frame does not ask.
+    if (!String(data.get("firstName") ?? "").trim()) {
+      setErrors({ firstName: "Skriv ditt förnamn." });
+      return;
+    }
     setState({ kind: "sending" });
     setErrors({});
 

@@ -14,11 +14,13 @@ import { newId, normaliseEmail } from "@/domain";
 // ---------------------------------------------------------------------------
 
 const schema = z.object({
+  // Optional: the opening frame asks for an email only. The fuller form below
+  // asks for a name and enforces it there.
   firstName: z
     .string()
     .trim()
-    .min(1, "Skriv ditt förnamn.")
-    .max(80, "Det där namnet är ovanligt långt — kontrollera gärna."),
+    .max(80, "Det där namnet är ovanligt långt — kontrollera gärna.")
+    .nullish(),
   email: z
     .string()
     .trim()
@@ -40,7 +42,7 @@ export type WaitlistResult =
   | { status: "failed"; message: string };
 
 export async function joinWaitlistAction(input: {
-  firstName: string;
+  firstName?: string | null;
   email: string;
   source?: string;
   utmSource?: string | null;
@@ -65,7 +67,7 @@ export async function joinWaitlistAction(input: {
   try {
     const outcome = await getRepositories().waitlist.add({
       id: newId("wl"),
-      firstName,
+      firstName: firstName ? firstName : null,
       email: normaliseEmail(email),
       source,
       utmSource: utmSource ?? null,

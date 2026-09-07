@@ -11,7 +11,8 @@ import { Id } from "./primitives";
 
 export interface WaitlistEntry {
   id: Id;
-  firstName: string;
+  /** Null when the signup came from a surface that only asks for an email. */
+  firstName: string | null;
   email: string;
   /** Which surface the signup came from, e.g. "landing-hero", "landing-final". */
   source: string;
