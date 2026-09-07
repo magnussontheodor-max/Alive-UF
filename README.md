@@ -129,15 +129,14 @@ product lives at `/dashboard` under `app/(app)`. The app group carries
 `force-dynamic` because every page reads one founder's memory, while the brand
 surface reads nothing and is statically prerendered.
 
-It is one dark register throughout, left-aligned to a single column grid:
-the opening (eyebrow, headline, one line, one email field), one section for
+It is one dark register throughout, left-aligned to a single edge: the
+opening (eyebrow, headline, one line, one email field), one section for
 the thing that makes Spark different, and the seven steps of the journey as a
 numbered list where every step is visible at once. Nothing is centred.
 
-Depth comes from three fixed layers behind the page rather than photography:
-the same column grid the content sits on, a slowly drifting green light, and a
-fine grain. Every colour is a token under `.brand`, so the register is changed
-in one place.
+Depth comes from two fixed layers behind the page rather than photography: a
+slowly drifting green light and a fine grain. Every colour is a token under
+`.brand`, so the register is changed in one place.
 
 **Typography.** The headline, section headings, labels, numbers and controls
 are set in Might (`app/fonts/Might.ttf`), which is uppercase-only. Everything

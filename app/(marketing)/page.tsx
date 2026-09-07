@@ -17,10 +17,9 @@ export default function BrandPage() {
     <>
       <PageView path="/" />
 
-      {/* Three faint layers behind everything: the column grid the page is set
-          against, a slow drift of green light, and grain. */}
+      {/* Two faint layers behind everything: a slow drift of green light,
+          and grain. */}
       <div className="b-bg" aria-hidden="true">
-        <div className="b-bg-grid" />
         <div className="b-bg-glow" />
         <div className="b-bg-grain" />
       </div>

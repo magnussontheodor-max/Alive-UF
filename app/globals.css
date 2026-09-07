@@ -52,8 +52,7 @@
   --rule-soft: #1c1a17;
   --accent: #3de686;
 
-  /* Drives both the page padding and the column grid drawn behind it, so the
-     two can never drift apart. */
+  /* The page's left and right edge, named once. */
   --gutter: clamp(1.25rem, 0.55rem + 3vw, 4rem);
 
   background: var(--paper);
@@ -313,10 +312,9 @@
 }
 
 /* --- atmosphere ----------------------------------------------------------
-   Three faint layers behind the page, fixed so they do not scroll with it:
-   the column grid the whole page is set against, a slow drift of green
-   light, and a fine grain. Each is well under the threshold where you would
-   name it if asked what you saw.
+   Two faint layers behind the page, fixed so they do not scroll with it: a
+   slow drift of green light, and a fine grain. Both are well under the
+   threshold where you would name them if asked what you saw.
    ------------------------------------------------------------------------- */
 
 .b-bg {
@@ -325,19 +323,6 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-}
-
-/* The same columns the content sits on: four on a phone, twelve above that. */
-.b-bg-grid {
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: calc((100% - 2 * var(--gutter)) / 4) 100%;
-  background-position: var(--gutter) 0;
-  background-repeat: repeat-x;
-}
-@media (min-width: 768px) {
-  .b-bg-grid { background-size: calc((100% - 2 * var(--gutter)) / 12) 100%; }
 }
 
 .b-bg-glow {
