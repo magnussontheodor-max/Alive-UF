@@ -138,10 +138,12 @@ Depth comes from two fixed layers behind the page rather than photography: a
 slowly drifting green light and a fine grain. Every colour is a token under
 `.brand`, so the register is changed in one place.
 
-**Typography.** The headline, section headings, labels, numbers and controls
-are set in Might (`app/fonts/Might.ttf`), which is uppercase-only. Everything
-read in sentences stays lowercase in Inter: å, ä and ö are hard to read in a
-condensed uppercase face. The wordmark uses Orbitron. Might is licensed for
+**Typography.** The headline, section headings, labels, numbers, controls and
+the seven answers are set in Might (`app/fonts/Might.ttf`). The face has no
+lowercase glyphs, so all of that renders as condensed uppercase; the answers
+carry extra tracking and leading to stay readable at length, and their copy
+avoids an em dash, for which the face draws a doubled rule. The hero line and
+the footer stay in Inter. The wordmark uses Orbitron. Might is licensed for
 **personal use only** — see `app/fonts/Might-LICENCE.txt`; a commercial licence
 must be bought from funtypefonts.com before launch. Swapping it is one
 declaration in `app/layout.tsx`.

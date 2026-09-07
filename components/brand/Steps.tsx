@@ -1,9 +1,10 @@
 // The whole product as one list. Every step is visible at once: the section is
 // meant to be read in a few seconds, not clicked through.
 //
-// Labels and numbers are uppercase in the display face; the descriptions stay
-// lowercase in Inter, because å, ä and ö are hard to read in a condensed
-// uppercase face.
+// Labels, numbers and answers all take the display face, which has no
+// lowercase glyphs — so the answers set as condensed uppercase, and get extra
+// tracking and leading to stay readable. Copy here therefore avoids an em
+// dash: the face has no glyph for one and draws a doubled rule instead.
 
 const STEPS = [
   {
@@ -24,7 +25,7 @@ const STEPS = [
   {
     id: "market",
     label: "Marknad",
-    body: "Kunder, konkurrenter och risker — innan du lägger månader på fel sak.",
+    body: "Kunder, konkurrenter och risker, innan du lägger månader på fel sak.",
   },
   {
     id: "validation",

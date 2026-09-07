@@ -272,11 +272,20 @@
   text-transform: uppercase;
 }
 
+/* The answers carry the display face too. It has no lowercase glyphs, so
+   this is condensed uppercase: it needs tracking, leading and full ink to
+   stay readable at length. The measure is in rem rather than ch, because ch
+   is taken from the fallback and this face sets far narrower than Inter —
+   34rem lands near 65 characters. */
 .b-step-body {
   grid-column: 2;
-  color: var(--ink-soft);
-  line-height: 1.6;
-  max-width: 60ch;
+  font-family: var(--font-display), "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  line-height: 1.42;
+  letter-spacing: 0.045em;
+  color: var(--ink);
+  max-width: 34rem;
 }
 
 @media (min-width: 768px) {
