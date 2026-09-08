@@ -39,48 +39,59 @@
 /* ===========================================================================
    Brand surface (the public site)
    Scoped under .brand so the application's own design system is untouched.
-   One face, every word uppercase, flat surfaces. Green appears in exactly
-   four places: the hero block, the step numbers, and the two wordmarks.
+
+   Every colour on the page comes from the tokens below and nowhere else.
+   Flat surfaces only — no gradients. The call to action is the one white
+   element on the page, and is meant to be the clearest thing on screen.
    =========================================================================== */
 
+/* The app and the public site share one <body>, and the app's surface is
+   cream. Without this the page's own background stops at the .brand element,
+   so an overscroll bounce reveals cream behind a dark page — and the browser
+   chrome, which follows theme-color, disagrees with what is on screen. */
+body:has(.brand) {
+  background-color: #262b31;
+}
+
 .brand {
-  --black: #08090a;
-  --green: #24f08b;
-  --green-ink: #04150c;
-  --bone: #ede9dd;
-  --grey: #8a9490;
-  /* The spec's #4A544E gives 2.53:1 against the page at 10px, well under the
-     4.5:1 minimum — measured, not guessed. Lifted to the nearest value on the
-     same hue that passes (4.55:1). Revert the moment the palette is settled if
-     the design would rather have the darker tone. */
-  --dim: #6e7c73;
-  --dim-green: #5f7a6b;
-  --line: #1b2620;
-  --line-soft: #12180f;
+  --page: #262b31;        /* dark slate page background */
+  --slab: #8098ac;        /* dusty blue-grey hero slab */
+  --slab-ink: #16222e;    /* every word on the slab */
+  --field: #16222e;       /* the email field's fill */
+  --field-text: #8da3b5;  /* placeholder — measures 6.17:1 on --field */
+  --button: #ffffff;      /* the only white on the page */
+  --button-ink: #16222e;
+  --bone: #f0f2f3;        /* headings and step labels */
+  --body: #a9b4ae;        /* step descriptions */
+  --dim: #6b757d;         /* nav links, footer meta */
+  --line: #343a41;        /* section dividers */
+  --line-soft: #2e343a;   /* between step rows */
 
   --pad: 34px;
 
-  background: var(--black);
+  background: var(--page);
   color: var(--bone);
   font-weight: 600;
-  /* Every word on the page is uppercase, without exception. */
+  /* Set here, never in the content: the markup stays in sentence case so a
+     screen reader announces words rather than spelling out letters, and a
+     search result shows a readable title. */
   text-transform: uppercase;
 }
 
 .brand ::selection {
-  background: var(--green);
-  color: var(--green-ink);
+  background: var(--slab);
+  color: var(--slab-ink);
 }
 
-/* Content sits on one 1100px column; only the green block's background runs
-   the full width of the window. */
+/* Content sits on one 1100px column; only the slab's background runs the
+   full width of the window. */
 .b-inner {
   max-width: 1100px;
   margin-inline: auto;
   padding-inline: var(--pad);
 }
 
-/* --- 1 · nav — on black, above the green, never on it -------------------- */
+/* --- nav ----------------------------------------------------------------- */
 
 .b-nav { padding-block: 26px 24px; }
 .b-nav .b-inner {
@@ -91,222 +102,138 @@
 }
 
 .b-mark {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
-  letter-spacing: 0.24em;
-  color: var(--green);
+  letter-spacing: 0.22em;
+  color: var(--bone);
 }
 
 .b-navlinks { display: flex; align-items: center; gap: 14px; }
 
 .b-navlink {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   color: var(--dim);
+  transition: color 0.2s ease;
 }
+.b-navlink:hover { color: var(--bone); }
 
-.b-navsep { font-size: 10px; color: var(--dim); }
+.b-navsep { font-size: 0.625rem; color: var(--dim); }
 
-/* --- 2 · hero — full bleed green ----------------------------------------
-   One ink colour inside the block, three opacities for hierarchy. A second
-   hue in here would read as a banner ad rather than as architecture.
+/* --- the slab -----------------------------------------------------------
+   Full bleed: a panel with page-coloured margins around it reads as a banner
+   ad, a band that reaches both edges reads as architecture. One ink colour
+   inside it, at three weights of opacity.
    ------------------------------------------------------------------------- */
 
 .b-hero {
-  background: var(--green);
-  color: var(--green-ink);
+  background: var(--slab);
+  color: var(--slab-ink);
 }
 .b-hero .b-inner { padding-block: var(--pad); }
 
 .b-eyebrow {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.26em;
-  opacity: 0.7;
+  letter-spacing: 0.24em;
+  color: var(--slab-ink);
+  opacity: 0.75;
 }
 
 .b-display {
-  font-size: 58px;
+  font-size: clamp(2.1rem, 7vw, 3.6rem);
   font-weight: 700;
-  /* Large caps need pulling together, not spreading apart. */
-  letter-spacing: -0.01em;
-  line-height: 0.9;
+  /* Negative. Large caps need pulling together, not spreading apart. */
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: var(--slab-ink);
 }
 
 .b-subline {
   max-width: 450px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
-  /* Running sentences never take more than 0.13em, or they fall apart. */
-  letter-spacing: 0.13em;
+  /* Running sentences never past 0.12em, or the words come apart. */
+  letter-spacing: 0.12em;
   /* Å, Ä and Ö sit above cap height and hit the line above at normal leading. */
-  line-height: 1.85;
-  opacity: 0.78;
+  line-height: 1.8;
+  color: var(--slab-ink);
+  opacity: 0.8;
 }
 
-/* --- the signup: field and button share one fill ------------------------- */
+/* --- the signup ---------------------------------------------------------- */
 
 .b-signup { max-width: 450px; }
 .b-signup-row { display: flex; gap: 10px; }
 
 .b-signup-row input,
 .b-signup-row button {
-  background: var(--green-ink);
   border: 0;
   border-radius: 3px;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   padding: 14px 16px;
 }
+
 .b-signup-row input {
   flex: 1;
   min-width: 0;
+  background: var(--field);
   color: var(--bone);
   outline: none;
 }
-.b-signup-row input::placeholder { color: var(--dim-green); opacity: 1; }
+.b-signup-row input::placeholder { color: var(--field-text); opacity: 1; }
+
+/* The one white element on the page. */
 .b-signup-row button {
-  color: var(--bone);
+  background: var(--button);
+  color: var(--button-ink);
   white-space: nowrap;
   padding-inline: 20px;
+  transition: opacity 0.18s ease;
 }
-.b-signup-row button:disabled { opacity: 0.6; cursor: default; }
+.b-signup-row button:hover { opacity: 0.88; }
+.b-signup-row button:disabled { opacity: 0.55; cursor: default; }
 
 .b-msg {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   line-height: 1.8;
+  color: var(--slab-ink);
 }
 
 .b-done-label {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.26em;
-  opacity: 0.7;
+  letter-spacing: 0.24em;
+  color: var(--slab-ink);
+  opacity: 0.75;
 }
 .b-done-note {
-  font-size: 12px;
+  max-width: 450px;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.13em;
-  line-height: 1.85;
-  opacity: 0.78;
-}
-
-/* --- 3 · steps — columns tight together, all seven on one screen --------- */
-
-.b-section { padding-block: 38px 34px; }
-
-.b-h2 {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: normal;
-  color: var(--bone);
-}
-
-.b-step {
-  display: grid;
-  grid-template-columns: 24px 100px 1fr;
-  gap: 20px;
-  align-items: baseline;
-  padding-block: 14px;
-  border-bottom: 1px solid var(--line-soft);
-}
-.b-step:last-child { border-bottom: 0; }
-
-.b-num {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: normal;
-  color: var(--green);
-}
-
-.b-step-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--bone);
-}
-
-.b-step-body {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   line-height: 1.8;
-  color: var(--grey);
+  color: var(--slab-ink);
+  opacity: 0.8;
 }
 
-/* --- the memory claim, in the same register ------------------------------ */
-
-.b-statement { border-top: 1px solid var(--line); }
-.b-statement p {
-  max-width: 560px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.13em;
-  line-height: 1.8;
-  color: var(--grey);
-}
-
-/* --- 4 · footer ---------------------------------------------------------- */
-
-.b-footer {
-  border-top: 1px solid var(--line);
-  padding-block: 26px;
-}
-.b-footer .b-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
-}
-
-.b-foot-line {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  line-height: 1.8;
-  color: var(--grey);
-}
-
-.b-foot-mark {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  color: var(--green);
-}
-
-.b-foot-date {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  line-height: 1.8;
-  color: var(--dim);
-}
-
-.brand :focus-visible {
-  outline: 2px solid var(--green);
-  outline-offset: 2px;
-}
-
-/* --- the form's second field, microcopy and honeypot -------------------- */
-
-/* Inside the green block, so it takes the block's own ink at an opacity —
-   --dim is a colour for the black surface and fails contrast on green. 0.70
-   is the same step the eyebrow uses, and measures 5.7:1. */
+/* The form's own labels sit on the slab, so they take the slab's ink — at
+   full strength, which measures 5.38:1, rather than an opacity that would
+   not. */
 .b-field-label {
   display: block;
   margin-top: 18px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--green-ink);
-  opacity: 0.7;
+  letter-spacing: 0.18em;
+  color: var(--slab-ink);
 }
 
 .b-textarea {
@@ -314,42 +241,40 @@
   width: 100%;
   max-width: 450px;
   margin-top: 8px;
-  background: var(--green-ink);
+  background: var(--field);
   border: 0;
   border-radius: 3px;
   padding: 12px 16px;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   line-height: 1.8;
   text-transform: uppercase;
   color: var(--bone);
   outline: none;
   resize: vertical;
 }
-.b-textarea::placeholder { color: var(--dim-green); opacity: 1; }
+.b-textarea::placeholder { color: var(--field-text); opacity: 1; }
 
 .b-counter {
   max-width: 450px;
   margin-top: 6px;
   text-align: right;
-  font-size: 9px;
+  font-size: 0.5625rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--green-ink);
-  opacity: 0.7;
+  letter-spacing: 0.18em;
+  color: var(--slab-ink);
 }
 
 .b-microcopy {
   max-width: 450px;
   margin-top: 16px;
-  font-size: 9px;
+  font-size: 0.5625rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   line-height: 1.9;
-  color: var(--green-ink);
-  opacity: 0.7;
+  color: var(--slab-ink);
 }
 
 .b-underline { text-decoration: underline; text-underline-offset: 3px; }
@@ -364,22 +289,126 @@
   overflow: hidden;
 }
 
+/* --- sections ------------------------------------------------------------ */
+
+.b-section { padding-block: 38px 34px; }
+
+.b-h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+}
+
+/* --- the seven steps ----------------------------------------------------
+   Three tight columns, so all seven rows fit on one screen and the section is
+   read rather than scrolled through.
+   ------------------------------------------------------------------------- */
+
+.b-step {
+  display: grid;
+  grid-template-columns: 24px 100px 1fr;
+  gap: 20px;
+  align-items: baseline;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.b-step:last-child { border-bottom: 0; }
+
+.b-num {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+
+.b-step-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--bone);
+}
+
+.b-step-body {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.8;
+  color: var(--body);
+}
+
+/* --- the memory claim ---------------------------------------------------- */
+
+.b-statement { border-top: 1px solid var(--line); }
+.b-statement p {
+  max-width: 560px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.8;
+  color: var(--body);
+}
+
+/* --- footer -------------------------------------------------------------- */
+
+.b-footer {
+  border-top: 1px solid var(--line);
+  padding-block: 26px;
+}
+.b-footer .b-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.b-foot-line {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.8;
+  color: var(--body);
+}
+
+.b-foot-mark {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--bone);
+}
+
+.b-foot-date {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.8;
+  color: var(--dim);
+}
+
+.brand :focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
 /* --- the legal and confirmation pages ----------------------------------- */
 
 .b-legal { padding-block: 34px 60px; }
 
 .b-legal-h1 {
   margin-top: 34px;
-  font-size: 26px;
+  font-size: 1.5rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--bone);
 }
 
 .b-legal-h2 {
   margin-top: 34px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   color: var(--bone);
 }
 
@@ -387,11 +416,11 @@
 .b-legal p,
 .b-legal li {
   max-width: 62ch;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   line-height: 1.9;
-  color: var(--grey);
+  color: var(--body);
 }
 
 .b-legal p { margin-top: 14px; }
@@ -407,13 +436,10 @@
 
 .b-legal-back { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
 
-/* --- mobile ------------------------------------------------------------- */
-
 /* --- mobile -------------------------------------------------------------- */
 
 @media (max-width: 640px) {
   .brand { --pad: 20px; }
-  .b-display { font-size: 34px; }
   .b-signup-row { flex-direction: column; }
   .b-signup-row button { padding-inline: 16px; }
   /* number and label on one line, the description under them */

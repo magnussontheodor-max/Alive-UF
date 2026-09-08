@@ -17,14 +17,15 @@ export const contentType = "image/png";
 // in the wrong typeface beats no share card at all.
 // ---------------------------------------------------------------------------
 
-const BLACK = "#08090A";
-const GREEN = "#24F08B";
-const GREEN_INK = "#04150C";
+const PAGE = "#262B31";
+const SLAB = "#8098AC";
+const SLAB_INK = "#16222E";
+const BONE = "#F0F2F3";
 
 async function loadFont(): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(
-      "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap",
       { headers: { "user-agent": "Mozilla/5.0" } }
     ).then((response) => response.text());
 
@@ -48,7 +49,7 @@ export default async function OpengraphImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          background: BLACK,
+          background: PAGE,
         }}
       >
         <div style={{ display: "flex", padding: "48px 64px 0" }}>
@@ -57,7 +58,7 @@ export default async function OpengraphImage() {
               fontSize: 28,
               fontWeight: 700,
               letterSpacing: 6,
-              color: GREEN,
+              color: BONE,
               textTransform: "uppercase",
             }}
           >
@@ -73,7 +74,7 @@ export default async function OpengraphImage() {
             flex: 1,
             margin: "40px 0 0",
             padding: "56px 64px",
-            background: GREEN,
+            background: SLAB,
           }}
         >
           <div
@@ -81,7 +82,7 @@ export default async function OpengraphImage() {
               fontSize: 22,
               fontWeight: 700,
               letterSpacing: 6,
-              color: GREEN_INK,
+              color: SLAB_INK,
               opacity: 0.7,
               textTransform: "uppercase",
             }}
@@ -95,7 +96,7 @@ export default async function OpengraphImage() {
               lineHeight: 1,
               fontWeight: 700,
               letterSpacing: -2,
-              color: GREEN_INK,
+              color: SLAB_INK,
               textTransform: "uppercase",
               display: "flex",
               flexDirection: "column",
@@ -112,7 +113,7 @@ export default async function OpengraphImage() {
               lineHeight: 1.6,
               fontWeight: 700,
               letterSpacing: 2,
-              color: GREEN_INK,
+              color: SLAB_INK,
               opacity: 0.78,
               textTransform: "uppercase",
             }}
@@ -125,7 +126,7 @@ export default async function OpengraphImage() {
     {
       ...size,
       fonts: font
-        ? [{ name: "Chakra Petch", data: font, weight: 700, style: "normal" }]
+        ? [{ name: "Inter", data: font, weight: 700, style: "normal" }]
         : undefined,
     }
   );

@@ -129,27 +129,42 @@ lives at `/dashboard` under `app/(app)`. The app group carries `force-dynamic`
 because every page reads one founder's memory, while the pre-launch page reads
 nothing and is statically prerendered.
 
-It is four parts: a nav on black, a full-bleed green block carrying the
-opening, the seven steps of the journey, and the footer. The green runs to
-both edges of the window — a green panel with black margins reads as a banner
-ad, a full-width band reads as architecture — while everything else sits on
-one centred 1100px column.
+It is four parts: a nav, a full-bleed slab carrying the opening, the seven
+steps of the journey, and the footer. The slab runs to both edges of the
+window — a panel with page-coloured margins around it reads as a banner ad, a
+band that reaches both edges reads as architecture — while everything else
+sits on one centred 1100px column.
 
-Green appears in exactly four places: the hero block, the step numbers, and
-the two wordmarks. Nowhere else. On black there are three text colours (bone,
-grey, dim); inside the green block there is one ink at three opacities. There
-are no gradients anywhere.
+Every colour comes from the tokens at the top of the `.brand` block in
+`app/globals.css` and nowhere else. Surfaces are flat; there are no gradients.
+The call to action is the only white element on the page, and is meant to be
+the clearest thing on screen. Inside the slab there is one ink colour at three
+opacities.
 
-**Typography.** One face, Chakra Petch, and every word on the page is
-uppercase. Weight and letter-spacing carry the hierarchy: short labels take
-extreme tracking (0.20–0.26em), running sentences never more than 0.13em, and
-the headline takes *negative* tracking, because large caps need pulling
-together rather than spreading apart. Multi-line text sits at 1.8–1.85
-line-height: å, ä and ö sit above cap height and collide with the line above
-at normal leading.
+**Typography.** One face, Inter, loaded through `next/font/google` rather than
+an `@import` — an `@import` is only fetched after the stylesheet parses, so the
+first paint lands in the system default, and next/font self-hosts the file
+instead of leaving a third-party request on the critical path.
 
-Every colour is a token at the top of the `.brand` block in `app/globals.css`.
-Changing the palette is that one block and nothing else.
+Every word on the page is uppercase, set with `text-transform` in CSS and never
+in the content: the markup stays in sentence case so a screen reader announces
+words instead of spelling out letters, and a search result shows a readable
+title. Weight and letter-spacing carry the hierarchy — short labels take
+0.18–0.24em, running sentences never past 0.12em, and the headline takes
+*negative* tracking, because large caps need pulling together rather than
+spreading apart. Multi-line text sits at 1.8 line-height: å, ä and ö rise above
+cap height and collide with the line above at normal leading.
+
+**Measured contrast.** The palette's one stated requirement — the placeholder
+against the field's fill — is met as specified, at 6.17:1. Three values sit
+below the 4.5:1 AA minimum for small text and are shipped as specified rather
+than quietly altered:
+
+| Element | Colour | Measured | To reach 4.5:1 |
+|---|---|---|---|
+| Nav links, step numbers, footer date | `--dim` `#6B757D` on `--page` | 3.03:1 | `#87939E` |
+| Hero eyebrow | `--slab-ink` at 75% on `--slab` | 3.54:1 | opacity `1` (5.38:1) |
+| Hero subline | `--slab-ink` at 80% on `--slab` | 3.89:1 | opacity `1` (5.38:1) |
 
 `app/fonts/Might.ttf` is no longer referenced. It is licensed for **personal
 use only** — see `app/fonts/Might-LICENCE.txt` — so bringing it back means

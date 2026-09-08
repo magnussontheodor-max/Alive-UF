@@ -26,15 +26,15 @@ function shell(bodyHtml: string): string {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Spark</title>
 </head>
-<body style="margin:0;padding:0;background:#08090A;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#08090A;">
+<body style="margin:0;padding:0;background:#262B31;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#262B31;">
     <tr>
       <td align="center" style="padding:40px 20px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-               style="max-width:520px;background:#08090A;">
+               style="max-width:520px;background:#262B31;">
           <tr>
             <td style="padding-bottom:28px;font-family:Helvetica,Arial,sans-serif;font-size:14px;
-                       font-weight:700;letter-spacing:0.24em;color:#24F08B;text-transform:uppercase;">
+                       font-weight:700;letter-spacing:0.24em;color:#F0F2F3;text-transform:uppercase;">
               Spark.
             </td>
           </tr>
@@ -80,16 +80,16 @@ export function confirmationEmail(signupId: string): BuiltEmail {
   ].join("\n");
 
   const paragraph =
-    "font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.7;color:#B9C0BC;margin:0 0 18px;";
+    "font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.7;color:#A9B4AE;margin:0 0 18px;";
   const small =
-    "font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8A9490;margin:0 0 8px;";
-  const link = "color:#24F08B;text-decoration:underline;";
+    "font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#6B757D;margin:0 0 8px;";
+  const link = "color:#F0F2F3;text-decoration:underline;";
 
   const html = shell(`
           <tr>
             <td>
               <h1 style="font-family:Helvetica,Arial,sans-serif;font-size:22px;line-height:1.25;
-                         font-weight:700;letter-spacing:0.02em;color:#EDE9DD;margin:0 0 20px;
+                         font-weight:700;letter-spacing:0.02em;color:#F0F2F3;margin:0 0 20px;
                          text-transform:uppercase;">
                 Du står på listan.
               </h1>
@@ -103,7 +103,7 @@ export function confirmationEmail(signupId: string): BuiltEmail {
             </td>
           </tr>
           <tr>
-            <td style="padding-top:24px;border-top:1px solid #1B2620;">
+            <td style="padding-top:24px;border-top:1px solid #343A41;">
               <p style="${small}">
                 <a href="${escapeHtml(unsubscribeUrl)}" style="${link}">Ta bort mig från listan</a>
               </p>
@@ -131,7 +131,7 @@ export function backupEmail(rowCount: number, dateLabel: string): BuiltEmail {
           <tr>
             <td>
               <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.7;
-                        color:#B9C0BC;margin:0;">
+                        color:#A9B4AE;margin:0;">
                 Backup av signups, ${escapeHtml(dateLabel)} (Europe/Stockholm).<br>
                 ${rowCount} rader. CSV bifogad.
               </p>
