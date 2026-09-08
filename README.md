@@ -141,8 +141,8 @@ The call to action is the only white element on the page, and is meant to be
 the clearest thing on screen. Inside the slab there is one ink colour at three
 opacities.
 
-**Typography.** One face, Inter, loaded through `next/font/google` rather than
-an `@import` — an `@import` is only fetched after the stylesheet parses, so the
+**Typography.** One face, Chakra Petch, loaded through `next/font/google`
+rather than an `@import` — an `@import` is only fetched after the stylesheet parses, so the
 first paint lands in the system default, and next/font self-hosts the file
 instead of leaving a third-party request on the critical path.
 

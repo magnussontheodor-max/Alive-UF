@@ -25,7 +25,7 @@ const BONE = "#F0F2F3";
 async function loadFont(): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(
-      "https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&display=swap",
       { headers: { "user-agent": "Mozilla/5.0" } }
     ).then((response) => response.text());
 
@@ -126,7 +126,7 @@ export default async function OpengraphImage() {
     {
       ...size,
       fonts: font
-        ? [{ name: "Inter", data: font, weight: 700, style: "normal" }]
+        ? [{ name: "Chakra Petch", data: font, weight: 700, style: "normal" }]
         : undefined,
     }
   );

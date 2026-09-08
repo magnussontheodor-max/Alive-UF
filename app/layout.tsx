@@ -1,21 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Chakra_Petch } from "next/font/google";
 import { siteUrl, umami } from "@/lib/env";
 import "./globals.css";
 
-// The only face on the site: a neutral grotesk. Loaded through
-// next/font/google rather than an @import in CSS — an @import is fetched only
-// after the stylesheet parses, so the page renders in the system default first
-// and next/font self-hosts the file instead of leaving a third-party request
-// on the critical path.
+// The only face on the site. Loaded through next/font/google rather than an
+// @import in CSS — an @import is fetched only after the stylesheet parses, so
+// the page renders in the system default first, and next/font self-hosts the
+// file instead of leaving a third-party request on the critical path.
 //
 // Every word on the page is uppercase, so weight and letter-spacing carry the
 // whole hierarchy: short labels take heavy tracking, running sentences never
 // more than 0.12em.
-const inter = Inter({
+const chakra = Chakra_Petch({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -54,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const analytics = umami();
 
   return (
-    <html lang="sv" className={inter.variable}>
+    <html lang="sv" className={chakra.variable}>
       <body className="font-sans antialiased">
         {children}
 
