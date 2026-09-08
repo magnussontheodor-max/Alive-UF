@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 // with [...] have to be filled in before launch.
 // ---------------------------------------------------------------------------
 
-const UPDATED = "7 september 2026";
+const UPDATED = "8 september 2026";
 
 export default function PrivacyPage() {
   return (
@@ -36,8 +36,14 @@ export default function PrivacyPage() {
 
         <h2 className="b-legal-h2">Vilka vi är</h2>
         <p>
-          Spark drivs av [FÖRETAGSNAMN], organisationsnummer [ORGNR], med adress
-          [ADRESS]. Vi är personuppgiftsansvariga för de uppgifter som beskrivs här.
+          Spark är ett UF-företag — ett övningsföretag inom Ung Företagsamhet — som
+          drivs av elever vid [SKOLANS NAMN] i Stockholm. UF-företag registreras hos
+          Ung Företagsamhet och inte hos Bolagsverket, och har därför inget
+          organisationsnummer. Vårt UF-företags-ID är [UF-ID].
+        </p>
+        <p>
+          Eftersom ett UF-företag inte är en egen juridisk person är det vi som driver
+          företaget som är personuppgiftsansvariga för de uppgifter som beskrivs här.
           Du når oss på <a className="b-underline" href="mailto:[KONTAKT@DOMÄN]">[KONTAKT@DOMÄN]</a>.
         </p>
 
@@ -83,23 +89,21 @@ export default function PrivacyPage() {
           Ber du oss radera tidigare gör vi det direkt.
         </p>
 
+        <h2 className="b-legal-h2">När UF-året tar slut</h2>
+        <p>
+          Ett UF-företag avvecklas i juni. Om vi då inte fortsätter driva Spark i någon
+          annan form raderar vi alla uppgifter vi samlat in. Fortsätter vi, hör vi av
+          oss innan uppgifterna förs över och du får möjlighet att säga nej.
+        </p>
+
         <h2 className="b-legal-h2">Vilka som får se dem</h2>
         <p>
           Vi säljer inte uppgifter och delar dem inte för någon annans marknadsföring.
-          De behandlas av de leverantörer vi använder för att driva tjänsten, som
-          personuppgiftsbiträden åt oss:
+          De behandlas av Supabase (databasen) och Brevo (bekräftelsemejlet) som
+          personuppgiftsbiträden åt oss, båda med lagring inom EU. Sidan driftas av
+          Vercel, ett amerikanskt bolag, där viss behandling kan ske utanför EU med
+          stöd av EU-kommissionens standardavtalsklausuler.
         </p>
-        <ul className="b-legal-list">
-          <li>
-            <strong>Supabase</strong> — databasen där anmälan lagras. Servrar inom EU.
-          </li>
-          <li>
-            <strong>Brevo</strong> — utskicket av bekräftelsemejlet. Servrar inom EU.
-          </li>
-          <li>
-            <strong>Vercel</strong> — driften av själva webbplatsen.
-          </li>
-        </ul>
         <p>
           Vår besöksstatistik är cookiefri och kopplas inte till dig som person. Därför
           har den här sidan ingen cookiebanner: vi sätter inga cookies som kräver ditt
@@ -129,9 +133,15 @@ export default function PrivacyPage() {
           <li>få ut dina uppgifter i ett maskinläsbart format (dataportabilitet)</li>
         </ul>
         <p>
-          Hör av dig till{" "}
-          <a className="b-underline" href="mailto:[KONTAKT@DOMÄN]">[KONTAKT@DOMÄN]</a> så
-          svarar vi inom 30 dagar.
+          Vill du utöva någon av rättigheterna mejlar du{" "}
+          <a className="b-underline" href="mailto:[KONTAKT@DOMÄN]">[KONTAKT@DOMÄN]</a>. Vi
+          svarar inom en månad.
+        </p>
+
+        <h2 className="b-legal-h2">Ålder</h2>
+        <p>
+          Du behöver vara minst 13 år för att anmäla dig. Är du yngre ber vi dig låta
+          en vårdnadshavare göra det åt dig.
         </p>
 
         <h2 className="b-legal-h2">Klagomål</h2>
@@ -146,8 +156,8 @@ export default function PrivacyPage() {
 
         <h2 className="b-legal-h2">Ändringar</h2>
         <p>
-          Ändrar vi den här policyn uppdaterar vi datumet högst upp. Är ändringen
-          väsentlig hör vi av oss till dig som står på listan.
+          Ändrar vi något väsentligt i den här policyn mejlar vi dig innan ändringen
+          börjar gälla. Datumet högst upp visar när den senast uppdaterades.
         </p>
 
         <p className="b-legal-back">
