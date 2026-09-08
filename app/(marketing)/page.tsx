@@ -31,10 +31,7 @@ export default function BrandPage() {
               medgrundare.
             </h1>
 
-            <p className="b-subline mt-5">
-              Från första idén till något människor faktiskt vill ha. Spark gör jobbet med dig
-              — research, validering, produkt.
-            </p>
+            <p className="b-subline mt-5">Din idé. Spark gör resten.</p>
 
             <div className="mt-[26px]">
               <SignupForm />

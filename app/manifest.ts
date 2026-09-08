@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Spark — din AI-medgrundare",
     short_name: "Spark",
     description:
-      "Spark hjälper dig från första idén till något människor faktiskt vill ha.",
+      "Spark hjälper dig från idé till validerad möjlighet och första digitala produkt.",
     lang: "sv",
     start_url: "/",
     display: "standalone",

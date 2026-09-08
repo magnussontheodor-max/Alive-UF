@@ -118,7 +118,7 @@ export default async function OpengraphImage() {
               textTransform: "uppercase",
             }}
           >
-            Från första idén till något människor faktiskt vill ha.
+            Din idé. Spark gör resten.
           </div>
         </div>
       </div>
