@@ -1,22 +1,29 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
 @theme {
-  --color-page: #262B31;
-  --color-panel: #2B3138;
-  --color-slab: #8098AC;
-  --color-slabink: #16222E;
-  --color-bone: #F0F2F3;
-  --color-body: #A9B4AE;
-  --color-dim: #6B757D;
-  --color-line: #343A41;
-  --color-linesoft: #2E343A;
-  --color-ok: #6FCF97;
-  --color-warn: #E8C468;
-  --color-bad: #E88068;
+  /* Färgerna pekar på tokenlagret så att designläget kan skriva över dem. */
+  --color-page: var(--page);
+  --color-panel: var(--panel);
+  --color-panel2: var(--panel-2);
+  --color-slab: var(--slab);
+  --color-slabink: var(--slab-ink);
+  --color-bone: var(--bone);
+  --color-body: var(--body);
+  --color-dim: var(--dim);
+  --color-line: var(--line);
+  --color-linesoft: var(--line-soft);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --color-raised: var(--surface-raised);
 
-  --radius-sharp: 3px;
+  /* Ett enda steg styr varje avståndsverktyg: p-, gap-, m-, w-, h- … */
+  --spacing: calc(0.25rem * var(--space));
 
-  --font-sans: var(--font-chakra), ui-sans-serif, system-ui, sans-serif;
+  --radius-sharp: var(--radius);
+
+  --font-sans: var(--font-body), var(--font-chakra), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -25,11 +32,27 @@
 
 html,
 body {
-  background: var(--color-page);
-  color: var(--color-body);
-  font-family: var(--font-sans);
+  background: var(--page);
+  color: var(--body);
+  font-family: var(--font-body), var(--font-chakra), ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
+  font-size: calc(14px * var(--scale));
+  line-height: var(--lh-body);
+  letter-spacing: var(--track-body);
+  text-transform: var(--case-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Rubriker får sin egen familj och sin egen spärr. */
+h1, h2, h3 {
+  font-family: var(--font-display), var(--font-chakra), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: var(--track-head);
+  text-transform: none;
+}
+
+/* Versalläget i brödtexten ska inte slå igenom på fält man skriver i. */
+input, textarea, button {
+  text-transform: none;
 }
 
 ::selection {
@@ -146,4 +169,121 @@ body {
   .rise, .fade, .expand, .pulsedot, .caret {
     animation: none !important;
   }
+}
+
+
+/* ——— Linjetjocklek ur tokenlagret ———
+   Tailwind skriver 1px direkt i sina border-verktyg. De här raderna
+   ligger senare i filen och tar över med samma specificitet. */
+.border { border-width: var(--border-width); }
+.border-t { border-top-width: var(--border-width); }
+.border-b { border-bottom-width: var(--border-width); }
+.border-l { border-left-width: var(--border-width); }
+.border-r { border-right-width: var(--border-width); }
+.border-b-0 { border-bottom-width: 0; }
+.border-l-2 { border-left-width: calc(var(--border-width) * 2); }
+.border-t-2 { border-top-width: calc(var(--border-width) * 2); }
+
+/* Hairline-hjälparna i prototypen läser samma token. */
+.hair { border: var(--border-width) solid var(--line); border-radius: var(--radius); }
+.hair-soft { border: var(--border-width) solid var(--line-soft); border-radius: var(--radius); }
+
+.eyebrow {
+  font-size: var(--fs-10);
+  letter-spacing: var(--track-label-wide);
+  line-height: var(--lh-tight);
+}
+.label-caps { letter-spacing: var(--track-label); }
+
+/* ——— Designläget ———
+   Bara markeringar och breddläge. Ingenting här påverkar produktionsvyn
+   när designläget är avstängt, och allt kan raderas med mappen. */
+:root[data-design-on] [data-section] {
+  position: relative;
+}
+:root[data-design-on] [data-section]:hover {
+  outline: 1px solid #5B9DD9;
+  outline-offset: 2px;
+}
+:root[data-design-on] [data-section]:hover::after {
+  content: attr(data-section-name);
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  transform: translateY(-100%);
+  background: #5B9DD9;
+  color: #0B1520;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px 3px 0 0;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 60;
+}
+/* Markering när man hovrar raden i panelens sektionslista. */
+:root[data-design-hover="poangmatare"] [data-section="poangmatare"],
+:root[data-design-hover="nastasteg"] [data-section="nastasteg"],
+:root[data-design-hover="sedansist"] [data-section="sedansist"],
+:root[data-design-hover="pulsen"] [data-section="pulsen"],
+:root[data-design-hover="toppen"] [data-section="toppen"],
+:root[data-design-hover="delarna"] [data-section="delarna"],
+:root[data-design-hover="fastak"] [data-section="fastak"],
+:root[data-design-hover="forslag"] [data-section="forslag"] {
+  outline: 1px solid #5B9DD9;
+  outline-offset: 2px;
+}
+
+/* Breddläge: krymper innehållsytan utan att fönstret ändras. */
+:root[data-design-vp] [data-shell="root"] {
+  max-width: var(--design-vp);
+  margin-inline: auto;
+  outline: 1px dashed #3C4753;
+}
+
+/* Sidomenyn överst i stället för till vänster. Bara på breda vyer —
+   på små skärmar gäller prototypens egen mobilmeny. */
+@media (min-width: 1024px) {
+  :root[data-nav="top"] [data-shell="root"] {
+    flex-direction: column;
+  }
+  :root[data-nav="top"] [data-shell="sidebar"] {
+    position: static;
+    width: 100%;
+    flex: 0 0 auto;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(var(--spacing) * 4);
+    border-right: 0;
+    border-bottom: var(--border-width) solid var(--line);
+    padding-inline: calc(var(--spacing) * 5);
+  }
+  :root[data-nav="top"] [data-shell="sidebar"] > *:first-child {
+    border-bottom: 0;
+    padding: calc(var(--spacing) * 3) 0;
+  }
+  :root[data-nav="top"] [data-shell="sidebar"] nav {
+    flex-direction: row;
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+  }
+  :root[data-nav="top"] [data-shell="sidebar"] nav a {
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+    white-space: nowrap;
+  }
+  :root[data-nav="top"] [data-shell="sidebar"] nav a > span:first-child {
+    display: none;
+  }
+  :root[data-nav="top"] [data-shell="sidebar"] > *:last-child {
+    margin-left: auto;
+    border-top: 0;
+    padding: calc(var(--spacing) * 2) 0;
+  }
+
+  /* Variant a är utgångsläget. Designläget skriver över per grupp. */
+  [data-variant] { display: none; }
+  [data-variant="a"] { display: contents; }
 }

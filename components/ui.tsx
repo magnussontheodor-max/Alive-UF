@@ -15,14 +15,14 @@ export function SourceChip({
   return (
     <span
       title={kalla.detail}
-      className={`inline-flex max-w-full items-start gap-1.5 border px-1.5 py-[3px] text-[10px] leading-[1.35] rounded-[3px] ${
+      className={`inline-flex max-w-full items-start gap-1.5 border px-1.5 py-[3px] text-[length:var(--fs-10)] leading-[var(--lh-tight)] rounded-[var(--radius)] ${
         ton === "slab"
           ? "border-slab/40 text-slab"
           : "border-line text-dim"
       }`}
     >
       <Database size={9} strokeWidth={2.2} className="mt-[2px] shrink-0 opacity-70" />
-      <span className="min-w-0 tracking-[0.06em]">
+      <span className="min-w-0 tracking-[var(--track-body)]">
         {kalla.origin} · {kalla.date}
       </span>
     </span>
@@ -93,11 +93,11 @@ export function PageTitle({
   return (
     <header className="mb-7">
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h1 className="mt-2.5 text-[26px] font-bold leading-[1.1] tracking-[0.02em] text-bone uppercase">
+      <h1 className="mt-2.5 text-[length:var(--fs-26)] font-bold leading-[var(--lh-head)] tracking-[var(--track-head)] text-bone uppercase">
         {titel}
       </h1>
       {ingress ? (
-        <p className="mt-3 max-w-[64ch] text-[13.5px] leading-[1.65] text-body">
+        <p className="mt-3 max-w-[64ch] text-[length:var(--fs-13-5)] leading-[var(--lh-relaxed)] text-body">
           {ingress}
         </p>
       ) : null}
@@ -118,7 +118,7 @@ export function Panel({
   const Tag = as;
   return (
     <Tag
-      className={`border border-line bg-panel/55 rounded-[3px] ${className}`}
+      className={`border border-line bg-panel/55 rounded-[var(--radius)] ${className}`}
     >
       {children}
     </Tag>
@@ -134,7 +134,7 @@ export function PanelHead({
 }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-linesoft px-4 py-2.5">
-      <h2 className="label-caps text-[10px] tracking-[0.14em] text-dim">
+      <h2 className="label-caps text-[length:var(--fs-10)] tracking-[var(--track-label-wide)] text-dim">
         {titel}
       </h2>
       {hoger}
@@ -161,7 +161,7 @@ export function Bar({
   }[ton];
   return (
     <div
-      className="w-full bg-linesoft overflow-hidden rounded-[1px]"
+      className="w-full bg-linesoft overflow-hidden rounded-[var(--radius-xs)]"
       style={{ height: hojd }}
     >
       <div
@@ -189,9 +189,9 @@ export function Knapp({
   title?: string;
 }) {
   const bas =
-    "inline-flex items-center justify-center gap-2 rounded-[3px] px-3.5 py-2 text-[11px] label-caps tracking-[0.12em] transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center gap-2 rounded-[var(--radius)] px-3.5 py-2 text-[length:var(--fs-11)] label-caps tracking-[var(--track-label)] transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed";
   const stil = {
-    primar: "bg-slab text-slabink hover:bg-[#8FA6B8]",
+    primar: "bg-slab text-slabink hover:bg-[var(--slab-hover)]",
     sekundar: "border border-line text-body hover:border-slab/60 hover:text-bone",
     tyst: "text-dim hover:text-body",
   }[variant];
@@ -225,7 +225,7 @@ export function Marke({
   }[ton];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 border ${stil} rounded-[3px] px-2 py-[3px] text-[9.5px] label-caps tracking-[0.13em] whitespace-nowrap`}
+      className={`inline-flex items-center gap-1.5 border ${stil} rounded-[var(--radius)] px-2 py-[3px] text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label)] whitespace-nowrap`}
     >
       {children}
     </span>

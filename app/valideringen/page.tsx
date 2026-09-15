@@ -52,13 +52,13 @@ export default function Valideringen() {
           },
         ].map((k) => (
           <div key={k.e} className="rise bg-panel/55 px-5 py-5">
-            <div className="text-[30px] font-bold leading-none tabular-nums text-bone">
+            <div className="text-[length:var(--fs-30)] font-bold leading-none tabular-nums text-bone">
               {k.v}
             </div>
-            <div className="mt-2 text-[11px] label-caps tracking-[0.11em] text-slab">
+            <div className="mt-2 text-[length:var(--fs-11)] label-caps tracking-[var(--track-label-tight)] text-slab">
               {k.e}
             </div>
-            <p className="mt-2.5 text-[11.5px] leading-[1.55] text-dim">{k.b}</p>
+            <p className="mt-2.5 text-[length:var(--fs-11-5)] leading-[var(--lh-tight)] text-dim">{k.b}</p>
           </div>
         ))}
       </div>
@@ -75,8 +75,8 @@ export default function Valideringen() {
             ["Period", outreach.period],
           ].map(([k, v]) => (
             <div key={k} className="bg-panel/55 px-5 py-4">
-              <div className="text-[9.5px] label-caps tracking-[0.12em] text-dim">{k}</div>
-              <p className="mt-1.5 text-[12px] leading-[1.55] text-body">{v}</p>
+              <div className="text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label)] text-dim">{k}</div>
+              <p className="mt-1.5 text-[length:var(--fs-12)] leading-[var(--lh-tight)] text-body">{v}</p>
             </div>
           ))}
         </div>
@@ -99,13 +99,13 @@ export default function Valideringen() {
                         ton === "ok" ? "text-ok" : ton === "bad" ? "text-bad" : "text-warn"
                       }`}
                     />
-                    <h3 className="max-w-[70ch] text-[13.5px] leading-[1.5] text-bone">
+                    <h3 className="max-w-[70ch] text-[length:var(--fs-13-5)] leading-[var(--lh-tight)] text-bone">
                       {a.text}
                     </h3>
                   </div>
                   <Marke ton={ton}>{a.status}</Marke>
                 </div>
-                <p className="mt-2.5 max-w-[80ch] pl-[26px] text-[12px] leading-[1.65] text-body">
+                <p className="mt-2.5 max-w-[80ch] pl-[26px] text-[length:var(--fs-12)] leading-[var(--lh-relaxed)] text-body">
                   {a.underlag}
                 </p>
                 <div className="mt-2.5 pl-[26px]">
@@ -120,7 +120,7 @@ export default function Valideringen() {
       <div>
         <div className="mb-3 flex items-baseline justify-between">
           <Eyebrow>Svaren · ordagrant</Eyebrow>
-          <span className="text-[10px] text-dim">
+          <span className="text-[length:var(--fs-10)] text-dim">
             2 av 6 avvisar. Det är underlaget, inte ett urval.
           </span>
         </div>
@@ -128,14 +128,14 @@ export default function Valideringen() {
           {replies.map((r) => (
             <article
               key={r.id}
-              className="rise flex flex-col border border-line bg-panel/55 rounded-[3px]"
+              className="rise flex flex-col border border-line bg-panel/55 rounded-[var(--radius)]"
             >
               <div className="flex items-start justify-between gap-3 border-b border-linesoft px-4 py-3">
                 <div className="min-w-0">
-                  <h3 className="truncate text-[12.5px] font-semibold text-bone">
+                  <h3 className="truncate text-[length:var(--fs-12-5)] font-semibold text-bone">
                     {r.person}
                   </h3>
-                  <p className="mt-0.5 truncate text-[11px] text-dim">
+                  <p className="mt-0.5 truncate text-[length:var(--fs-11)] text-dim">
                     {r.roll} · {r.foretag}
                   </p>
                 </div>
@@ -143,20 +143,20 @@ export default function Valideringen() {
               </div>
               <div className="flex-1 px-4 py-4">
                 <Quote size={11} strokeWidth={2.4} className="mb-2.5 text-slab" />
-                <blockquote className="text-[12.5px] leading-[1.7] text-body">
+                <blockquote className="text-[length:var(--fs-12-5)] leading-[var(--lh-relaxed)] text-body">
                   {r.citat}
                 </blockquote>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-2 border-t border-linesoft px-4 py-2.5">
-                <span className="text-[10.5px] text-dim">
+                <span className="text-[length:var(--fs-10-5)] text-dim">
                   {r.ort} · {r.anstallda} anställda · {r.datum}
                 </span>
                 {r.prisangivelse ? (
-                  <span className="text-[10.5px] tabular-nums text-slab">
+                  <span className="text-[length:var(--fs-10-5)] tabular-nums text-slab">
                     Angav {r.prisangivelse} kr/mån
                   </span>
                 ) : (
-                  <span className="text-[10.5px] text-dim">Ingen prisangivelse</span>
+                  <span className="text-[length:var(--fs-10-5)] text-dim">Ingen prisangivelse</span>
                 )}
               </div>
             </article>
@@ -169,34 +169,34 @@ export default function Valideringen() {
         <div className="px-5 py-5">
           <div className="flex flex-wrap items-end gap-8">
             <div>
-              <div className="text-[10px] label-caps tracking-[0.12em] text-dim">
+              <div className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-dim">
                 Vad kunderna sa
               </div>
               <div className="mt-2 flex items-baseline gap-2">
                 {priceEvidence.angivnaPriser.map((p) => (
                   <span
                     key={p}
-                    className="border border-ok/40 px-2.5 py-1 text-[13px] tabular-nums text-ok rounded-[3px]"
+                    className="border border-ok/40 px-2.5 py-1 text-[length:var(--fs-13)] tabular-nums text-ok rounded-[var(--radius)]"
                   >
                     {p} kr
                   </span>
                 ))}
               </div>
-              <div className="mt-2.5 text-[11px] text-dim">
+              <div className="mt-2.5 text-[length:var(--fs-11)] text-dim">
                 Median {priceEvidence.median} kr · 3 av 4 svarande
               </div>
             </div>
             <div className="h-10 w-px bg-line" />
             <div>
-              <div className="text-[10px] label-caps tracking-[0.12em] text-dim">
+              <div className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-dim">
                 Ditt pris
               </div>
               <div className="mt-2">
-                <span className="border border-bad/40 px-2.5 py-1 text-[13px] tabular-nums text-bad rounded-[3px]">
+                <span className="border border-bad/40 px-2.5 py-1 text-[length:var(--fs-13)] tabular-nums text-bad rounded-[var(--radius)]">
                   {priceEvidence.dittPris} kr
                 </span>
               </div>
-              <div className="mt-2.5 text-[11px] text-bad">
+              <div className="mt-2.5 text-[length:var(--fs-11)] text-bad">
                 {priceEvidence.faktor} för högt
               </div>
             </div>
@@ -209,27 +209,27 @@ export default function Valideringen() {
 
       <Panel className="rise border-warn/35">
         <div className="border-b border-warn/20 px-5 py-2.5">
-          <span className="text-[10px] label-caps tracking-[0.16em] text-warn">
+          <span className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label-wide)] text-warn">
             Domen · steg 06
           </span>
         </div>
         <div className="px-5 py-6">
-          <h2 className="text-[34px] font-bold leading-none tracking-[0.04em] text-warn uppercase">
+          <h2 className="text-[length:var(--fs-34)] font-bold leading-none tracking-[var(--track-head)] text-warn uppercase">
             {verdict.beslut}
           </h2>
           <div className="mt-5 max-w-[74ch] space-y-3">
-            <p className="text-[14px] leading-[1.7] text-bone">{verdict.sammanfattning}</p>
-            <p className="text-[14px] leading-[1.7] text-bone">{verdict.invandning}</p>
+            <p className="text-[length:var(--fs-14)] leading-[var(--lh-relaxed)] text-bone">{verdict.sammanfattning}</p>
+            <p className="text-[length:var(--fs-14)] leading-[var(--lh-relaxed)] text-bone">{verdict.invandning}</p>
           </div>
-          <p className="mt-5 border-l-2 border-warn/50 pl-4 text-[15px] leading-[1.6] text-bone">
+          <p className="mt-5 border-l-2 border-warn/50 pl-4 text-[length:var(--fs-15)] leading-[var(--lh-body)] text-bone">
             {verdict.atgard}
           </p>
-          <p className="mt-4 max-w-[80ch] text-[12.5px] leading-[1.7] text-body">
+          <p className="mt-4 max-w-[80ch] text-[length:var(--fs-12-5)] leading-[var(--lh-relaxed)] text-body">
             {verdict.detalj}
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <SourceChip kalla={verdict.kalla} />
-            <span className="text-[11px] text-dim">{verdict.spärr}</span>
+            <span className="text-[length:var(--fs-11)] text-dim">{verdict.spärr}</span>
           </div>
         </div>
       </Panel>

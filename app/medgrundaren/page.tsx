@@ -46,7 +46,7 @@ function BlockView({
 
   if (block.typ === "text") {
     return (
-      <p className="max-w-[68ch] text-[13.5px] leading-[1.7] text-body">
+      <p className="max-w-[68ch] text-[length:var(--fs-13-5)] leading-[var(--lh-relaxed)] text-body">
         {visat}
         {animera && !klar ? <span className="caret" /> : null}
       </p>
@@ -57,11 +57,11 @@ function BlockView({
     return (
       <figure className="fade max-w-[68ch] border-l-2 border-slab/45 bg-page/40 py-3 pl-4 pr-3">
         <Quote size={11} strokeWidth={2.4} className="mb-2 text-slab" />
-        <blockquote className="text-[13px] leading-[1.7] text-bone italic">
+        <blockquote className="text-[length:var(--fs-13)] leading-[var(--lh-relaxed)] text-bone italic">
           {visat}
           {animera && !klar ? <span className="caret" /> : null}
         </blockquote>
-        <figcaption className="mt-2.5 text-[10.5px] text-dim">{block.av}</figcaption>
+        <figcaption className="mt-2.5 text-[length:var(--fs-10-5)] text-dim">{block.av}</figcaption>
       </figure>
     );
   }
@@ -72,7 +72,7 @@ function BlockView({
         {block.punkter.map((p, i) => (
           <li
             key={i}
-            className="rise flex gap-3 border border-linesoft bg-page/40 px-3.5 py-2.5 text-[12.5px] leading-[1.6] text-body"
+            className="rise flex gap-3 border border-linesoft bg-page/40 px-3.5 py-2.5 text-[length:var(--fs-12-5)] leading-[var(--lh-body)] text-body"
             style={{ animationDelay: `${i * 90}ms` }}
           >
             <span className="mt-[9px] h-px w-3 shrink-0 bg-slab" />
@@ -87,11 +87,11 @@ function BlockView({
     <div className="rise max-w-[68ch] border border-slab/40 bg-slab/[0.07] px-4 py-3.5">
       <div className="flex items-center gap-2 text-slab">
         <Wrench size={12} strokeWidth={2.3} />
-        <span className="text-[10px] label-caps tracking-[0.14em]">{block.rubrik}</span>
+        <span className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label-wide)]">{block.rubrik}</span>
       </div>
       <ul className="mt-3 space-y-1.5">
         {block.rader.map((r, i) => (
-          <li key={i} className="text-[12px] leading-[1.6] text-body">
+          <li key={i} className="text-[length:var(--fs-12)] leading-[var(--lh-body)] text-body">
             {r}
           </li>
         ))}
@@ -99,7 +99,7 @@ function BlockView({
       {block.lank ? (
         <Link
           href={block.lank}
-          className="mt-3.5 inline-flex items-center gap-2 text-[10.5px] label-caps tracking-[0.12em] text-slab transition-opacity hover:opacity-75"
+          className="mt-3.5 inline-flex items-center gap-2 text-[length:var(--fs-10-5)] label-caps tracking-[var(--track-label)] text-slab transition-opacity hover:opacity-75"
         >
           {block.lankText} <ArrowRight size={11} strokeWidth={2.4} />
         </Link>
@@ -127,7 +127,7 @@ function CoMessage({
 
   return (
     <div className="flex gap-3.5">
-      <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center border border-slab/45 text-[9px] font-bold tracking-[0.06em] text-slab">
+      <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center border border-slab/45 text-[length:var(--fs-9)] font-bold tracking-[var(--track-body)] text-slab">
         M
       </div>
       <div className="min-w-0 flex-1 space-y-3.5">
@@ -188,19 +188,19 @@ function Minnet() {
                 className="block px-4 py-3.5 transition-colors duration-200 hover:bg-panel/50"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[12px] label-caps tracking-[0.12em] text-bone">
+                  <span className="text-[length:var(--fs-12)] label-caps tracking-[var(--track-label)] text-bone">
                     {l.namn}
                   </span>
                   <ArrowRight size={11} strokeWidth={2.4} className="text-dim" />
                 </div>
-                <p className="mt-1.5 text-[11.5px] leading-[1.55] text-dim">{l.undertext}</p>
-                <p className="mt-2 text-[11px] text-slab">{l.matt}</p>
+                <p className="mt-1.5 text-[length:var(--fs-11-5)] leading-[var(--lh-tight)] text-dim">{l.undertext}</p>
+                <p className="mt-2 text-[length:var(--fs-11)] text-slab">{l.matt}</p>
               </Link>
             </li>
           ))}
         </ul>
         <div className="border-t border-linesoft px-4 py-3">
-          <p className="text-[10.5px] leading-[1.6] text-dim">
+          <p className="text-[length:var(--fs-10-5)] leading-[var(--lh-body)] text-dim">
             Hela minnet läses inför varje svar. Det är därför medgrundaren kan säga emot
             dig utan att fråga om bakgrunden igen.
           </p>
@@ -210,7 +210,7 @@ function Minnet() {
       <Panel>
         <PanelHead titel="Tonen" />
         <div className="px-4 py-4">
-          <p className="text-[11.5px] leading-[1.65] text-body">
+          <p className="text-[length:var(--fs-11-5)] leading-[var(--lh-relaxed)] text-body">
             Svensk och rak, ingen peppning. En medgrundare som håller med om allt är
             värdelös — den ska döda svaga idéer i stället för att låta dig lägga månader
             på fel sak.
@@ -283,11 +283,11 @@ export default function Medgrundaren() {
       />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_290px]">
-        <div className="flex min-w-0 flex-col border border-line bg-panel/40 rounded-[3px]">
+        <div className="flex min-w-0 flex-col border border-line bg-panel/40 rounded-[var(--radius)]">
         <div className="flex items-center justify-between gap-3 border-b border-linesoft px-5 py-2.5">
           <div className="flex items-center gap-2.5">
             <span className="pulsedot h-1.5 w-1.5 rounded-full bg-ok" />
-            <span className="text-[10px] label-caps tracking-[0.14em] text-dim">
+            <span className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label-wide)] text-dim">
               Läser profilen, hjärnan och spåret
             </span>
           </div>
@@ -298,11 +298,11 @@ export default function Medgrundaren() {
           {items.map((i) =>
             i.roll === "elin" ? (
               <div key={i.id} className="rise flex justify-end">
-                <div className="max-w-[54ch] border border-line bg-[#2F353D] px-3.5 py-2.5">
-                  <div className="mb-1 text-right text-[9px] label-caps tracking-[0.14em] text-dim">
+                <div className="max-w-[54ch] border border-line bg-[var(--surface-raised)] px-3.5 py-2.5">
+                  <div className="mb-1 text-right text-[length:var(--fs-9)] label-caps tracking-[var(--track-label-wide)] text-dim">
                     Elin
                   </div>
-                  <p className="text-[13px] leading-[1.6] text-bone">{i.text}</p>
+                  <p className="text-[length:var(--fs-13)] leading-[var(--lh-body)] text-bone">{i.text}</p>
                 </div>
               </div>
             ) : (
@@ -317,7 +317,7 @@ export default function Medgrundaren() {
 
           {vantar ? (
             <div className="fade flex gap-3.5">
-              <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center border border-slab/45 text-[9px] font-bold text-slab">
+              <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center border border-slab/45 text-[length:var(--fs-9)] font-bold text-slab">
                 M
               </div>
               <div className="flex items-center gap-1.5 pt-2">
@@ -343,13 +343,13 @@ export default function Medgrundaren() {
                 type="button"
                 onClick={() => svaraPa(f)}
                 disabled={vantar}
-                className="border border-line px-3 py-1.5 text-[11.5px] text-body transition-colors duration-200 hover:border-slab/60 hover:text-bone disabled:opacity-40 rounded-[3px]"
+                className="border border-line px-3 py-1.5 text-[length:var(--fs-11-5)] text-body transition-colors duration-200 hover:border-slab/60 hover:text-bone disabled:opacity-40 rounded-[var(--radius)]"
               >
                 {f}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 border border-line bg-page/50 px-3 py-2 rounded-[3px] focus-within:border-slab/50">
+          <div className="flex items-center gap-2 border border-line bg-page/50 px-3 py-2 rounded-[var(--radius)] focus-within:border-slab/50">
             <input
               value={utkast}
               onChange={(e) => setUtkast(e.target.value)}
@@ -357,13 +357,13 @@ export default function Medgrundaren() {
                 if (e.key === "Enter") skicka();
               }}
               placeholder="Skriv till din medgrundare"
-              className="min-w-0 flex-1 bg-transparent text-[13px] text-bone outline-none placeholder:text-dim"
+              className="min-w-0 flex-1 bg-transparent text-[length:var(--fs-13)] text-bone outline-none placeholder:text-dim"
             />
             <button
               type="button"
               onClick={skicka}
               disabled={vantar || utkast.trim().length === 0}
-              className="flex items-center gap-1.5 text-[10px] label-caps tracking-[0.12em] text-dim transition-colors hover:text-slab disabled:opacity-40"
+              className="flex items-center gap-1.5 text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-dim transition-colors hover:text-slab disabled:opacity-40"
             >
               Skicka <CornerDownLeft size={11} strokeWidth={2.4} />
             </button>
@@ -374,7 +374,7 @@ export default function Medgrundaren() {
         <Minnet />
       </div>
 
-      <div className="mt-4 text-[11px] leading-relaxed text-dim">
+      <div className="mt-4 text-[length:var(--fs-11)] leading-relaxed text-dim">
         <Eyebrow>Regeln</Eyebrow>
         <span className="mt-1.5 block max-w-[72ch]">
           Varje samtal slutar med att ett verktyg körs eller att du har en konkret

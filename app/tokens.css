@@ -1,0 +1,78 @@
+/* ————————————————————————————————————————————————————————
+   Tokenlagret. Varje designvärde i prototypen läses härifrån, och
+   designläget skriver till document.documentElement.style — därför
+   syns en ändring direkt utan omrendering.
+
+   Storlekar räknas ur --scale. Avstånd ur --space.
+   ———————————————————————————————————————————————————————— */
+:root {
+  /* —— färg —— */
+  --page: #262B31;
+  --panel: #2B3138;
+  --panel-2: #232830;
+  --slab: #8098AC;
+  --slab-hover: #8FA6B8;
+  --slab-ink: #16222E;
+  --bone: #F0F2F3;
+  --body: #A9B4AE;
+  --dim: #6B757D;
+  --line: #343A41;
+  --line-soft: #2E343A;
+  --ok: #6FCF97;
+  --warn: #E8C468;
+  --bad: #E88068;
+  --surface-raised: #2F353D;
+
+  /* —— typografi —— */
+  --font-display: "Chakra Petch";
+  --font-body: "Chakra Petch";
+  --scale: 1;
+  --track-head: -0.01em;
+  --track-label: 0.12em;
+  --track-body: 0.02em;
+  --lh-body: 1.6;
+  --lh-head: 1.15;
+  --case-body: none;
+
+  /* —— form —— */
+  --radius: 3px;
+  --space: 1;
+  --border-width: 1px;
+  --maxw: 1120px;
+
+  /* —— härledda: spärr —— */
+  --track-label-tight: calc(var(--track-label) - 0.02em);
+  --track-label-wide: calc(var(--track-label) + 0.03em);
+  --track-wordmark: calc(var(--track-label) + 0.1em);
+
+  /* —— härledda: radhöjd —— */
+  --lh-tight: calc(var(--lh-body) - 0.1);
+  --lh-relaxed: calc(var(--lh-body) + 0.07);
+
+  /* —— härledda: radie —— */
+  --radius-xs: calc(var(--radius) / 3);
+
+  /* —— härledda: typskala —— */
+  --fs-9: calc(9px * var(--scale));
+  --fs-9-5: calc(9.5px * var(--scale));
+  --fs-10: calc(10px * var(--scale));
+  --fs-10-5: calc(10.5px * var(--scale));
+  --fs-11: calc(11px * var(--scale));
+  --fs-11-5: calc(11.5px * var(--scale));
+  --fs-12: calc(12px * var(--scale));
+  --fs-12-5: calc(12.5px * var(--scale));
+  --fs-13: calc(13px * var(--scale));
+  --fs-13-5: calc(13.5px * var(--scale));
+  --fs-14: calc(14px * var(--scale));
+  --fs-15: calc(15px * var(--scale));
+  --fs-17: calc(17px * var(--scale));
+  --fs-19: calc(19px * var(--scale));
+  --fs-21: calc(21px * var(--scale));
+  --fs-22: calc(22px * var(--scale));
+  --fs-26: calc(26px * var(--scale));
+  --fs-27: calc(27px * var(--scale));
+  --fs-30: calc(30px * var(--scale));
+  --fs-34: calc(34px * var(--scale));
+  --fs-54: calc(54px * var(--scale));
+  --fs-64: calc(64px * var(--scale));
+}

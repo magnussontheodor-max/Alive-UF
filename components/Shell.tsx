@@ -41,15 +41,15 @@ function ScoreHeader() {
   return (
     <Link
       href="/poangen"
-      className="group flex items-center gap-4 border border-line rounded-[3px] px-3.5 py-2 transition-colors duration-200 hover:border-slab/50"
+      className="group flex items-center gap-4 border border-line rounded-[var(--radius)] px-3.5 py-2 transition-colors duration-200 hover:border-slab/50"
     >
       <div className="flex items-baseline gap-1">
         <CountUp
           from={previous}
           to={total}
-          className={`text-[22px] font-bold leading-none tabular-nums ${tonKlass}`}
+          className={`text-[length:var(--fs-22)] font-bold leading-none tabular-nums ${tonKlass}`}
         />
-        <span className="text-[11px] leading-none text-dim">/ 100</span>
+        <span className="text-[length:var(--fs-11)] leading-none text-dim">/ 100</span>
       </div>
       <div className="hidden w-[196px] sm:block">
         <div className="relative h-[3px] w-full bg-linesoft">
@@ -63,7 +63,7 @@ function ScoreHeader() {
             title={`Taket i den här fasen är ${currentCap}`}
           />
         </div>
-        <div className="mt-2 flex items-center justify-between gap-2 text-[9px] label-caps tracking-[0.1em] text-dim">
+        <div className="mt-2 flex items-center justify-between gap-2 text-[length:var(--fs-9)] label-caps tracking-[var(--track-label-tight)] text-dim">
           <span className="truncate">{niva.namn}</span>
           <span className="shrink-0 text-ok">+{sinceLast}</span>
         </div>
@@ -76,14 +76,14 @@ export function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen bg-page">
+    <div data-shell="root" className="flex min-h-screen bg-page">
       {/* Vänsterkolumn */}
-      <aside className="sticky top-0 hidden h-screen w-[218px] shrink-0 flex-col border-r border-line bg-[#232830] lg:flex">
+      <aside data-shell="sidebar" className="sticky top-0 hidden h-screen w-[218px] shrink-0 flex-col border-r border-line bg-[var(--panel-2)] lg:flex">
         <div className="border-b border-line px-5 py-5">
-          <div className="text-[19px] font-bold tracking-[0.22em] text-bone uppercase">
+          <div className="text-[length:var(--fs-19)] font-bold tracking-[var(--track-wordmark)] text-bone uppercase">
             Spark
           </div>
-          <div className="mt-1.5 text-[10px] leading-relaxed text-dim">
+          <div className="mt-1.5 text-[length:var(--fs-10)] leading-relaxed text-dim">
             AI-medgrundare
           </div>
         </div>
@@ -97,7 +97,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <Link
                 key={n.href}
                 href={n.href}
-                className={`relative flex items-center gap-3 px-5 py-2.5 text-[12px] label-caps tracking-[0.1em] transition-colors duration-200 ${
+                className={`relative flex items-center gap-3 px-5 py-2.5 text-[length:var(--fs-12)] label-caps tracking-[var(--track-label-tight)] transition-colors duration-200 ${
                   aktiv
                     ? "text-bone bg-panel/70"
                     : "text-dim hover:text-body hover:bg-panel/35"
@@ -114,8 +114,8 @@ export function Shell({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="border-t border-line px-5 py-4">
-          <div className="text-[11.5px] font-semibold text-bone">{founder.namn}</div>
-          <div className="mt-1 text-[10px] leading-relaxed text-dim">
+          <div className="text-[length:var(--fs-11-5)] font-semibold text-bone">{founder.namn}</div>
+          <div className="mt-1 text-[length:var(--fs-10)] leading-relaxed text-dim">
             {founder.ort} · {founder.idéKort}
           </div>
         </div>
@@ -125,10 +125,10 @@ export function Shell({ children }: { children: ReactNode }) {
         {/* Sidhuvud — poängen syns på varje sida */}
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-line bg-page/95 px-5 py-3 backdrop-blur-sm lg:px-9">
           <div className="min-w-0">
-            <div className="text-[15px] font-bold tracking-[0.18em] text-bone uppercase lg:hidden">
+            <div className="text-[length:var(--fs-15)] font-bold tracking-[var(--track-label-wide)] text-bone uppercase lg:hidden">
               Spark
             </div>
-            <div className="hidden text-[11px] leading-tight text-dim lg:block">
+            <div className="hidden text-[length:var(--fs-11)] leading-tight text-dim lg:block">
               <span className="text-body">{founder.namn}</span> · steg 05 av 12 ·
               fasen Pröva
             </div>
@@ -145,7 +145,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <Link
                 key={n.href}
                 href={n.href}
-                className={`shrink-0 rounded-[3px] px-2.5 py-1.5 text-[10px] label-caps tracking-[0.1em] transition-colors ${
+                className={`shrink-0 rounded-[var(--radius)] px-2.5 py-1.5 text-[length:var(--fs-10)] label-caps tracking-[var(--track-label-tight)] transition-colors ${
                   aktiv ? "bg-slab text-slabink" : "text-dim"
                 }`}
               >
@@ -156,7 +156,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </nav>
 
         <main key={pathname} className="fade min-w-0 flex-1 px-5 py-7 lg:px-9 lg:py-9">
-          <div className="mx-auto w-full max-w-[1120px]">{children}</div>
+          <div className="mx-auto w-full max-w-[var(--maxw)]">{children}</div>
         </main>
       </div>
     </div>

@@ -39,13 +39,13 @@ export default function Marknaden() {
       <div className="grid gap-px bg-linesoft sm:grid-cols-2 lg:grid-cols-4">
         {marketHeadline.map((h) => (
           <div key={h.enhet} className="rise bg-panel/55 px-5 py-5">
-            <div className="text-[30px] font-bold leading-none tabular-nums text-bone">
+            <div className="text-[length:var(--fs-30)] font-bold leading-none tabular-nums text-bone">
               {h.varde}
             </div>
-            <div className="mt-2 text-[11px] label-caps tracking-[0.11em] text-slab">
+            <div className="mt-2 text-[length:var(--fs-11)] label-caps tracking-[var(--track-label-tight)] text-slab">
               {h.enhet}
             </div>
-            <p className="mt-2.5 text-[11.5px] leading-[1.55] text-dim">{h.beskrivning}</p>
+            <p className="mt-2.5 text-[length:var(--fs-11-5)] leading-[var(--lh-tight)] text-dim">{h.beskrivning}</p>
             <div className="mt-3.5">
               <SourceChip kalla={h.kalla} />
             </div>
@@ -58,27 +58,27 @@ export default function Marknaden() {
           <PanelHead
             titel="Storleksfördelning"
             hoger={
-              <span className="text-[10px] text-dim">{segment.sni}</span>
+              <span className="text-[length:var(--fs-10)] text-dim">{segment.sni}</span>
             }
           />
           <div className="px-5 py-5">
             <div className="space-y-3.5">
               {sizeDistribution.map((d) => (
                 <div key={d.spann} className="grid grid-cols-[124px_minmax(0,1fr)_auto] items-center gap-3.5">
-                  <span className="text-[11.5px] text-body">{d.spann}</span>
+                  <span className="text-[length:var(--fs-11-5)] text-body">{d.spann}</span>
                   <div className="h-[13px] w-full bg-page/60">
                     <div
                       className="h-full bg-slab/85 transition-[width] duration-700"
                       style={{ width: `${(d.antal / max) * 100}%` }}
                     />
                   </div>
-                  <span className="w-[86px] text-right text-[11.5px] tabular-nums text-dim">
+                  <span className="w-[86px] text-right text-[length:var(--fs-11-5)] tabular-nums text-dim">
                     <span className="text-bone">{d.antal}</span> · {d.medianOms}
                   </span>
                 </div>
               ))}
             </div>
-            <p className="mt-5 max-w-[74ch] border-l-2 border-slab/45 pl-3.5 text-[12px] leading-[1.65] text-body">
+            <p className="mt-5 max-w-[74ch] border-l-2 border-slab/45 pl-3.5 text-[length:var(--fs-12)] leading-[var(--lh-relaxed)] text-body">
               197 av 312 har färre än 11 anställda. Det är den halvan som avvisade idén i
               samtalen, och den halvan som drar ner medianomsättningen. Det är också därför
               Spark föreslår att du snävar kundprofilen.
@@ -100,21 +100,21 @@ export default function Marknaden() {
                 ["Okontaktade", `${contactState.okontaktade} företag`],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-3 border-b border-linesoft pb-2.5 last:border-b-0">
-                  <dt className="text-[11px] label-caps tracking-[0.11em] text-dim">{k}</dt>
-                  <dd className="text-[13px] tabular-nums text-bone">{v}</dd>
+                  <dt className="text-[length:var(--fs-11)] label-caps tracking-[var(--track-label-tight)] text-dim">{k}</dt>
+                  <dd className="text-[length:var(--fs-13)] tabular-nums text-bone">{v}</dd>
                 </div>
               ))}
             </dl>
             <div className="mt-4 border border-line bg-page/40 px-3.5 py-3">
               <div className="flex items-baseline justify-between">
-                <span className="text-[11px] label-caps tracking-[0.11em] text-dim">
+                <span className="text-[length:var(--fs-11)] label-caps tracking-[var(--track-label-tight)] text-dim">
                   Svarsfrekvens
                 </span>
-                <span className="text-[19px] font-bold tabular-nums text-ok">
+                <span className="text-[length:var(--fs-19)] font-bold tabular-nums text-ok">
                   {contactState.svarsfrekvens}
                 </span>
               </div>
-              <p className="mt-2 text-[11.5px] leading-[1.6] text-body">
+              <p className="mt-2 text-[length:var(--fs-11-5)] leading-[var(--lh-body)] text-body">
                 Normalt i den här branschen är {contactState.benchmark}. Ditt språk
                 fungerar — det är underlagets storlek som är problemet, inte mejlet.
               </p>
@@ -130,7 +130,7 @@ export default function Marknaden() {
         <PanelHead
           titel="Kundlistan · namngivna företag ur registret"
           hoger={
-            <span className="text-[9.5px] label-caps tracking-[0.11em] text-dim">
+            <span className="text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label-tight)] text-dim">
               Demonstrationsdata
             </span>
           }
@@ -142,7 +142,7 @@ export default function Marknaden() {
                 {["Företag", "Ort", "Omsättning", "Anställda", "Status", "Senast"].map((h) => (
                   <th
                     key={h}
-                    className="px-5 py-2.5 text-[9.5px] label-caps tracking-[0.12em] text-dim"
+                    className="px-5 py-2.5 text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label)] text-dim"
                   >
                     {h}
                   </th>
@@ -155,25 +155,25 @@ export default function Marknaden() {
                   key={c.namn}
                   className="border-b border-linesoft transition-colors duration-150 last:border-b-0 hover:bg-panel/40"
                 >
-                  <td className="px-5 py-3 text-[12.5px] text-bone">{c.namn}</td>
-                  <td className="px-5 py-3 text-[12px] text-body">{c.ort}</td>
-                  <td className="px-5 py-3 text-[12px] tabular-nums text-body">
+                  <td className="px-5 py-3 text-[length:var(--fs-12-5)] text-bone">{c.namn}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-12)] text-body">{c.ort}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-12)] tabular-nums text-body">
                     {c.omsattning}
                   </td>
-                  <td className="px-5 py-3 text-[12px] tabular-nums text-body">
+                  <td className="px-5 py-3 text-[length:var(--fs-12)] tabular-nums text-body">
                     {c.anstallda}
                   </td>
                   <td className="px-5 py-3">
                     <Marke ton={statusTon[c.status]}>{statusText[c.status]}</Marke>
                   </td>
-                  <td className="px-5 py-3 text-[11px] text-dim">{c.notering ?? "—"}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-11)] text-dim">{c.notering ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3">
-          <span className="text-[11px] text-dim">
+          <span className="text-[length:var(--fs-11)] text-dim">
             10 av 312 träffar visas. Resten finns i listan med kontaktuppgifter.
           </span>
           <SourceChip
@@ -191,7 +191,7 @@ export default function Marknaden() {
                 {["Leverantör", "Vad de är", "Prisnivå", "Täcker"].map((h) => (
                   <th
                     key={h}
-                    className="px-5 py-2.5 text-[9.5px] label-caps tracking-[0.12em] text-dim"
+                    className="px-5 py-2.5 text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label)] text-dim"
                   >
                     {h}
                   </th>
@@ -201,10 +201,10 @@ export default function Marknaden() {
             <tbody>
               {competitors.map((k) => (
                 <tr key={k.namn} className="border-b border-linesoft last:border-b-0">
-                  <td className="px-5 py-3 text-[12.5px] text-bone">{k.namn}</td>
-                  <td className="px-5 py-3 text-[12px] text-body">{k.beskrivning}</td>
-                  <td className="px-5 py-3 text-[12px] tabular-nums text-body">{k.prisniva}</td>
-                  <td className="px-5 py-3 text-[12px] text-dim">{k.tacker}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-12-5)] text-bone">{k.namn}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-12)] text-body">{k.beskrivning}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-12)] tabular-nums text-body">{k.prisniva}</td>
+                  <td className="px-5 py-3 text-[length:var(--fs-12)] text-dim">{k.tacker}</td>
                 </tr>
               ))}
             </tbody>
@@ -212,7 +212,7 @@ export default function Marknaden() {
         </div>
         <div className="border-t border-line px-5 py-4">
           <Eyebrow>Luckan</Eyebrow>
-          <p className="mt-2 max-w-[80ch] text-[12.5px] leading-[1.65] text-body">
+          <p className="mt-2 max-w-[80ch] text-[length:var(--fs-12-5)] leading-[var(--lh-relaxed)] text-body">
             {competitionVerdict}
           </p>
           <div className="mt-3">

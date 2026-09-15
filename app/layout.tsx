@@ -3,6 +3,7 @@ import { Chakra_Petch } from "next/font/google";
 import "./globals.css";
 import { DemoProvider } from "@/components/DemoState";
 import { Shell } from "@/components/Shell";
+import { DesignMode } from "@/components/design-mode";
 
 const chakra = Chakra_Petch({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
         <DemoProvider>
           <Shell>{children}</Shell>
         </DemoProvider>
+        <DesignMode />
       </body>
     </html>
   );

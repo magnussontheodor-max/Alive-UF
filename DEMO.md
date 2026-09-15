@@ -134,3 +134,65 @@ Allt. Företagsnamn, personer, citat, siffror och leverantörer är
 demonstrationsdata skriven för att vara trovärdig, inte hämtad. Det finns
 ingen backend, inga API-anrop och ingen databas — all data ligger som typade
 TypeScript-objekt i `/data`. Registertabellen på Marknaden är diskret märkt.
+
+---
+
+## Designläget
+
+Prototypens utseende går att ändra direkt i webbläsaren — färger, typsnitt,
+avstånd, sektionsordning — och exportera. Inget av det syns för en vanlig
+besökare.
+
+**Öppna det** med `Cmd + D` (eller `Ctrl + D`). Det fungerar bara när appen
+körs med `npm run dev`, eller när `?design=1` ligger i adressen på en byggd
+app. Utan något av det gör tangenttryckningen ingenting.
+
+Panelen ligger som ett överlägg till höger och knuffar inte innehållet i
+sidled, så det man ser är hur designen faktiskt ser ut.
+
+### Fem flikar
+
+| Flik | Vad den styr |
+|---|---|
+| Färg | Femton färgtokens med hexfält och färgväljare, fyra färdiga paletter och WCAG-kontrast med röd markering under kravet |
+| Typsnitt | Typsnitt för rubriker och brödtext var för sig, hämtade från Google Fonts när de väljs, plus storlek, spärr per nivå, radhöjd och versalläge |
+| Layout | Avstånd, hörnradie, linjetjocklek, innehållets bredd, sidomeny till vänster eller överst, kompakt eller luftigt, linjer på eller av |
+| Sektioner | Sidans sektioner i ordning — dra för att flytta, ögonikon för att dölja, och variantväljare där det finns flera varianter |
+| Export | Kopiera CSS, ladda ner JSON, importera JSON |
+
+### Exportera ett tema
+
+1. Ändra det du vill i panelen.
+2. Gå till **Export**.
+3. **Kopiera CSS** ger hela `:root`-blocket med nuvarande värden. Klistra in
+   det i `app/tokens.css` för att göra temat till prototypens nya utgångsläge.
+4. **Ladda ner JSON** sparar hela tillståndet — även sektionsordning, dolda
+   sektioner och valda varianter — som `spark-tema.json`. **Importera JSON**
+   läser tillbaka det.
+
+Teman sparas också i webbläsaren under `spark-design`. Väljaren i panelens
+huvud har `Nytt tema`, `Spara`, `Duplicera` och `Ta bort`, och tre teman finns
+från början: Blågrå, Grön och Ljus. **Återställ** går tillbaka till
+utgångsläget.
+
+### Medan du arbetar
+
+- `Cmd + Z` ångrar, `Shift + Cmd + Z` gör om. Historiken håller tjugo steg.
+- **Håll mellanslag** för att tillfälligt se utgångsläget. Släpp för att se
+  ändringen igen.
+- Hovra en sektion på sidan så ritas en kontur med sektionens namn.
+- De fyra knapparna i panelens fot — 390, 768, 1280 och Full — krymper
+  innehållsytan så du ser hur designen beter sig utan att ändra fönstret.
+
+### Varianter som finns att välja mellan
+
+På hemvyn: poängmätaren som **mätare** eller som **ring med dellista**, och
+nästa steg som **stor rubrik** eller som **rad med underlaget framme**. På
+poängvyn: toppen **med förklaring** eller som **kompakt rad**, och de åtta
+delarna som **utfällbar lista** eller som **rutnät**.
+
+### Ta bort designläget
+
+Radera `components/design-mode/` och raden som renderar `<DesignMode />` i
+`app/layout.tsx`. Tokenlagret i `app/tokens.css` stannar — prototypen behöver
+det — och `data-section`-attributen på sidorna är inert markup utan panelen.

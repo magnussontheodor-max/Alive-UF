@@ -32,28 +32,28 @@ function Poangmatare() {
             <CountUp
               from={previous}
               to={total}
-              className={`text-[54px] font-bold leading-none tabular-nums ${ton}`}
+              className={`text-[length:var(--fs-54)] font-bold leading-none tabular-nums ${ton}`}
             />
-            <span className="text-[15px] leading-none text-dim">/ 100</span>
+            <span className="text-[length:var(--fs-15)] leading-none text-dim">/ 100</span>
           </div>
           <div className="pt-1.5">
-            <div className="text-[12px] label-caps tracking-[0.13em] text-bone">
+            <div className="text-[length:var(--fs-12)] label-caps tracking-[var(--track-label)] text-bone">
               {niva.namn}
             </div>
-            <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-ok">
+            <div className="mt-1.5 flex items-center gap-1.5 text-[length:var(--fs-11)] text-ok">
               <TrendingUp size={12} strokeWidth={2.4} />
               <span>+{sinceLast} sedan måndag</span>
             </div>
-            <p className="mt-2.5 max-w-[42ch] text-[12px] leading-[1.6] text-body">
+            <p className="mt-2.5 max-w-[42ch] text-[length:var(--fs-12)] leading-[var(--lh-body)] text-body">
               {niva.sager}
             </p>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[10px] label-caps tracking-[0.12em] text-dim">
+          <div className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-dim">
             {greeting.hälsning}
           </div>
-          <div className="mt-1.5 text-[10px] label-caps tracking-[0.12em] text-slab">
+          <div className="mt-1.5 text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-slab">
             {greeting.läge}
           </div>
         </div>
@@ -68,11 +68,11 @@ function Poangmatare() {
           />
         </div>
         <div className="relative mt-2 h-4">
-          <span className="absolute left-0 top-0 text-[9.5px] label-caps tracking-[0.11em] text-dim">
+          <span className="absolute left-0 top-0 text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label-tight)] text-dim">
             Poängen mäter hur mycket som är bevisat
           </span>
           <span
-            className="absolute top-0 -translate-x-1/2 whitespace-nowrap text-[9.5px] label-caps tracking-[0.11em] text-dim"
+            className="absolute top-0 -translate-x-1/2 whitespace-nowrap text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label-tight)] text-dim"
             style={{ left: `${currentCap}%` }}
           >
             Tak i fasen Pröva · 66
@@ -85,12 +85,12 @@ function Poangmatare() {
           const v = parts[p.nyckel];
           return (
             <div key={p.nyckel} className="bg-panel/55 px-4 py-3">
-              <div className="text-[9.5px] label-caps tracking-[0.12em] text-dim">
+              <div className="text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label)] text-dim">
                 {p.namn}
               </div>
-              <div className="mt-1.5 text-[15px] font-semibold tabular-nums text-bone">
+              <div className="mt-1.5 text-[length:var(--fs-15)] font-semibold tabular-nums text-bone">
                 {v}
-                <span className="text-[11px] text-dim"> / {p.max}</span>
+                <span className="text-[length:var(--fs-11)] text-dim"> / {p.max}</span>
               </div>
               <div className="mt-2">
                 <Bar andel={(v / p.max) * 100} hojd={3} />
@@ -111,12 +111,12 @@ function NastaSteg() {
   return (
     <Panel
       key={currentStep.id}
-      className="rise border-slab/35 bg-[#2B333C]/70"
+      className="rise border-slab/35 bg-[var(--panel)]/70"
     >
       <div className="flex items-center justify-between gap-3 border-b border-slab/20 px-5 py-2.5">
         <div className="flex items-center gap-2.5">
           <Sparkles size={13} strokeWidth={2.2} className="text-slab" />
-          <h2 className="text-[11px] label-caps tracking-[0.16em] text-slab">
+          <h2 className="text-[length:var(--fs-11)] label-caps tracking-[var(--track-label-wide)] text-slab">
             Nästa steg
           </h2>
         </div>
@@ -126,24 +126,24 @@ function NastaSteg() {
               <Check size={9} strokeWidth={3} /> {doneCount} klarade i dag
             </Marke>
           ) : null}
-          <span className="text-[10px] label-caps tracking-[0.12em] text-dim">
+          <span className="text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-dim">
             {currentStep.steg}
           </span>
         </div>
       </div>
 
       <div className="px-5 py-6">
-        <h3 className="max-w-[26ch] text-[27px] font-bold leading-[1.15] tracking-[0.01em] text-bone">
+        <h3 className="max-w-[26ch] text-[length:var(--fs-27)] font-bold leading-[var(--lh-head)] tracking-[var(--track-head)] text-bone">
           {currentStep.rubrik}
         </h3>
-        <p className="mt-3 max-w-[52ch] text-[14px] leading-[1.6] text-body">
+        <p className="mt-3 max-w-[52ch] text-[length:var(--fs-14)] leading-[var(--lh-body)] text-body">
           {currentStep.underrubrik}
         </p>
 
         <div className="mt-6 border-l-2 border-slab/45 pl-4">
           <div className="eyebrow mb-2">Varför</div>
           {currentStep.varfor.map((v, i) => (
-            <p key={i} className="mb-2 max-w-[62ch] text-[12.5px] leading-[1.65] text-body last:mb-0">
+            <p key={i} className="mb-2 max-w-[62ch] text-[length:var(--fs-12-5)] leading-[var(--lh-relaxed)] text-body last:mb-0">
               {v}
             </p>
           ))}
@@ -156,7 +156,7 @@ function NastaSteg() {
               {currentStep.underlag.rader.map((r, i) => (
                 <li
                   key={i}
-                  className="flex gap-2.5 text-[12px] leading-[1.6] text-body"
+                  className="flex gap-2.5 text-[length:var(--fs-12)] leading-[var(--lh-body)] text-body"
                 >
                   <span className="mt-[7px] h-px w-3 shrink-0 bg-dim" />
                   <span>{r}</span>
@@ -193,7 +193,7 @@ function NastaSteg() {
             />
           </Knapp>
           {!sist && currentStep.okning > 0 ? (
-            <span className="ml-auto text-[10px] label-caps tracking-[0.12em] text-dim">
+            <span className="ml-auto text-[length:var(--fs-10)] label-caps tracking-[var(--track-label)] text-dim">
               Ger upp till +{currentStep.okning} poäng
             </span>
           ) : null}
@@ -231,9 +231,9 @@ function SedanSist() {
                 }`}
               />
               <div className="min-w-0 flex-1">
-                <p className="text-[12.5px] leading-[1.55] text-body">{t.text}</p>
+                <p className="text-[length:var(--fs-12-5)] leading-[var(--lh-tight)] text-body">{t.text}</p>
               </div>
-              <span className="shrink-0 text-[10px] whitespace-nowrap text-dim">
+              <span className="shrink-0 text-[length:var(--fs-10)] whitespace-nowrap text-dim">
                 {t.tid}
               </span>
             </li>
@@ -241,7 +241,7 @@ function SedanSist() {
         })}
       </ul>
       <div className="border-t border-linesoft px-4 py-2.5">
-        <span className="text-[10px] leading-relaxed text-dim">
+        <span className="text-[length:var(--fs-10)] leading-relaxed text-dim">
           Spåret skrivs av verktygen. Du rapporterar aldrig.
         </span>
       </div>
@@ -256,7 +256,7 @@ function Pulsen() {
       <PanelHead
         titel="Pulsen"
         hoger={
-          <span className="flex items-center gap-1.5 text-[9.5px] label-caps tracking-[0.12em] text-dim">
+          <span className="flex items-center gap-1.5 text-[length:var(--fs-9-5)] label-caps tracking-[var(--track-label)] text-dim">
             <span className="pulsedot h-1.5 w-1.5 rounded-full bg-ok" />
             14 september
           </span>
@@ -271,12 +271,12 @@ function Pulsen() {
             <li key={s.id} className="border-b border-linesoft px-4 py-4 last:border-b-0">
               <div className="flex items-start gap-2.5">
                 <Ikon size={12} strokeWidth={2.3} className={`mt-[3px] shrink-0 ${ton}`} />
-                <h3 className="text-[12.5px] font-semibold leading-[1.45] text-bone">
+                <h3 className="text-[length:var(--fs-12-5)] font-semibold leading-[var(--lh-tight)] text-bone">
                   {s.rubrik}
                 </h3>
               </div>
-              <p className="mt-2 text-[11.5px] leading-[1.6] text-dim">{s.brod}</p>
-              <p className="mt-2.5 border-l border-slab/40 pl-2.5 text-[11.5px] leading-[1.6] text-body">
+              <p className="mt-2 text-[length:var(--fs-11-5)] leading-[var(--lh-body)] text-dim">{s.brod}</p>
+              <p className="mt-2.5 border-l border-slab/40 pl-2.5 text-[length:var(--fs-11-5)] leading-[var(--lh-body)] text-body">
                 {s.varfor}
               </p>
               <div className="mt-3">
@@ -290,16 +290,142 @@ function Pulsen() {
   );
 }
 
+/* —— Variant b för poängmätaren: ring och lista i stället för mätare —— */
+function PoangmatareRing() {
+  const { total, previous, sinceLast, parts } = useDemo();
+  const niva = levelFor(total);
+  const ton = niva.farg === "ok" ? "text-ok" : niva.farg === "warn" ? "text-warn" : "text-bad";
+  const stroke = niva.farg === "ok" ? "var(--ok)" : niva.farg === "warn" ? "var(--warn)" : "var(--bad)";
+  const omkrets = 2 * Math.PI * 52;
+
+  return (
+    <Panel className="rise">
+      <div className="flex flex-wrap items-center gap-7 px-5 py-6">
+        <div className="relative h-[124px] w-[124px] shrink-0">
+          <svg width="124" height="124" viewBox="0 0 124 124" className="-rotate-90">
+            <circle cx="62" cy="62" r="52" fill="none" stroke="var(--line-soft)" strokeWidth="9" />
+            <circle
+              cx="62"
+              cy="62"
+              r="52"
+              fill="none"
+              stroke={stroke}
+              strokeWidth="9"
+              strokeLinecap="round"
+              strokeDasharray={omkrets}
+              strokeDashoffset={omkrets * (1 - total / 100)}
+              className="transition-[stroke-dashoffset] duration-[900ms] ease-out"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <CountUp from={previous} to={total} className={`text-[length:var(--fs-34)] font-bold leading-none tabular-nums ${ton}`} />
+            <span className="text-[length:var(--fs-10)] text-dim">av 100</span>
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-[length:var(--fs-12)] label-caps tracking-[var(--track-label)] text-bone">
+              {niva.namn}
+            </span>
+            <span className="flex items-center gap-1.5 text-[length:var(--fs-11)] text-ok">
+              <TrendingUp size={12} strokeWidth={2.4} />+{sinceLast} sedan måndag
+            </span>
+          </div>
+          <div className="mt-4 flex flex-col gap-2">
+            {scoreParts.filter((p) => !p.last).map((p) => (
+              <div key={p.nyckel} className="flex items-center gap-3">
+                <span className="w-[118px] shrink-0 text-[length:var(--fs-11)] text-body">{p.namn}</span>
+                <span className="min-w-0 flex-1"><Bar andel={(parts[p.nyckel] / p.max) * 100} hojd={3} /></span>
+                <span className="w-[46px] shrink-0 text-right text-[length:var(--fs-11)] tabular-nums text-dim">
+                  <span className="text-bone">{parts[p.nyckel]}</span>/{p.max}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+/* —— Variant b för nästa steg: en rad med underlaget alltid framme —— */
+function NastaStegRad() {
+  const { currentStep, completeStep, doneCount } = useDemo();
+  const sist = Boolean(currentStep.sist);
+
+  return (
+    <Panel className="rise border-slab/35 bg-[var(--panel)]">
+      <div className="flex flex-wrap items-center gap-4 px-5 py-4">
+        <Sparkles size={14} strokeWidth={2.2} className="shrink-0 text-slab" />
+        <h3 className="min-w-0 flex-1 text-[length:var(--fs-17)] font-bold leading-[var(--lh-head)] text-bone">
+          {currentStep.rubrik}
+        </h3>
+        {doneCount > 0 ? <Marke ton="ok"><Check size={9} strokeWidth={3} /> {doneCount} i dag</Marke> : null}
+        {sist ? (
+          <Link href="/valideringen"><Knapp variant="primar">Öppna domen</Knapp></Link>
+        ) : (
+          <Knapp variant="primar" onClick={completeStep}><Check size={12} strokeWidth={3} /> Klar</Knapp>
+        )}
+      </div>
+      <div className="grid gap-5 border-t border-linesoft px-5 py-4 md:grid-cols-2">
+        <div>
+          <div className="eyebrow mb-2">Varför</div>
+          {currentStep.varfor.map((v, i) => (
+            <p key={i} className="mb-2 text-[length:var(--fs-12)] leading-[var(--lh-relaxed)] text-body last:mb-0">{v}</p>
+          ))}
+        </div>
+        <div>
+          <div className="eyebrow mb-2">{currentStep.underlag.rubrik}</div>
+          <ul className="flex flex-col gap-1.5">
+            {currentStep.underlag.rader.map((r, i) => (
+              <li key={i} className="text-[length:var(--fs-11)] leading-[var(--lh-tight)] text-dim">{r}</li>
+            ))}
+          </ul>
+          <div className="mt-3"><SourceChip kalla={currentStep.underlag.kalla} /></div>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
 export default function Hem() {
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="flex min-w-0 flex-col gap-5">
-        <Poangmatare />
-        <NastaSteg />
-        <SedanSist />
+        <div
+          data-section="poangmatare"
+          data-section-name="Poängmätaren"
+          data-col="huvud"
+          data-col-name="Huvudspalt"
+          data-variant-group="hem-poang"
+          data-variants="a:Mätare|b:Ring och lista"
+        >
+          <div data-variant="a"><Poangmatare /></div>
+          <div data-variant="b"><PoangmatareRing /></div>
+        </div>
+
+        <div
+          data-section="nastasteg"
+          data-section-name="Nästa steg"
+          data-col="huvud"
+          data-col-name="Huvudspalt"
+          data-variant-group="hem-steg"
+          data-variants="a:Stor rubrik|b:Rad med underlag"
+        >
+          <div data-variant="a"><NastaSteg /></div>
+          <div data-variant="b"><NastaStegRad /></div>
+        </div>
+
+        <div data-section="sedansist" data-section-name="Sedan sist" data-col="huvud" data-col-name="Huvudspalt">
+          <SedanSist />
+        </div>
       </div>
-      <div className="min-w-0">
-        <Pulsen />
+
+      <div className="flex min-w-0 flex-col gap-5">
+        <div data-section="pulsen" data-section-name="Pulsen" data-col="sido" data-col-name="Sidospalt">
+          <Pulsen />
+        </div>
       </div>
     </div>
   );
